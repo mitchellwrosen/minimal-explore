@@ -1,4 +1,4 @@
-module Types where
+module Main.Types where
 
 import Prelude
 

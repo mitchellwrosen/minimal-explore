@@ -1,7 +1,7 @@
-module Perlenspiel where
+module Main.Perlenspiel where
 
 import Prelude
-import Types
+import Main.Types
 import FFI
 
 setPSEvent :: String -> Fay () -> Fay ()

@@ -1,9 +1,9 @@
-module Game ( main
-            ) where
+module Main.Game ( main
+                 ) where
 
 import Prelude
-import Perlenspiel
-import Types
+import Main.Perlenspiel
+import Main.Types
 
 main :: Fay ()
 main = do
