@@ -9,7 +9,15 @@ import GameLogic.Grid ( replace
                       )
 import GameLogic.Player
 
+data GridBead = Wall
+              | Empty
+              | PlayerBead Player
+  deriving (Show, Eq)
 
+getView :: Grid a -> Player -> [[a]]
+getView grid player = grid !! playerX
+  where
+    (playerX, _, _) = playerGetPosition player
 
 testPlayer :: Player
 testPlayer = Player (1, 1, 1) Positive
@@ -23,21 +31,21 @@ spec = do
             replace ["a", "b", "c"] 2 "d" `shouldBe` ["a", "b", "d"]
 
     describe "grid" $ do
-        let testMap :: Grid Int
-            testMap = [ [ [ 000, 001 ]
-                        , [ 010, 011 ]
-                        ]
+        let testGrid :: Grid Int
+            testGrid = [ [ [ 000, 001 ]
+                         , [ 010, 011 ]
+                         ]
 
-                      , [ [ 100, 101 ]
-                        , [ 110, 111 ]
-                        ]
-                      ]
+                       , [ [ 100, 101 ]
+                         , [ 110, 111 ]
+                         ]
+                       ]
         it "can get the value at a given (x,y,z)" $ do
-            gridGet testMap 0 1 1 `shouldBe` 011
-            gridGet testMap 1 1 0 `shouldBe` 110
+            gridGet testGrid 0 1 1 `shouldBe` 011
+            gridGet testGrid 1 1 0 `shouldBe` 110
 
         it "can set the value at a given (x,y,z)" $ do
-            gridSet testMap 1 1 0 42 `shouldBe`
+            gridSet testGrid 1 1 0 42 `shouldBe`
                 [ [ [ 000, 001 ]
                   , [ 010, 011 ]
                   ]
@@ -47,7 +55,21 @@ spec = do
                   ]
                 ]
 
-    describe "GameLogic" $ do
+        it "can have players and walls and empties" $ do
+            let grid :: Grid GridBead
+                grid = [ [ [ PlayerBead testPlayer, Wall ]
+                         , [ Wall,                  Wall ]
+                         ]
+
+                       , [ [ Empty, Wall ]
+                         , [ Empty, Wall ]
+                         ]
+                       ]
+            gridGet grid 0 0 0 `shouldBe` PlayerBead testPlayer
+            gridGet grid 0 1 1 `shouldBe` Wall
+            gridGet grid 1 0 0 `shouldBe` Empty
+
+    describe "Game Logic" $ do
         describe "the player" $ do
             it "has an xyz position" $ do
                 playerGetPosition testPlayer `shouldBe` (1, 1, 1)
@@ -74,3 +96,24 @@ spec = do
                 it "reverses left/right for the z direction" $ do
                     playerGetPosition (playerMoveLeft player') `shouldBe` (1, 1, 2)
                     playerGetPosition (playerMoveRight player') `shouldBe` (1, 1, 0)
+
+    describe "Game View" $ do
+        let testGrid :: Grid Int
+            testGrid = [ [ [ 000, 001, 002 ]
+                         , [ 010, 011, 012 ]
+                         , [ 020, 021, 022 ]
+                         ]
+
+                       , [ [ 100, 101, 102 ]
+                         , [ 110, 111, 112 ]
+                         , [ 120, 121, 122 ]
+                         ]
+
+                       , [ [ 100, 101, 102 ]
+                         , [ 110, 111, 112 ]
+                         , [ 120, 121, 122 ]
+                         ]
+                       ]
+
+        it "returns the yz plane from the grid and the player" $ do
+            getView testGrid testPlayer `shouldBe` testGrid !! 1
