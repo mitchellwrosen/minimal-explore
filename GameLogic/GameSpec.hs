@@ -39,6 +39,7 @@ spec = do
                        ]
             gameState :: (GridX, GridY, GridZ) -> GameState
             gameState pos = GameState (Player pos Positive) testGrid
+
         describe "player positions" $ do
             describe "valid positions" $ do
                 it "Empty slots" $ do
@@ -57,6 +58,7 @@ spec = do
                 it "OoB Z" $ do
                     let gs = gameState (1, 1, 3)
                     isValidPlayerPosition gs `shouldBe` False
+
         describe "player movement" $ do
             it "allows player movement to a valid position" $ do
                 leftButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 0)
@@ -178,7 +180,7 @@ spec = do
             it "draws the player with player color with Positive facing" $ do
                 viewAt gameState 0 2 `shouldBe` PlayerColor
             it "draws empty walls with the faded WallColor" $ do
-                viewAt gameState 0 0 `shouldBe` WallColor 1
+                viewAt gameState 0 0 `shouldBe` WallColor 2
 
         describe "negative facing" $ do
             let gameState = GameState (Player (2, 0, 0) Negative) testGrid
