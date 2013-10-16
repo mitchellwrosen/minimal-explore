@@ -1,7 +1,9 @@
 module Main.Perlenspiel where
 
 import Prelude
-import Main.Types
+
+import GameLogic.Types
+
 import FFI
 
 setPSEvent :: String -> Fay () -> Fay ()

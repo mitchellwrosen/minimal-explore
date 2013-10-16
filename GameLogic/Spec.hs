@@ -3,12 +3,12 @@ module GameLogic.Spec ( spec
 
 import Test.Hspec
 
-import Main.Types ( GridX
-                  , GridY
-                  , GridZ
-                  , GridBead(..)
-                  , Color(..)
-                  )
+import GameLogic.Types ( GridX
+                       , GridY
+                       , GridZ
+                       , GridBead(..)
+                       , Color(..)
+                       )
 import GameLogic.Grid ( replace
                       , gridGet
                       , gridSet

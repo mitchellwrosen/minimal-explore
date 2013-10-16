@@ -16,8 +16,8 @@ import GameLogic.Player ( Player(..)
 import GameLogic.Grid ( Grid(..)
                       , gridGet
                       )
-import Main.Types ( GridBead(..)
-                  )
+import GameLogic.Types ( GridBead(..)
+                       )
 
 data GameState = GameState { _player :: Player
                            , _grid :: Grid GridBead

@@ -14,11 +14,11 @@ import GameLogic.Grid ( Grid(..)
                       , gridDimensions
                       , gridGet
                       )
-import Main.Types ( GridY
-                  , GridZ
-                  , Color(..)
-                  , GridBead(..)
-                  )
+import GameLogic.Types ( GridY
+                       , GridZ
+                       , Color(..)
+                       , GridBead(..)
+                       )
 
 mapInd :: (Int -> a -> b) -> [a] -> [b]
 mapInd f l = zipWith f [0..] l

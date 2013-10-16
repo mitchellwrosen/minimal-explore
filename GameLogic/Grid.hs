@@ -5,10 +5,10 @@ module GameLogic.Grid ( Grid(..)
                       , replace
                       ) where
 
-import Main.Types ( GridX
-                  , GridY
-                  , GridZ
-                  )
+import GameLogic.Types ( GridX
+                       , GridY
+                       , GridZ
+                       )
 
 type Grid a = [[[a]]]
 

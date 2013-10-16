@@ -3,7 +3,8 @@ module Main.Game ( main
 
 import Prelude
 import Main.Perlenspiel
-import Main.Types
+
+import GameLogic.Types
 
 main :: Fay ()
 main = do
