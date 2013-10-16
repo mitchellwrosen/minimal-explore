@@ -1,8 +1,8 @@
-module GameLogic.GameView where
+module GameLogic.View where
 
 import Data.Maybe (fromMaybe)
 
-import GameLogic.GameState
+import GameLogic.State
 import GameLogic.Player
 import GameLogic.Grid
 import Main.Types

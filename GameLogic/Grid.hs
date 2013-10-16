@@ -5,7 +5,7 @@ import Main.Types
 type Grid a = [[[a]]]
 
 gridDimensions :: Grid a -> (GridX, GridY, GridZ)
-gridDimensions grid = (sizeX, sizeY, sizeZ) 
+gridDimensions grid = (sizeX, sizeY, sizeZ)
   where
     sizeX = length grid
     sizeY = length $ grid !! 0

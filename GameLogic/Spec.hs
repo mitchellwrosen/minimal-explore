@@ -1,4 +1,4 @@
-module GameLogic.GameSpec where
+module GameLogic.Spec where
 
 import Test.Hspec
 import Main.Types
@@ -9,8 +9,8 @@ import GameLogic.Grid ( replace
                       , Grid(..)
                       )
 import GameLogic.Player
-import GameLogic.GameState
-import GameLogic.GameView
+import GameLogic.State
+import GameLogic.View
 
 spec :: Spec
 spec = do

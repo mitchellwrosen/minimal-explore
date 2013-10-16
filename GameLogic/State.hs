@@ -1,4 +1,4 @@
-module GameLogic.GameState where
+module GameLogic.State where
 
 import GameLogic.Player
 import GameLogic.Grid
