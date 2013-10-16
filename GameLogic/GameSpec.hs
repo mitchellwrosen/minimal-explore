@@ -9,89 +9,8 @@ import GameLogic.Grid ( replace
                       , Grid(..)
                       )
 import GameLogic.Player
-
-import Debug.Trace
-
-data Color = WallFG
-           | EmptyColor
-           | PlayerColor
-  deriving (Show, Eq)
-
-data GridBead = Wall
-              | Empty
-  deriving (Show, Eq)
-
-data GameState = GameState { _player :: Player
-                           , _grid :: Grid GridBead
-                           }
-  deriving (Show, Eq)
-
-mapInd :: (Int -> a -> b) -> [a] -> [b]
-mapInd f l = zipWith f [0..] l
-
-isValidPlayerPosition :: GameState -> Bool
-isValidPlayerPosition gameState =
-    gridGet grid x y z == Just Empty
-  where grid = _grid gameState
-        player = _player gameState
-        (x, y, z) = (playerGetPosition player)
-
-leftButtonPressed :: GameState -> GameState
-leftButtonPressed gameState@(GameState player grid) =
-    if isValidPlayerPosition gameState'
-    then gameState'
-    else gameState
-  where
-    gameState' = GameState (playerMoveLeft player) grid
-
-rightButtonPressed :: GameState -> GameState
-rightButtonPressed gameState@(GameState player grid) =
-    if isValidPlayerPosition gameState'
-    then gameState'
-    else gameState
-  where
-    gameState' = GameState (playerMoveRight player) grid
-
-upButtonPressed :: GameState -> GameState
-upButtonPressed gameState@(GameState player grid) =
-    if isValidPlayerPosition gameState'
-    then gameState'
-    else gameState
-  where
-    gameState' = GameState (playerMoveUp player) grid
-
-downButtonPressed :: GameState -> GameState
-downButtonPressed gameState@(GameState player grid) =
-    if isValidPlayerPosition gameState'
-    then gameState'
-    else gameState
-  where
-    gameState' = GameState (playerMoveDown player) grid
-
-getView :: GameState -> [[Color]]
-getView (GameState player grid) =
-    mapInd (mapInd . beadColor) viewSection
-  where
-    playerFacing = playerGetFacing player
-
-    viewSection' = grid !! playerX
-    viewSection
-        | playerFacing == Positive = viewSection'
-        | otherwise = map reverse viewSection'
-
-    (playerX, playerY, playerZ) = playerGetPosition player
-    (_, _, maxZ) = gridDimensions grid
-
-    beadColor :: GridY -> GridZ -> GridBead -> Color
-    beadColor y z bead
-        | playerFacing == Positive &&
-          y == playerY &&
-          z == playerZ = PlayerColor
-        | playerFacing == Negative &&
-          y == playerY &&
-          z == (maxZ - playerZ - 1) = PlayerColor
-        | bead == Wall  = WallFG
-        | bead == Empty = EmptyColor
+import GameLogic.GameState
+import GameLogic.GameView
 
 spec :: Spec
 spec = do
@@ -231,7 +150,7 @@ spec = do
                          , [ Wall, Empty, Wall ]
                          , [ Wall, Wall, Wall ]
                          ]
-                                       -- \/player
+
                        , [ [ Empty, Empty, Empty ]
                          , [ Empty, Wall, Empty ]
                          , [ Empty, Empty, Empty ]
@@ -242,20 +161,31 @@ spec = do
                          , [ Empty, Empty, Wall ]
                          ]
                        ]
+            viewAt :: GameState -> Int -> Int -> Color
+            viewAt state x y = ((getView state) !! x) !! y
+
+        {-
+         -describe "the edge" $ do
+         -    let gameState = GameState (Player (2, 0, 0) Positive) testGrid
+         -    it "draws OoB with the wall color" $ do
+         -        viewAt gameState 0 1 `shouldBe` WallColor 1
+         -}
+
         describe "positive facing" $ do
             let gameState = GameState (Player (1, 0, 2) Positive) testGrid
-            it "draws empty walls with the empty color" $ do
-                ((getView gameState) !! 0) !! 0 `shouldBe` EmptyColor
             it "draws walls with the wall foreground color" $ do
-                ((getView gameState) !! 1) !! 1 `shouldBe` WallFG
+                viewAt gameState 1 1 `shouldBe` WallColor 0
             it "draws the player with player color with Positive facing" $ do
-                ((getView gameState) !! 0) !! 2 `shouldBe` PlayerColor
+                viewAt gameState 0 2 `shouldBe` PlayerColor
+            it "draws empty walls with the faded WallColor" $ do
+                viewAt gameState 0 0 `shouldBe` WallColor 1
+
         describe "negative facing" $ do
             let gameState = GameState (Player (2, 0, 0) Negative) testGrid
             it "draws the player with player color with Negative facing" $ do
-                ((getView gameState) !! 0) !! 2 `shouldBe` PlayerColor
-                ((getView gameState) !! 0) !! 0 `shouldBe` WallFG
+                viewAt gameState 0 2 `shouldBe` PlayerColor
+                viewAt gameState 0 0 `shouldBe` WallColor 0
             it "draws walls with the wall foreground color" $ do
-                ((getView gameState) !! 0) !! 0 `shouldBe` WallFG
-            it "draws empties with the empty color" $ do
-                ((getView gameState) !! 1) !! 2 `shouldBe` EmptyColor
+                viewAt gameState 0 0 `shouldBe` WallColor 0
+            it "draws empties with the faded WallColor" $ do
+                viewAt gameState 1 2 `shouldBe` WallColor 2
