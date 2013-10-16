@@ -1,4 +1,9 @@
-module GameLogic.Grid where
+module GameLogic.Grid ( Grid(..)
+                      , gridGet
+                      , gridSet
+                      , gridDimensions
+                      , replace
+                      ) where
 
 import Main.Types ( GridX
                   , GridY

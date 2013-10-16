@@ -1,4 +1,14 @@
-module GameLogic.Player where
+module GameLogic.Player ( Facing(..)
+                        , Player(..)
+                        , playerGetFacing
+                        , playerGetPosition
+                        , playerMoveUp
+                        , playerMoveDown
+                        , playerMoveLeft
+                        , playerMoveRight
+                        , playerMoveForward
+                        , playerChangeDirection
+                        ) where
 
 import Main.Types ( GridX
                   , GridY

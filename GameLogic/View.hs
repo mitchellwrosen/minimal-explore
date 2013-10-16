@@ -1,4 +1,5 @@
-module GameLogic.View where
+module GameLogic.View ( getView
+                      ) where
 
 import Data.Maybe ( fromMaybe
                   )

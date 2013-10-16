@@ -1,4 +1,5 @@
-module GameLogic.Spec where
+module GameLogic.Spec ( spec
+                      ) where
 
 import Test.Hspec
 

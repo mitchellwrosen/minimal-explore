@@ -1,4 +1,10 @@
-module GameLogic.State where
+module GameLogic.State ( GameState(..)
+                       , isValidPlayerPosition
+                       , leftButtonPressed
+                       , rightButtonPressed
+                       , upButtonPressed
+                       , downButtonPressed
+                       ) where
 
 import GameLogic.Player ( Player(..)
                         , playerGetPosition
