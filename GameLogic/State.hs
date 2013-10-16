@@ -1,16 +1,22 @@
 module GameLogic.State where
 
-import GameLogic.Player
-import GameLogic.Grid
-import Main.Types
+import GameLogic.Player ( Player(..)
+                        , playerGetPosition
+                        , playerMoveLeft
+                        , playerMoveRight
+                        , playerMoveUp
+                        , playerMoveDown
+                        )
+import GameLogic.Grid ( Grid(..)
+                      , gridGet
+                      )
+import Main.Types ( GridBead(..)
+                  )
 
 data GameState = GameState { _player :: Player
                            , _grid :: Grid GridBead
                            }
   deriving (Show, Eq)
-
-mapInd :: (Int -> a -> b) -> [a] -> [b]
-mapInd f l = zipWith f [0..] l
 
 isValidPlayerPosition :: GameState -> Bool
 isValidPlayerPosition gameState =

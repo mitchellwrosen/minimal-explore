@@ -1,6 +1,9 @@
 module GameLogic.Grid where
 
-import Main.Types
+import Main.Types ( GridX
+                  , GridY
+                  , GridZ
+                  )
 
 type Grid a = [[[a]]]
 

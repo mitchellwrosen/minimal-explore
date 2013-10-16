@@ -1,16 +1,38 @@
 module GameLogic.Spec where
 
 import Test.Hspec
-import Main.Types
+
+import Main.Types ( GridX
+                  , GridY
+                  , GridZ
+                  , GridBead(..)
+                  , Color(..)
+                  )
 import GameLogic.Grid ( replace
                       , gridGet
                       , gridSet
-                      , gridDimensions
                       , Grid(..)
                       )
-import GameLogic.Player
-import GameLogic.State
-import GameLogic.View
+import GameLogic.Player ( Player(..)
+                        , Facing(..)
+                        , playerGetPosition
+                        , playerGetFacing
+                        , playerChangeDirection
+                        , playerMoveUp
+                        , playerMoveDown
+                        , playerMoveLeft
+                        , playerMoveRight
+                        , playerMoveForward
+                        )
+import GameLogic.State ( GameState(..)
+                       , isValidPlayerPosition
+                       , leftButtonPressed
+                       , rightButtonPressed
+                       , upButtonPressed
+                       , downButtonPressed
+                       )
+import GameLogic.View ( getView
+                      )
 
 spec :: Spec
 spec = do

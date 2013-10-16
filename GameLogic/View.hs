@@ -1,13 +1,26 @@
 module GameLogic.View where
 
-import Data.Maybe (fromMaybe)
+import Data.Maybe ( fromMaybe
+                  )
 
-import GameLogic.State
-import GameLogic.Player
-import GameLogic.Grid
-import Main.Types
+import GameLogic.State ( GameState(..)
+                       )
+import GameLogic.Player ( Facing(..)
+                        , playerGetFacing
+                        , playerGetPosition
+                        )
+import GameLogic.Grid ( Grid(..)
+                      , gridDimensions
+                      , gridGet
+                      )
+import Main.Types ( GridY
+                  , GridZ
+                  , Color(..)
+                  , GridBead(..)
+                  )
 
-import Debug.Trace
+mapInd :: (Int -> a -> b) -> [a] -> [b]
+mapInd f l = zipWith f [0..] l
 
 getView :: GameState -> [[Color]]
 getView (GameState player grid) =

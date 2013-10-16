@@ -1,6 +1,9 @@
 module GameLogic.Player where
 
-import Main.Types (GridX, GridY, GridZ)
+import Main.Types ( GridX
+                  , GridY
+                  , GridZ
+                  )
 
 data Facing = Positive | Negative
   deriving (Show, Eq)
