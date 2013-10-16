@@ -26,12 +26,12 @@ playerMoveForward player = player { _position = (x+1, y, z) }
     (x, y, z) = playerGetPosition player
 
 playerMoveUp :: Player -> Player
-playerMoveUp player = player { _position = (x, y+1, z) }
+playerMoveUp player = player { _position = (x, y-1, z) }
   where
     (x, y, z) = playerGetPosition player
 
 playerMoveDown :: Player -> Player
-playerMoveDown player = player { _position = (x, y-1, z) }
+playerMoveDown player = player { _position = (x, y+1, z) }
   where
     (x, y, z) = playerGetPosition player
 
