@@ -65,4 +65,4 @@ playerMoveRight player = player { _position = (x, y, delta z) }
     (x, y, z) = playerGetPosition player
 
 playerGetPosition :: Player -> (GridX, GridY, GridZ)
-playerGetPosition player = _position player
+playerGetPosition = _position

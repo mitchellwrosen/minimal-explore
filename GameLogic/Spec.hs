@@ -76,7 +76,7 @@ spec = do
                     let gs = gameState (3, 0, 1)
                     isValidPlayerPosition gs `shouldBe` False
                 it "OoB Y" $ do
-                    let gs = gameState (1, (-1), 1)
+                    let gs = gameState (1, -1, 1)
                     isValidPlayerPosition gs `shouldBe` False
                 it "OoB Z" $ do
                     let gs = gameState (1, 1, 3)
@@ -187,7 +187,7 @@ spec = do
                          ]
                        ]
             viewAt :: GameState -> Int -> Int -> Color
-            viewAt state x y = ((getView state) !! x) !! y
+            viewAt state x y = (getView state !! x) !! y
 
         {-
          -describe "the edge" $ do

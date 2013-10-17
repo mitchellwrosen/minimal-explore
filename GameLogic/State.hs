@@ -29,7 +29,7 @@ isValidPlayerPosition gameState =
     gridGet grid x y z == Just Empty
   where grid = _grid gameState
         player = _player gameState
-        (x, y, z) = (playerGetPosition player)
+        (x, y, z) = playerGetPosition player
 
 leftButtonPressed :: GameState -> GameState
 leftButtonPressed gameState@(GameState player grid) =

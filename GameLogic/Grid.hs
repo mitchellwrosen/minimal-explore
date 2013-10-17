@@ -16,8 +16,8 @@ gridDimensions :: Grid a -> (GridX, GridY, GridZ)
 gridDimensions grid = (sizeX, sizeY, sizeZ)
   where
     sizeX = length grid
-    sizeY = length $ grid !! 0
-    sizeZ = length $ (grid !! 0) !! 0
+    sizeY = length $ head grid
+    sizeZ = length . head . head $ grid
 
 validBounds :: Grid a -> GridX -> GridY -> GridZ -> Bool
 validBounds grid x y z =
@@ -29,7 +29,7 @@ validBounds grid x y z =
 
 replace :: [a] -> Int -> a -> [a]
 replace list index val =
-    (take index list) ++ val:(drop (index + 1) list)
+    take index list ++ val : drop (index + 1) list
 
 gridGet :: Grid a -> GridX -> GridY -> GridZ -> Maybe a
 gridGet grid x y z

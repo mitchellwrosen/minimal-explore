@@ -21,7 +21,7 @@ import GameLogic.Types ( GridY
                        )
 
 mapInd :: (Int -> a -> b) -> [a] -> [b]
-mapInd f l = zipWith f [0..] l
+mapInd f = zipWith f [0..]
 
 getView :: GameState -> [[Color]]
 getView (GameState player grid) =
