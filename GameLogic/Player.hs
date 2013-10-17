@@ -10,7 +10,12 @@ module GameLogic.Player ( Facing(..)
                         , playerChangeDirection
                         ) where
 
-import Prelude
+import Prelude ( Show
+               , Eq
+               , (+)
+               , (-)
+               , (==)
+               )
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ

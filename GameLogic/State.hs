@@ -6,7 +6,12 @@ module GameLogic.State ( GameState(..)
                        , downButtonPressed
                        ) where
 
-import Prelude
+import Prelude ( Show
+               , Eq
+               , Bool(..)
+               , Maybe(..)
+               , (==)
+               )
 import GameLogic.Player ( Player(..)
                         , playerGetPosition
                         , playerMoveLeft

@@ -1,10 +1,22 @@
-module Main.Game ( main
-                 ) where
+module Main.Game () where
 
-import Prelude
-import Main.Perlenspiel
+import Prelude ( Fay
+               , Bool
+               , return
+               )
+import Main.Perlenspiel ( setPSEvent
+                        , setPSMouseEvent
+                        , setPSMouseWheelEvent
+                        , setPSKeyEvent
+                        , psGridSize
+                        )
 
-import GameLogic.Types
+import GameLogic.Types ( GridX
+                       , GridY
+                       , KeyValue
+                       , MWheelDelta
+                       , BeadData
+                       )
 
 main :: Fay ()
 main = do
@@ -18,7 +30,8 @@ main = do
     setPSKeyEvent "KeyUp" psKeyUp
 
 psInit :: Fay ()
-psInit = psGridSize 10 10
+psInit = do
+    psGridSize 10 10
 
 psClick :: GridX -> GridY -> BeadData -> Fay ()
 psClick x y beadData = return ()

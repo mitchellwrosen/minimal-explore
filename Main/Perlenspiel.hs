@@ -1,10 +1,24 @@
-module Main.Perlenspiel where
+module Main.Perlenspiel ( setPSEvent
+                        , setPSMouseEvent
+                        , setPSMouseWheelEvent
+                        , setPSKeyEvent
+                        , psGridSize
+                        ) where
 
-import Prelude
+import Prelude ( String
+               , Int
+               , Bool
+               , Fay
+               )
 
-import GameLogic.Types
+import GameLogic.Types ( GridX
+                       , GridY
+                       , BeadData
+                       , KeyValue
+                       , MWheelDelta
+                       )
 
-import FFI
+import FFI (ffi)
 
 setPSEvent :: String -> Fay () -> Fay ()
 setPSEvent = ffi "PS[%1] = %2"

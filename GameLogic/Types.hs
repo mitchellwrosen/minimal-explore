@@ -1,6 +1,9 @@
 module GameLogic.Types where
 
-import Prelude
+import Prelude ( Int
+               , Show
+               , Eq
+               )
 
 type GridX = Int
 type GridY = Int

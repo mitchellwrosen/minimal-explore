@@ -1,7 +1,19 @@
 module GameLogic.View ( getView
                       ) where
 
-import Prelude
+import Prelude ( Maybe(..)
+               , Int
+               , reverse
+               , zipWith
+               , map
+               , otherwise
+               , (.)
+               , ($)
+               , (+)
+               , (==)
+               , (-)
+               , (!!)
+               )
 
 import GameLogic.State ( GameState(..)
                        )

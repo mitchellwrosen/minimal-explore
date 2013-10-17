@@ -5,7 +5,23 @@ module GameLogic.Grid ( Grid(..)
                       , replace
                       ) where
 
-import Prelude
+import Prelude ( Int
+               , Bool
+               , Maybe(..)
+               , length
+               , otherwise
+               , take
+               , drop
+               , head
+               , (++)
+               , (!!)
+               , (+)
+               , (.)
+               , (>=)
+               , (<)
+               , (&&)
+               , ($)
+               )
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
