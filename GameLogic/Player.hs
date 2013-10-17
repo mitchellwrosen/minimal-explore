@@ -10,6 +10,7 @@ module GameLogic.Player ( Facing(..)
                         , playerChangeDirection
                         ) where
 
+import Prelude
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
@@ -51,17 +52,17 @@ playerMoveDown player = player { _position = (x, y+1, z) }
 playerMoveLeft :: Player -> Player
 playerMoveLeft player = player { _position = (x, y, delta z) }
   where
-    delta
-        | playerGetFacing player == Positive = (+) (-1)
-        | playerGetFacing player == Negative = (+) 1
+    delta = if playerGetFacing player == Positive
+            then (+ (-1))
+            else (+ 1)
     (x, y, z) = playerGetPosition player
 
 playerMoveRight :: Player -> Player
 playerMoveRight player = player { _position = (x, y, delta z) }
   where
-    delta
-        | playerGetFacing player == Positive = (+) 1
-        | playerGetFacing player == Negative = (+) (-1)
+    delta = if playerGetFacing player == Positive
+            then (+ 1)
+            else (+ (-1))
     (x, y, z) = playerGetPosition player
 
 playerGetPosition :: Player -> (GridX, GridY, GridZ)

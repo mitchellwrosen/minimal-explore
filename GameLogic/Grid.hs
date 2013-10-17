@@ -5,6 +5,7 @@ module GameLogic.Grid ( Grid(..)
                       , replace
                       ) where
 
+import Prelude
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ

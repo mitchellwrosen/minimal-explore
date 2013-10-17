@@ -1,8 +1,7 @@
 module GameLogic.View ( getView
                       ) where
 
-import Data.Maybe ( fromMaybe
-                  )
+import Prelude
 
 import GameLogic.State ( GameState(..)
                        )
@@ -20,6 +19,10 @@ import GameLogic.Types ( GridY
                        , GridBead(..)
                        )
 
+fromMaybe :: a -> Maybe a -> a
+fromMaybe _ (Just something) = something
+fromMaybe def _ = def
+
 mapInd :: (Int -> a -> b) -> [a] -> [b]
 mapInd f = zipWith f [0..]
 
@@ -33,14 +36,14 @@ getView (GameState player grid) =
     invertZ z = maxZ - z - 1
 
     (playerX, playerY, playerZ') = playerGetPosition player
-    playerZ
-        | positiveFacing = playerZ'
-        | otherwise =  invertZ playerZ'
+    playerZ = if positiveFacing
+              then playerZ'
+              else invertZ playerZ'
 
     viewSection' = grid !! playerX
-    viewSection
-        | positiveFacing = viewSection'
-        | otherwise = map reverse viewSection'
+    viewSection = if positiveFacing
+                  then viewSection'
+                  else map reverse viewSection'
 
     distanceToWall :: GridY -> GridZ -> Int
     distanceToWall y z' =
@@ -52,9 +55,9 @@ getView (GameState player grid) =
             xSlice :: [GridBead]
             xSlice = map (\x -> fromMaybe Wall $ gridGet grid x y z) [(-1)..maxX]
 
-            delta
-                | positiveFacing = (+ 1)
-                | otherwise = (+ (-1))
+            delta = if positiveFacing
+                    then (+ 1)
+                    else (+ (-1))
 
             distance :: Int -> Int -> Int
             distance dist index

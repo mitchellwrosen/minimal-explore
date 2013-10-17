@@ -1,5 +1,7 @@
 module GameLogic.Types where
 
+import Prelude
+
 type GridX = Int
 type GridY = Int
 type GridZ = Int

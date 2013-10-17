@@ -3,6 +3,7 @@ module GameLogic.Spec ( spec
 
 import Test.Hspec
 
+import Prelude
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ

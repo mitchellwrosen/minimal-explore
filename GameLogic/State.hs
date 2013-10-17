@@ -6,6 +6,7 @@ module GameLogic.State ( GameState(..)
                        , downButtonPressed
                        ) where
 
+import Prelude
 import GameLogic.Player ( Player(..)
                         , playerGetPosition
                         , playerMoveLeft
@@ -26,7 +27,9 @@ data GameState = GameState { _player :: Player
 
 isValidPlayerPosition :: GameState -> Bool
 isValidPlayerPosition gameState =
-    gridGet grid x y z == Just Empty
+    case gridGet grid x y z of
+        Just something -> something == Empty
+        _ -> False
   where grid = _grid gameState
         player = _player gameState
         (x, y, z) = playerGetPosition player
