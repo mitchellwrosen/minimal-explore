@@ -31,6 +31,8 @@ import GameLogic.State ( GameState(..)
                        , rightButtonPressed
                        , upButtonPressed
                        , downButtonPressed
+                       , forwardButtonPressed
+                       , reverseButtonPressed
                        )
 import GameLogic.View ( getView
                       )
@@ -97,6 +99,11 @@ spec = do
                     upButtonPressed (gameState (1, 2, 1)) `shouldBe` gameState (1, 1, 1)
                 it "down" $ do
                     downButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 2, 1)
+                it "forward" $ do
+                    forwardButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (2, 1, 1)
+                it "reverse" $ do
+                    reverseButtonPressed (gameState (1, 1, 1)) `shouldBe`
+                        GameState (Player (1, 1, 1) Negative) testGrid
 
     describe "grid" $ do
         let testGrid :: Grid Int

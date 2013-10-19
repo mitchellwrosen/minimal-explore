@@ -3,6 +3,7 @@ module Main.Perlenspiel ( setPSEvent
                         , setPSMouseWheelEvent
                         , setPSKeyEvent
                         , psGridSize
+                        , psBeadColor
                         ) where
 
 import Prelude ( String

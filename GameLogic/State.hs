@@ -4,6 +4,8 @@ module GameLogic.State ( GameState(..)
                        , rightButtonPressed
                        , upButtonPressed
                        , downButtonPressed
+                       , forwardButtonPressed
+                       , reverseButtonPressed
                        ) where
 
 import Prelude ( Show
@@ -18,6 +20,8 @@ import GameLogic.Player ( Player(..)
                         , playerMoveRight
                         , playerMoveUp
                         , playerMoveDown
+                        , playerMoveForward
+                        , playerChangeDirection
                         )
 import GameLogic.Grid ( Grid(..)
                       , gridGet
@@ -70,3 +74,16 @@ downButtonPressed gameState@(GameState player grid) =
     else gameState
   where
     gameState' = GameState (playerMoveDown player) grid
+
+forwardButtonPressed :: GameState -> GameState
+forwardButtonPressed gameState@(GameState player grid) =
+    if isValidPlayerPosition gameState'
+    then gameState'
+    else gameState
+  where
+    gameState' = GameState (playerMoveForward player) grid
+
+reverseButtonPressed :: GameState -> GameState
+reverseButtonPressed gameState@(GameState player grid) = gameState'
+  where
+    gameState' = GameState (playerChangeDirection player) grid
