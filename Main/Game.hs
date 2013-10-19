@@ -27,6 +27,7 @@ import Main.Perlenspiel ( setPSEvent
                         , psBeadColor
                         )
 
+import qualified Levels.Level1
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
@@ -52,28 +53,6 @@ import GameLogic.State ( GameState(..)
                        )
 import GameLogic.View ( getView
                       )
-
-grid :: Grid GridBead
-grid = [ [ [ Wall, Wall, Wall ]
-         , [ Wall, Empty, Wall ]
-         , [ Wall, Wall, Wall ]
-         ]
-
-       , [ [ Empty, Empty, Empty ]
-         , [ Empty, Empty, Empty ]
-         , [ Empty, Wall, Empty ]
-         ]
-
-       , [ [ Empty, Empty, Empty ]
-         , [ Wall, Empty, Empty ]
-         , [ Wall, Wall, Empty ]
-         ]
-       ]
-player :: Player
-player = Player (0, 1, 1) Positive
-
-gameState :: GameState
-gameState = GameState player grid
 
 beadColor :: Color -> [Int]
 beadColor (EmptyColor) = [255, 255, 255]
@@ -101,15 +80,14 @@ drawMap gameState = do
 -- Everything is in main for the beautiful closure that it offers over stateRef.
 main :: Fay ()
 main = do
-    stateRef <- newRef gameState
+    stateRef <- newRef Levels.Level1.gameState
 
     let psInit :: Fay ()
         psInit = do
-            psGridSize gridWidth gridHeight
             gameState <- readRef stateRef
+            let (_, gridHeight, gridWidth) = gridDimensions (_grid gameState)
+            psGridSize gridWidth gridHeight
             drawMap gameState
-          where
-            (_, gridWidth, gridHeight) = gridDimensions (_grid gameState)
 
         psTouch :: GridX -> GridY -> BeadData -> Fay ()
         psTouch x y beadData = return ()

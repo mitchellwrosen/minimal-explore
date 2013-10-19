@@ -1,0 +1,1 @@
+let g:hdevtools_options = '-g -package -g fay-base -g -hide-package -g base'
