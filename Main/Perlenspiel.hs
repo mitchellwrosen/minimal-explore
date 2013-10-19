@@ -34,7 +34,7 @@ setPSKeyEvent :: String -> (KeyValue -> Bool -> Bool -> Fay ()) -> Fay ()
 setPSKeyEvent = ffi "PS[%1] = %2"
 
 psGridSize :: Int -> Int -> Fay()
-psGridSize = ffi "PS.GridSize(%1, %2)"
+psGridSize = ffi "PS.gridSize(%1, %2)"
 
 psBeadColor :: Int -> Int -> [Int] -> Fay ()
-psBeadColor = ffi "PS.BeadColor(%1, %2, %3)"
+psBeadColor = ffi "PS.color(%1, %2, %3)"

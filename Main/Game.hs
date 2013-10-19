@@ -54,19 +54,19 @@ import GameLogic.View ( getView
                       )
 
 grid :: Grid GridBead
-grid = [ [ [ Empty, Empty, Empty ]
-         , [ Empty, Empty, Empty ]
-         , [ Empty, Empty, Empty ]
+grid = [ [ [ Wall, Wall, Wall ]
+         , [ Wall, Empty, Wall ]
+         , [ Wall, Wall, Wall ]
          ]
 
        , [ [ Empty, Empty, Empty ]
          , [ Empty, Empty, Empty ]
-         , [ Empty, Empty, Empty ]
+         , [ Empty, Wall, Empty ]
          ]
 
        , [ [ Empty, Empty, Empty ]
-         , [ Empty, Empty, Empty ]
-         , [ Empty, Empty, Empty ]
+         , [ Wall, Empty, Empty ]
+         , [ Wall, Wall, Empty ]
          ]
        ]
 player :: Player
@@ -111,8 +111,8 @@ main = do
           where
             (_, gridWidth, gridHeight) = gridDimensions (_grid gameState)
 
-        psClick :: GridX -> GridY -> BeadData -> Fay ()
-        psClick x y beadData = return ()
+        psTouch :: GridX -> GridY -> BeadData -> Fay ()
+        psTouch x y beadData = return ()
 
         psRelease :: GridX -> GridY -> BeadData -> Fay ()
         psRelease x y beadData = return ()
@@ -120,11 +120,14 @@ main = do
         psEnter :: GridX -> GridY -> BeadData -> Fay ()
         psEnter x y beadData = return ()
 
-        psLeave :: GridX -> GridY -> BeadData -> Fay ()
-        psLeave x y beadData = return ()
+        psExit :: GridX -> GridY -> BeadData -> Fay ()
+        psExit x y beadData = return ()
 
-        psWheel :: MWheelDelta -> Fay ()
-        psWheel delta = return ()
+        psExitGrid :: Fay ()
+        psExitGrid = return ()
+
+        psInput :: Fay ()
+        psInput = return ()
 
         psKeyDown :: KeyValue -> Bool -> Bool -> Fay ()
         psKeyDown keyValue shift ctrl = do
@@ -143,11 +146,12 @@ main = do
         psKeyUp :: KeyValue -> Bool -> Bool -> Fay ()
         psKeyUp keyValue shift ctrl = return ()
 
-    setPSEvent "Init" psInit
-    setPSMouseEvent "Click" psClick
-    setPSMouseEvent "Release" psRelease
-    setPSMouseEvent "Enter" psEnter
-    setPSMouseEvent "Leave" psLeave
-    setPSMouseWheelEvent "Wheel" psWheel
-    setPSKeyEvent "KeyDown" psKeyDown
-    setPSKeyEvent "KeyUp" psKeyUp
+    setPSEvent "init" psInit
+    setPSEvent "exitGrid" psExitGrid
+    setPSEvent "input" psInput
+    setPSMouseEvent "touch" psTouch
+    setPSMouseEvent "release" psRelease
+    setPSMouseEvent "enter" psEnter
+    setPSMouseEvent "exit" psExit
+    setPSKeyEvent "keyDown" psKeyDown
+    setPSKeyEvent "keyUp" psKeyUp

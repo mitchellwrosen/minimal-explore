@@ -101,9 +101,15 @@ spec = do
                     downButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 2, 1)
                 it "forward" $ do
                     forwardButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (2, 1, 1)
-                it "reverse" $ do
-                    reverseButtonPressed (gameState (1, 1, 1)) `shouldBe`
-                        GameState (Player (1, 1, 1) Negative) testGrid
+                describe "reverse" $ do
+                    let gameStateReverse :: (GridX, GridY, GridZ) -> GameState
+                        gameStateReverse pos = GameState (Player pos Negative) testGrid
+                    it "change directions" $ do
+                        reverseButtonPressed (gameState (1, 1, 1)) `shouldBe`
+                            gameStateReverse (1, 1, 1)
+                    it "forward" $ do
+                        forwardButtonPressed (gameStateReverse (1, 1, 1)) `shouldBe`
+                            gameStateReverse (0, 1, 1)
 
     describe "grid" $ do
         let testGrid :: Grid Int
@@ -175,6 +181,9 @@ spec = do
             it "reverses left/right for the z direction" $ do
                 playerGetPosition (playerMoveLeft player') `shouldBe` (1, 1, 2)
                 playerGetPosition (playerMoveRight player') `shouldBe` (1, 1, 0)
+
+            it "moves forward in the -x direction" $ do
+                playerGetPosition (playerMoveForward player') `shouldBe` (0, 1, 1)
 
     describe "Game View" $ do
         let testGrid :: Grid GridBead

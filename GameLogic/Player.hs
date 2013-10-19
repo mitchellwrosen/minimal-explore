@@ -40,8 +40,11 @@ playerChangeDirection player = player { _facing = oppositeFacing facing }
     facing = playerGetFacing player
 
 playerMoveForward :: Player -> Player
-playerMoveForward player = player { _position = (x+1, y, z) }
+playerMoveForward player = player { _position = (delta x, y, z) }
   where
+    delta = if playerGetFacing player == Positive
+            then (+1)
+            else (+ (-1))
     (x, y, z) = playerGetPosition player
 
 playerMoveUp :: Player -> Player
