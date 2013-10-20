@@ -39,7 +39,7 @@ import GameLogic.View ( getView
 import GameLogic.GameMap ( GameMap(..)
                          , getGameMapFromDoor
                          , makeGameMap
-                         , getMatchingDoor
+                         , getMatchingDoorPosition
                          )
 
 spec :: Spec
@@ -75,7 +75,7 @@ spec = do
                 getGameMapFromDoor maps doorA `shouldBe` gameMapB
 
             it "finds the matching door in a map" $ do
-                getMatchingDoor gameMapA gameMapB doorA `shouldBe` doorB
+                getMatchingDoorPosition gameMapA gameMapB doorA `shouldBe` (0, 0, 0)
 
     describe "gameMap" $ do
         let name = "mapA"
@@ -90,7 +90,7 @@ spec = do
             gameMapName gameMap `shouldBe` name
 
         it "has a list of doors" $ do
-            gameMapDoors gameMap `shouldBe` [ door ]
+            map fst (gameMapDoors gameMap) `shouldBe` [ door ]
 
     describe "grid state" $ do
         let testGrid :: Grid GridBead

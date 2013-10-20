@@ -12,7 +12,9 @@ import Prelude ( Int
                , length
                , concat
                , otherwise
+               , zipWith
                , take
+               , map
                , drop
                , head
                , (++)
@@ -46,8 +48,12 @@ validBounds grid x y z =
   where
     (sizeX, sizeY, sizeZ) = gridDimensions grid
 
-gridElems :: Grid a -> [a]
-gridElems = concat . concat
+gridElems :: Grid a -> [(a, (GridX, GridY, GridZ))]
+gridElems grid = concat . concat $ indexedGrid
+  where
+    mapInd :: (Int -> a -> b) -> [a] -> [b]
+    mapInd f = zipWith f [0..]
+    indexedGrid = mapInd (\x -> mapInd (\y -> mapInd (\z val -> (val, (x, y, z))))) grid
 
 gridGet :: Grid a -> GridX -> GridY -> GridZ -> Maybe a
 gridGet grid x y z

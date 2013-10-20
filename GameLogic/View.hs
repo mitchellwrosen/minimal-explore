@@ -84,4 +84,7 @@ getView (GameState player gameMap) =
     beadColor :: GridY -> GridZ -> GridBead -> Color
     beadColor y z bead
         | (y, z) == (playerY, playerZ) = PlayerColor
-        | otherwise = WallColor $ distanceToWall y z
+        | otherwise = 
+            case bead of
+                (Door _ _) -> DoorColor
+                _ -> WallColor $ distanceToWall y z

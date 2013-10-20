@@ -33,6 +33,7 @@ import GameLogic.Grid ( Grid(..)
 import GameLogic.Types ( GridBead(..)
                        )
 import GameLogic.GameMap ( getGameMapFromDoor
+                         , getMatchingDoorPosition
                          , GameMap(..)
                          )
 import qualified Levels.GameMaps
@@ -42,10 +43,13 @@ data GameState = GameState { _player :: Player
                            }
   deriving (Show, Eq)
 
--- if door, load room
 loadNewRoom :: GameState -> GridBead -> GameState
-loadNewRoom gameState door = gameState
+loadNewRoom gameState door = gameState'
   where
+    oldFacing = _facing (_player gameState)
+    position = getMatchingDoorPosition (gameStateGameMap gameState) newMap door
+    player = Player position oldFacing
+    gameState' = GameState player newMap
     newMap = getGameMapFromDoor Levels.GameMaps.gameMaps door
 
 processPlayerMove :: (Player -> Player) -> GameState -> GameState

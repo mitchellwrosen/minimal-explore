@@ -20,6 +20,7 @@ type DistanceX = Int
 data Color = WallColor DistanceX
            | EmptyColor
            | PlayerColor
+           | DoorColor
   deriving (Show, Eq)
 
 data GridBead = Wall

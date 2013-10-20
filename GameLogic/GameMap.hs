@@ -1,6 +1,6 @@
 module GameLogic.GameMap ( GameMap(..)
                          , getGameMapFromDoor
-                         , getMatchingDoor
+                         , getMatchingDoorPosition
                          , makeGameMap
                          ) where
 
@@ -15,20 +15,27 @@ import Prelude ( String
                , filter
                , error
                , id
+               , fst
+               , snd
+               , map
                , (==)
                , (++)
                , ($)
+               , (.)
                )
 
 import GameLogic.Grid ( Grid(..)
                       , gridElems
                       )
 import GameLogic.Types ( GridBead(..)
+                       , GridX
+                       , GridY
+                       , GridZ
                        )
 
 data GameMap = GameMap { gameMapGrid :: Grid GridBead
                        , gameMapName :: String
-                       , gameMapDoors :: [GridBead]
+                       , gameMapDoors :: [(GridBead, (GridX, GridY, GridZ))]
                        }
   deriving (Eq, Show)
 
@@ -37,9 +44,9 @@ getGameMapFromDoor gameMaps (Door roomName _) =
     maybe (error $ "Bad RoomName " ++ roomName) id $ lookup roomName gameMaps
 
 
-getMatchingDoor :: GameMap -> GameMap -> GridBead -> GridBead
-getMatchingDoor fromMap toMap (Door name ident) =
-    findFirst (== Door (gameMapName fromMap) ident) (gameMapDoors toMap)
+getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> (GridX, GridY, GridZ)
+getMatchingDoorPosition fromMap toMap (Door name ident) =
+    snd $ findFirst ((== Door (gameMapName fromMap) ident) . fst) (gameMapDoors toMap)
   where
     findFirst :: (a -> Bool) -> [a] -> a
     findFirst filt list = head $ filter filt list
@@ -47,6 +54,6 @@ getMatchingDoor fromMap toMap (Door name ident) =
 makeGameMap :: Grid GridBead -> String -> GameMap
 makeGameMap grid name = GameMap grid name doors
   where
-    filterFunc (Door _ _) = True
+    filterFunc ((Door _ _), _) = True
     filterFunc _ = False
     doors = filter filterFunc $ gridElems grid

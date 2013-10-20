@@ -66,6 +66,7 @@ beadColor (WallColor dist) =
         3 -> [192, 192, 192]
         _ -> beadColor EmptyColor
 beadColor (PlayerColor) = [255, 0, 0]
+beadColor (DoorColor) = [0, 0, 255]
 
 drawMap :: GameState -> Fay ()
 drawMap gameState = do
