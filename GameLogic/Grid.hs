@@ -1,6 +1,7 @@
 module GameLogic.Grid ( Grid(..)
                       , gridGet
                       , gridSet
+                      , gridElems
                       , gridDimensions
                       , replace
                       ) where
@@ -9,6 +10,7 @@ import Prelude ( Int
                , Bool
                , Maybe(..)
                , length
+               , concat
                , otherwise
                , take
                , drop
@@ -44,9 +46,8 @@ validBounds grid x y z =
   where
     (sizeX, sizeY, sizeZ) = gridDimensions grid
 
-replace :: [a] -> Int -> a -> [a]
-replace list index val =
-    take index list ++ val : drop (index + 1) list
+gridElems :: Grid a -> [a]
+gridElems = concat . concat
 
 gridGet :: Grid a -> GridX -> GridY -> GridZ -> Maybe a
 gridGet grid x y z
@@ -64,3 +65,7 @@ gridSet grid x y z value = newMap
     newXList = replace xList y newYList
 
     newMap = replace grid x newXList
+
+replace :: [a] -> Int -> a -> [a]
+replace list index val =
+    take index list ++ val : drop (index + 1) list

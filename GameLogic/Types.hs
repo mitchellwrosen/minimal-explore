@@ -3,6 +3,7 @@ module GameLogic.Types where
 import Prelude ( Int
                , Show
                , Eq
+               , String
                )
 
 type GridX = Int
@@ -23,4 +24,7 @@ data Color = WallColor DistanceX
 
 data GridBead = Wall
               | Empty
+              | Door { doorMapName :: String
+                     , doorId :: String
+                     }
   deriving (Show, Eq)

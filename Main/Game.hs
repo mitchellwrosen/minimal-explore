@@ -43,6 +43,8 @@ import GameLogic.Grid ( Grid(..)
 import GameLogic.Player ( Player(..)
                         , Facing(..)
                         )
+import GameLogic.GameMap ( gameMapGrid
+                         )
 import GameLogic.State ( GameState(..)
                        , leftButtonPressed
                        , rightButtonPressed
@@ -80,12 +82,14 @@ drawMap gameState = do
 -- Everything is in main for the beautiful closure that it offers over stateRef.
 main :: Fay ()
 main = do
-    stateRef <- newRef Levels.Level1.gameState
+    let player = Player (0, 1, 1) Positive
+        gameState = GameState player Levels.Level1.gameMap
+    stateRef <- newRef gameState
 
     let psInit :: Fay ()
         psInit = do
             gameState <- readRef stateRef
-            let (_, gridHeight, gridWidth) = gridDimensions (_grid gameState)
+            let (_, gridHeight, gridWidth) = gridDimensions (gameMapGrid (gameStateGameMap gameState))
             psGridSize gridWidth gridHeight
             drawMap gameState
 
@@ -109,7 +113,6 @@ main = do
 
         psKeyDown :: KeyValue -> Bool -> Bool -> Fay ()
         psKeyDown keyValue shift ctrl = do
-            print keyValue
             let move = case keyValue of
                     87 -> upButtonPressed
                     65 -> leftButtonPressed

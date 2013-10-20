@@ -12,6 +12,7 @@ import GameLogic.Types ( GridX
 import GameLogic.Grid ( replace
                       , gridGet
                       , gridSet
+                      , gridElems
                       , Grid(..)
                       )
 import GameLogic.Player ( Player(..)
@@ -26,7 +27,6 @@ import GameLogic.Player ( Player(..)
                         , playerMoveForward
                         )
 import GameLogic.State ( GameState(..)
-                       , isValidPlayerPosition
                        , leftButtonPressed
                        , rightButtonPressed
                        , upButtonPressed
@@ -36,6 +36,11 @@ import GameLogic.State ( GameState(..)
                        )
 import GameLogic.View ( getView
                       )
+import GameLogic.GameMap ( GameMap(..)
+                         , getGameMapFromDoor
+                         , makeGameMap
+                         , getMatchingDoor
+                         )
 
 spec :: Spec
 spec = do
@@ -44,6 +49,48 @@ spec = do
             replace ["a", "b", "c"] 1 "d" `shouldBe` ["a", "d", "c"]
             replace ["a", "b", "c"] 0 "d" `shouldBe` ["d", "b", "c"]
             replace ["a", "b", "c"] 2 "d" `shouldBe` ["a", "b", "d"]
+
+    describe "door" $ do
+        let door = Door "map" "id"
+        it "has a map name" $ do
+            doorMapName door `shouldBe` "map"
+
+        it "has a unqiue id" $ do
+            doorId door `shouldBe` "id"
+
+        describe "player steps on door" $ do
+            let doorA = Door "mapB" "unique"
+                gridA = [ [ [ doorA ] ] ]
+                gameMapA = makeGameMap gridA "mapA"
+
+                doorB = Door "mapA" "unique"
+                gridB = [ [ [ doorB ] ] ]
+                gameMapB = makeGameMap gridB "mapB"
+
+                maps = [ (gameMapName gameMapA, gameMapA)
+                       , (gameMapName gameMapB, gameMapB)
+                       ]
+
+            it "finds the matching map" $ do
+                getGameMapFromDoor maps doorA `shouldBe` gameMapB
+
+            it "finds the matching door in a map" $ do
+                getMatchingDoor gameMapA gameMapB doorA `shouldBe` doorB
+
+    describe "gameMap" $ do
+        let name = "mapA"
+            door = Door "mapB" "unique"
+            grid = [ [ [ door ] ] ]
+            gameMap = makeGameMap grid name
+
+        it "has a grid" $ do
+            gameMapGrid gameMap `shouldBe` grid
+
+        it "has a name" $ do
+            gameMapName gameMap `shouldBe` name
+
+        it "has a list of doors" $ do
+            gameMapDoors gameMap `shouldBe` [ door ]
 
     describe "grid state" $ do
         let testGrid :: Grid GridBead
@@ -62,27 +109,10 @@ spec = do
                          , [ Empty, Empty, Empty ]
                          ]
                        ]
-            gameState :: (GridX, GridY, GridZ) -> GameState
-            gameState pos = GameState (Player pos Positive) testGrid
+            testMap = makeGameMap testGrid "test"
 
-        describe "player positions" $ do
-            describe "valid positions" $ do
-                it "Empty slots" $ do
-                    let gs = gameState (1, 1, 1)
-                    isValidPlayerPosition gs `shouldBe` True
-            describe "invalid positions" $ do
-                it "Wall slots" $ do
-                    let gs = gameState (1, 0, 1)
-                    isValidPlayerPosition gs `shouldBe` False
-                it "OoB X" $ do
-                    let gs = gameState (3, 0, 1)
-                    isValidPlayerPosition gs `shouldBe` False
-                it "OoB Y" $ do
-                    let gs = gameState (1, -1, 1)
-                    isValidPlayerPosition gs `shouldBe` False
-                it "OoB Z" $ do
-                    let gs = gameState (1, 1, 3)
-                    isValidPlayerPosition gs `shouldBe` False
+            gameState :: (GridX, GridY, GridZ) -> GameState
+            gameState pos = GameState (Player pos Positive) testMap
 
         describe "player movement" $ do
             it "allows player movement to a valid position" $ do
@@ -103,7 +133,7 @@ spec = do
                     forwardButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (2, 1, 1)
                 describe "reverse" $ do
                     let gameStateReverse :: (GridX, GridY, GridZ) -> GameState
-                        gameStateReverse pos = GameState (Player pos Negative) testGrid
+                        gameStateReverse pos = GameState (Player pos Negative) testMap
                     it "change directions" $ do
                         reverseButtonPressed (gameState (1, 1, 1)) `shouldBe`
                             gameStateReverse (1, 1, 1)
@@ -202,18 +232,13 @@ spec = do
                          , [ Empty, Empty, Wall ]
                          ]
                        ]
+
+            testMap = makeGameMap testGrid "test"
             viewAt :: GameState -> Int -> Int -> Color
             viewAt state x y = (getView state !! x) !! y
 
-        {-
-         -describe "the edge" $ do
-         -    let gameState = GameState (Player (2, 0, 0) Positive) testGrid
-         -    it "draws OoB with the wall color" $ do
-         -        viewAt gameState 0 1 `shouldBe` WallColor 1
-         -}
-
         describe "positive facing" $ do
-            let gameState = GameState (Player (1, 0, 2) Positive) testGrid
+            let gameState = GameState (Player (1, 0, 2) Positive) testMap
             it "draws walls with the wall foreground color" $ do
                 viewAt gameState 1 1 `shouldBe` WallColor 0
             it "draws the player with player color with Positive facing" $ do
@@ -222,7 +247,7 @@ spec = do
                 viewAt gameState 0 0 `shouldBe` WallColor 2
 
         describe "negative facing" $ do
-            let gameState = GameState (Player (2, 0, 0) Negative) testGrid
+            let gameState = GameState (Player (2, 0, 0) Negative) testMap
             it "draws the player with player color with Negative facing" $ do
                 viewAt gameState 0 2 `shouldBe` PlayerColor
                 viewAt gameState 0 0 `shouldBe` WallColor 0

@@ -17,6 +17,8 @@ import Prelude ( Maybe(..)
 
 import GameLogic.State ( GameState(..)
                        )
+import GameLogic.GameMap ( gameMapGrid
+                         )
 import GameLogic.Player ( Facing(..)
                         , playerGetFacing
                         , playerGetPosition
@@ -39,9 +41,10 @@ mapInd :: (Int -> a -> b) -> [a] -> [b]
 mapInd f = zipWith f [0..]
 
 getView :: GameState -> [[Color]]
-getView (GameState player grid) =
+getView (GameState player gameMap) =
     mapInd (mapInd . beadColor) viewSection
   where
+    grid = gameMapGrid gameMap
     positiveFacing = playerGetFacing player == Positive
 
     (maxX, _, maxZ) = gridDimensions grid
