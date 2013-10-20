@@ -22,39 +22,44 @@ import Prelude ( Int
                , (&&)
                , ($)
                )
-import GameLogic.Types ( GridX
-                       , GridY
-                       , GridZ
-                       )
+
+import GameLogic.Types 
+    ( Position(..)
+    , posX
+    , posY
+    , posZ
+    )
+
+import Control.Lens ( (^.) )
 
 type Grid a = [[[a]]]
 
-gridDimensions :: Grid a -> (GridX, GridY, GridZ)
-gridDimensions grid = (sizeX, sizeY, sizeZ)
+gridDimensions :: Grid a -> Position
+gridDimensions grid = Position (sizeX, sizeY, sizeZ)
   where
     sizeX = length grid
     sizeY = length $ head grid
     sizeZ = length . head . head $ grid
 
-validBounds :: Grid a -> GridX -> GridY -> GridZ -> Bool
-validBounds grid x y z =
+validBounds :: Grid a -> Position -> Bool
+validBounds grid (Position (x,y,z)) =
     x >= 0 && x < sizeX &&
     y >= 0 && y < sizeY &&
     z >= 0 && z < sizeZ
   where
-    (sizeX, sizeY, sizeZ) = gridDimensions grid
+    Position (sizeX, sizeY, sizeZ) = gridDimensions grid
 
 replace :: [a] -> Int -> a -> [a]
 replace list index val =
     take index list ++ val : drop (index + 1) list
 
-gridGet :: Grid a -> GridX -> GridY -> GridZ -> Maybe a
-gridGet grid x y z
-    | validBounds grid x y z = Just $ ((grid !! x) !! y) !! z
+gridGet :: Grid a -> Position -> Maybe a
+gridGet grid pos
+    | validBounds grid pos = Just $ ((grid !! (pos^.posX)) !! (pos^.posY)) !! (pos^.posZ)
     | otherwise = Nothing
 
-gridSet :: Grid a -> GridX -> GridY -> GridZ -> a -> Grid a
-gridSet grid x y z value = newMap
+gridSet :: Grid a -> Position -> a -> Grid a
+gridSet grid (Position (x,y,z)) value = newMap
   where
     xList = grid !! x
     yList = xList !! y

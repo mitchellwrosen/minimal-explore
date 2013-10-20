@@ -1,4 +1,6 @@
 module GameLogic.State ( GameState(..)
+                       , gsPlayer
+                       , gsGrid
                        , isValidPlayerPosition
                        , leftButtonPressed
                        , rightButtonPressed
@@ -15,7 +17,7 @@ import Prelude ( Show
                , (==)
                )
 import GameLogic.Player ( Player(..)
-                        , playerGetPosition
+                        , pPosition
                         , playerMoveLeft
                         , playerMoveRight
                         , playerMoveUp
@@ -29,19 +31,24 @@ import GameLogic.Grid ( Grid(..)
 import GameLogic.Types ( GridBead(..)
                        )
 
-data GameState = GameState { _player :: Player
-                           , _grid :: Grid GridBead
+import Control.Lens
+
+data GameState = GameState { _gsPlayer :: Player
+                           , _gsGrid :: Grid GridBead
                            }
   deriving (Show, Eq)
 
+gsPlayer :: Lens GameState Player
+gsPlayer = Lens _gsPlayer (\a s -> s { _gsPlayer = a })
+
+gsGrid :: Lens GameState (Grid GridBead)
+gsGrid = Lens _gsGrid (\a s -> s { _gsGrid = a })
+
 isValidPlayerPosition :: GameState -> Bool
 isValidPlayerPosition gameState =
-    case gridGet grid x y z of
+    case gridGet (gameState^.gsGrid) (gameState^.gsPlayer^.pPosition) of
         Just something -> something == Empty
         _ -> False
-  where grid = _grid gameState
-        player = _player gameState
-        (x, y, z) = playerGetPosition player
 
 leftButtonPressed :: GameState -> GameState
 leftButtonPressed gameState@(GameState player grid) =

@@ -15,12 +15,8 @@ import Prelude ( Maybe(..)
                , (!!)
                )
 
-import GameLogic.State ( GameState(..)
-                       )
-import GameLogic.Player ( Facing(..)
-                        , playerGetFacing
-                        , playerGetPosition
-                        )
+import GameLogic.State ( GameState(..) )
+import GameLogic.Player (Player(..), Facing(..), pFacing, pPosition)
 import GameLogic.Grid ( Grid(..)
                       , gridDimensions
                       , gridGet
@@ -29,7 +25,10 @@ import GameLogic.Types ( GridY
                        , GridZ
                        , Color(..)
                        , GridBead(..)
+                       , Position(..)
                        )
+
+import Control.Lens ( (^.) )
 
 fromMaybe :: a -> Maybe a -> a
 fromMaybe _ (Just something) = something
@@ -42,12 +41,12 @@ getView :: GameState -> [[Color]]
 getView (GameState player grid) =
     mapInd (mapInd . beadColor) viewSection
   where
-    positiveFacing = playerGetFacing player == Positive
+    positiveFacing = player^.pFacing == Positive
 
-    (maxX, _, maxZ) = gridDimensions grid
+    Position (maxX, _, maxZ) = gridDimensions grid
     invertZ z = maxZ - z - 1
 
-    (playerX, playerY, playerZ') = playerGetPosition player
+    Position (playerX, playerY, playerZ') = player^.pPosition
     playerZ = if positiveFacing
               then playerZ'
               else invertZ playerZ'
@@ -65,7 +64,7 @@ getView (GameState player grid) =
 
             -- x slice with the given yz values
             xSlice :: [GridBead]
-            xSlice = map (\x -> fromMaybe Wall $ gridGet grid x y z) [(-1)..maxX]
+            xSlice = map (\x -> fromMaybe Wall $ gridGet grid (Position (x,y,z))) [(-1)..maxX]
 
             delta = if positiveFacing
                     then (+ 1)

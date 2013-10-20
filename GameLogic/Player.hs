@@ -1,7 +1,7 @@
 module GameLogic.Player ( Facing(..)
                         , Player(..)
-                        , playerGetFacing
-                        , playerGetPosition
+                        , pPosition
+                        , pFacing
                         , playerMoveUp
                         , playerMoveDown
                         , playerMoveLeft
@@ -12,66 +12,65 @@ module GameLogic.Player ( Facing(..)
 
 import Prelude ( Show
                , Eq
+               , ($)
                , (+)
                , (-)
                , (==)
+               , subtract
                )
-import GameLogic.Types ( GridX
-                       , GridY
-                       , GridZ
-                       )
+
+import GameLogic.Types
+    ( Position
+    , posX
+    , posY
+    , posZ
+    )
+
+import Control.Lens
 
 data Facing = Positive | Negative
   deriving (Show, Eq)
 
-data Player = Player { _position :: (GridX, GridY, GridZ)
-                     , _facing :: Facing
-                     }
-  deriving (Show, Eq)
+data Player = Player
+    { _pPosition :: Position
+    , _pFacing   :: Facing
+    } deriving (Show, Eq)
 
-playerGetFacing :: Player -> Facing
-playerGetFacing = _facing
+pPosition :: Lens Player Position
+pPosition = Lens _pPosition (\a s -> s { _pPosition = a})
+
+pFacing :: Lens Player Facing
+pFacing = Lens _pFacing (\a s -> s { _pFacing = a})
 
 playerChangeDirection :: Player -> Player
-playerChangeDirection player = player { _facing = oppositeFacing facing }
+playerChangeDirection = pFacing %~ oppositeFacing
   where
     oppositeFacing Positive = Negative
     oppositeFacing Negative = Positive
-    facing = playerGetFacing player
 
 playerMoveForward :: Player -> Player
-playerMoveForward player = player { _position = (delta x, y, z) }
+playerMoveForward player = (pPosition ~> posX) %~ delta $ player
   where
-    delta = if playerGetFacing player == Positive
+    delta = if player^.pFacing == Positive
             then (+1)
-            else (+ (-1))
-    (x, y, z) = playerGetPosition player
+            else (subtract 1)
 
 playerMoveUp :: Player -> Player
-playerMoveUp player = player { _position = (x, y-1, z) }
-  where
-    (x, y, z) = playerGetPosition player
+playerMoveUp = (pPosition ~> posY) %~ (subtract 1)
 
 playerMoveDown :: Player -> Player
-playerMoveDown player = player { _position = (x, y+1, z) }
-  where
-    (x, y, z) = playerGetPosition player
+playerMoveDown = (pPosition ~> posY) %~ (+1)
 
 playerMoveLeft :: Player -> Player
-playerMoveLeft player = player { _position = (x, y, delta z) }
+playerMoveLeft player = (pPosition ~> posZ) %~ delta $ player
   where
-    delta = if playerGetFacing player == Positive
-            then (+ (-1))
+    delta = if player^.pFacing == Positive
+            then (subtract 1)
             else (+ 1)
-    (x, y, z) = playerGetPosition player
 
 playerMoveRight :: Player -> Player
-playerMoveRight player = player { _position = (x, y, delta z) }
+playerMoveRight player = (pPosition ~> posZ) %~ delta $ player
   where
-    delta = if playerGetFacing player == Positive
+    delta = if player^.pFacing == Positive
             then (+ 1)
-            else (+ (-1))
-    (x, y, z) = playerGetPosition player
-
-playerGetPosition :: Player -> (GridX, GridY, GridZ)
-playerGetPosition = _position
+            else (subtract 1)

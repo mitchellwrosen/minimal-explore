@@ -35,6 +35,7 @@ import GameLogic.Types ( GridX
                        , BeadData
                        , GridBead(..)
                        , Color(..)
+                       , Position(..)
                        )
 import GameLogic.Grid ( Grid(..)
                       , gridDimensions
@@ -43,6 +44,7 @@ import GameLogic.Player ( Player(..)
                         , Facing(..)
                         )
 import GameLogic.State ( GameState(..)
+                       , gsGrid
                        , leftButtonPressed
                        , rightButtonPressed
                        , upButtonPressed
@@ -52,6 +54,8 @@ import GameLogic.State ( GameState(..)
                        )
 import GameLogic.View ( getView
                       )
+
+import Control.Lens ( (^.) )
 
 grid :: Grid GridBead
 grid = [ [ [ Wall, Wall, Wall ]
@@ -70,7 +74,7 @@ grid = [ [ [ Wall, Wall, Wall ]
          ]
        ]
 player :: Player
-player = Player (0, 1, 1) Positive
+player = Player (Position (0,1,1)) Positive
 
 gameState :: GameState
 gameState = GameState player grid
@@ -109,7 +113,7 @@ main = do
             gameState <- readRef stateRef
             drawMap gameState
           where
-            (_, gridWidth, gridHeight) = gridDimensions (_grid gameState)
+            Position (_, gridWidth, gridHeight) = gridDimensions (gameState^.gsGrid)
 
         psTouch :: GridX -> GridY -> BeadData -> Fay ()
         psTouch x y beadData = return ()
