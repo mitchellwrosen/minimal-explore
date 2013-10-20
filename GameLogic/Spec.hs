@@ -8,6 +8,7 @@ import GameLogic.Types ( GridX
                        , GridZ
                        , GridBead(..)
                        , Color(..)
+                       , Position(..)
                        )
 import GameLogic.Grid ( replace
                       , gridGet
@@ -16,8 +17,8 @@ import GameLogic.Grid ( replace
                       )
 import GameLogic.Player ( Player(..)
                         , Facing(..)
-                        , playerGetPosition
-                        , playerGetFacing
+                        , pFacing
+                        , pPosition
                         , playerChangeDirection
                         , playerMoveUp
                         , playerMoveDown
@@ -36,6 +37,8 @@ import GameLogic.State ( GameState(..)
                        )
 import GameLogic.View ( getView
                       )
+
+import Control.Lens ( (^.) )
 
 spec :: Spec
 spec = do
@@ -62,54 +65,54 @@ spec = do
                          , [ Empty, Empty, Empty ]
                          ]
                        ]
-            gameState :: (GridX, GridY, GridZ) -> GameState
+            gameState :: Position -> GameState
             gameState pos = GameState (Player pos Positive) testGrid
 
         describe "player positions" $ do
             describe "valid positions" $ do
                 it "Empty slots" $ do
-                    let gs = gameState (1, 1, 1)
+                    let gs = gameState (Position (1, 1, 1))
                     isValidPlayerPosition gs `shouldBe` True
             describe "invalid positions" $ do
                 it "Wall slots" $ do
-                    let gs = gameState (1, 0, 1)
+                    let gs = gameState (Position (1, 0, 1))
                     isValidPlayerPosition gs `shouldBe` False
                 it "OoB X" $ do
-                    let gs = gameState (3, 0, 1)
+                    let gs = gameState (Position (3, 0, 1))
                     isValidPlayerPosition gs `shouldBe` False
                 it "OoB Y" $ do
-                    let gs = gameState (1, -1, 1)
+                    let gs = gameState (Position (1, -1, 1))
                     isValidPlayerPosition gs `shouldBe` False
                 it "OoB Z" $ do
-                    let gs = gameState (1, 1, 3)
+                    let gs = gameState (Position (1, 1, 3))
                     isValidPlayerPosition gs `shouldBe` False
 
         describe "player movement" $ do
             it "allows player movement to a valid position" $ do
-                leftButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 0)
+                leftButtonPressed (gameState (Position (1, 1, 1))) `shouldBe` gameState (Position (1, 1, 0))
             it "disallows player movement to an invalid position" $ do
-                leftButtonPressed (gameState (1, 1, 0)) `shouldBe` gameState (1, 1, 0)
+                leftButtonPressed (gameState (Position (1, 1, 0))) `shouldBe` gameState (Position (1, 1, 0))
 
             describe "directions" $ do
                 it "left" $ do
-                    leftButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 0)
+                    leftButtonPressed (gameState (Position (1, 1, 1))) `shouldBe` gameState (Position (1, 1, 0))
                 it "right" $ do
-                    rightButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 2)
+                    rightButtonPressed (gameState (Position (1, 1, 1))) `shouldBe` gameState (Position (1, 1, 2))
                 it "up" $ do
-                    upButtonPressed (gameState (1, 2, 1)) `shouldBe` gameState (1, 1, 1)
+                    upButtonPressed (gameState (Position (1, 2, 1))) `shouldBe` gameState (Position (1, 1, 1))
                 it "down" $ do
-                    downButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 2, 1)
+                    downButtonPressed (gameState (Position (1, 1, 1))) `shouldBe` gameState (Position (1, 2, 1))
                 it "forward" $ do
-                    forwardButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (2, 1, 1)
+                    forwardButtonPressed (gameState (Position (1, 1, 1))) `shouldBe` gameState (Position (2, 1, 1))
                 describe "reverse" $ do
-                    let gameStateReverse :: (GridX, GridY, GridZ) -> GameState
+                    let gameStateReverse :: Position -> GameState
                         gameStateReverse pos = GameState (Player pos Negative) testGrid
                     it "change directions" $ do
-                        reverseButtonPressed (gameState (1, 1, 1)) `shouldBe`
-                            gameStateReverse (1, 1, 1)
+                        reverseButtonPressed (gameState (Position (1, 1, 1))) `shouldBe`
+                            gameStateReverse (Position (1, 1, 1))
                     it "forward" $ do
-                        forwardButtonPressed (gameStateReverse (1, 1, 1)) `shouldBe`
-                            gameStateReverse (0, 1, 1)
+                        forwardButtonPressed (gameStateReverse (Position (1, 1, 1))) `shouldBe`
+                            gameStateReverse (Position (0, 1, 1))
 
     describe "grid" $ do
         let testGrid :: Grid Int
@@ -122,15 +125,15 @@ spec = do
                          ]
                        ]
         it "can get the value at a given (x,y,z)" $ do
-            gridGet testGrid 0 1 1 `shouldBe` Just 011
-            gridGet testGrid 1 1 0 `shouldBe` Just 110
+            gridGet testGrid (Position (0,1,1)) `shouldBe` Just 011
+            gridGet testGrid (Position (1,1,0)) `shouldBe` Just 110
 
         it "can get Nothing out of bounds" $ do
-            gridGet testGrid (-1) 1 1 `shouldBe` Nothing
-            gridGet testGrid   0  1 2 `shouldBe` Nothing
+            gridGet testGrid (Position (-1,1,1)) `shouldBe` Nothing
+            gridGet testGrid (Position (0,1,2)) `shouldBe` Nothing
 
         it "can set the value at a given (x,y,z)" $ do
-            gridSet testGrid 1 1 0 42 `shouldBe`
+            gridSet testGrid (Position (1,1,0)) 42 `shouldBe`
                 [ [ [ 000, 001 ]
                   , [ 010, 011 ]
                   ]
@@ -150,40 +153,40 @@ spec = do
                          , [ Empty, Wall ]
                          ]
                        ]
-            gridGet grid 0 1 1 `shouldBe` Just Wall
-            gridGet grid 1 0 0 `shouldBe` Just Empty
+            gridGet grid (Position (0,1,1)) `shouldBe` Just Wall
+            gridGet grid (Position (1,0,0)) `shouldBe` Just Empty
 
     describe "the player" $ do
         let testPlayer :: Player
-            testPlayer = Player (1, 1, 1) Positive
+            testPlayer = Player (Position (1,1,1)) Positive
         it "has an xyz position" $ do
-            playerGetPosition testPlayer `shouldBe` (1, 1, 1)
+            testPlayer^.pPosition `shouldBe` Position (1,1,1)
 
         it "moves up and down in the y direction one unit" $ do
-            playerGetPosition (playerMoveDown testPlayer) `shouldBe` (1, 2, 1)
-            playerGetPosition (playerMoveUp testPlayer) `shouldBe` (1, 0, 1)
+            (playerMoveDown testPlayer)^.pPosition `shouldBe` Position (1,2,1)
+            (playerMoveUp testPlayer)^.pPosition `shouldBe` Position (1,0,1)
 
         it "moves left and right in the z direction one unit" $ do
-            playerGetPosition (playerMoveLeft testPlayer) `shouldBe` (1, 1, 0)
-            playerGetPosition (playerMoveRight testPlayer) `shouldBe` (1, 1, 2)
+            (playerMoveLeft testPlayer)^.pPosition `shouldBe` Position (1,1,0)
+            (playerMoveRight testPlayer)^.pPosition `shouldBe` Position (1,1,2)
 
         it "can move forward in the x direction one unit" $ do
-            playerGetPosition (playerMoveForward testPlayer) `shouldBe` (2, 1, 1)
+            (playerMoveForward testPlayer)^.pPosition `shouldBe` Position (2,1,1)
 
         it "faces +x direction" $ do
-            playerGetFacing testPlayer `shouldBe` Positive
+            testPlayer^.pFacing `shouldBe` Positive
 
         describe "changing direction" $ do
             let player' = playerChangeDirection testPlayer
             it "faces -x direction" $ do
-                playerGetFacing player' `shouldBe` Negative
+                player'^.pFacing `shouldBe` Negative
 
             it "reverses left/right for the z direction" $ do
-                playerGetPosition (playerMoveLeft player') `shouldBe` (1, 1, 2)
-                playerGetPosition (playerMoveRight player') `shouldBe` (1, 1, 0)
+                (playerMoveLeft player')^.pPosition `shouldBe` Position (1,1,2)
+                (playerMoveRight player')^.pPosition `shouldBe` Position (1,1,0)
 
             it "moves forward in the -x direction" $ do
-                playerGetPosition (playerMoveForward player') `shouldBe` (0, 1, 1)
+                (playerMoveForward player')^.pPosition `shouldBe` Position (0,1,1)
 
     describe "Game View" $ do
         let testGrid :: Grid GridBead
@@ -213,7 +216,7 @@ spec = do
          -}
 
         describe "positive facing" $ do
-            let gameState = GameState (Player (1, 0, 2) Positive) testGrid
+            let gameState = GameState (Player (Position (1,0,2)) Positive) testGrid
             it "draws walls with the wall foreground color" $ do
                 viewAt gameState 1 1 `shouldBe` WallColor 0
             it "draws the player with player color with Positive facing" $ do
@@ -222,7 +225,7 @@ spec = do
                 viewAt gameState 0 0 `shouldBe` WallColor 2
 
         describe "negative facing" $ do
-            let gameState = GameState (Player (2, 0, 0) Negative) testGrid
+            let gameState = GameState (Player (Position (2,0,0)) Negative) testGrid
             it "draws the player with player color with Negative facing" $ do
                 viewAt gameState 0 2 `shouldBe` PlayerColor
                 viewAt gameState 0 0 `shouldBe` WallColor 0
