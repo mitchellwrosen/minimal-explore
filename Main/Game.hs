@@ -48,8 +48,6 @@ import GameLogic.State ( GameState(..)
                        , forwardButtonPressed
                        , reverseButtonPressed
                        )
-import GameLogic.View ( getView
-                      )
 
 -- Everything is in main for the beautiful closure that it offers over stateRef.
 main :: Fay ()
