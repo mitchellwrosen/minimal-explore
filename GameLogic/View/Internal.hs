@@ -42,6 +42,7 @@ import Prelude ( Maybe(..)
 import GameLogic.State ( GameState(..)
                        )
 import GameLogic.GameMap ( gameMapGrid
+                         , gameMapAmbientLight
                          )
 import GameLogic.Player ( Facing(..)
                         , playerGetFacing
@@ -57,16 +58,6 @@ import GameLogic.Types ( GridY
                        , Color(..)
                        , GridBead(..)
                        )
-
-maxLight :: Int
-maxLight = 64
-
-fadeValue :: Int -> Int
-fadeValue 0 = 0
-fadeValue 1 = round $ fromIntegral maxLight * 64 / 255
-fadeValue 2 = round $ fromIntegral maxLight * 128 / 255
-fadeValue 3 = round $ fromIntegral maxLight * 192 / 255
-fadeValue _ = maxLight
 
 getR, getG, getB :: (GridBead, Int) -> Int
 getR (Light _ (r, _, _), _) = r
@@ -107,16 +98,6 @@ beadDiffuse (DoorColor dist) =
         1 -> (0.4, 0.4, 1.0)
         _ -> (0.5, 0.5, 1.0)
 
-calculateBeadColor :: (Color, [(GridBead, Int)]) -> [Int]
-calculateBeadColor (color@(EmptyColor), lights) =
-    multLights (beadDiffuse color) [maxLight, maxLight, maxLight] lights
-calculateBeadColor (color@(PlayerColor), lights) =
-    multLights (beadDiffuse color) [maxLight, 0, 0] lights
-calculateBeadColor (color@(WallColor dist), lights) =
-    multLights (beadDiffuse color) (replicate 3 $ fadeValue dist) lights
-calculateBeadColor (color@(DoorColor dist), lights) =
-    multLights (beadDiffuse color) ((replicate 2 $ fadeValue dist) ++ [maxLight]) lights
-
 fromMaybe :: a -> Maybe a -> a
 fromMaybe = flip maybe id
 
@@ -125,6 +106,26 @@ mapInd f = zipWith f [0..]
 
 getColorView :: GameState -> [[[Int]]]
 getColorView gameState = map (map (calculateBeadColor)) $ getView gameState
+  where
+    maxLight = gameMapAmbientLight $ gameStateGameMap gameState
+
+    fadeValue :: Int -> Int
+    fadeValue 0 = 0
+    fadeValue 1 = round $ fromIntegral maxLight * 64 / 255
+    fadeValue 2 = round $ fromIntegral maxLight * 128 / 255
+    fadeValue 3 = round $ fromIntegral maxLight * 192 / 255
+    fadeValue _ = maxLight
+
+    calculateBeadColor :: (Color, [(GridBead, Int)]) -> [Int]
+    calculateBeadColor (color@(EmptyColor), lights) =
+        multLights (beadDiffuse color) [maxLight, maxLight, maxLight] lights
+    calculateBeadColor (color@(PlayerColor), lights) =
+        multLights (beadDiffuse color) [maxLight, 0, 0] lights
+    calculateBeadColor (color@(WallColor dist), lights) =
+        multLights (beadDiffuse color) (replicate 3 $ fadeValue dist) lights
+    calculateBeadColor (color@(DoorColor dist), lights) =
+        multLights (beadDiffuse color) ((replicate 2 $ fadeValue dist) ++ [maxLight]) lights
+
 
 getView :: GameState -> [[(Color, [(GridBead, Int)])]]
 getView (GameState player gameMap) =

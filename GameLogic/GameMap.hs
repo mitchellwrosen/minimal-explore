@@ -5,6 +5,7 @@ module GameLogic.GameMap ( GameMap(..)
                          ) where
 
 import Prelude ( String
+               , Int
                , Eq
                , Show
                , Maybe(..)
@@ -36,6 +37,7 @@ import GameLogic.Types ( GridBead(..)
 data GameMap = GameMap { gameMapGrid :: Grid GridBead
                        , gameMapName :: String
                        , gameMapDoors :: [(GridBead, (GridX, GridY, GridZ))]
+                       , gameMapAmbientLight :: Int
                        }
   deriving (Eq, Show)
 
@@ -51,8 +53,8 @@ getMatchingDoorPosition fromMap toMap (Door name ident) =
     findFirst :: (a -> Bool) -> [a] -> a
     findFirst filt list = head $ filter filt list
 
-makeGameMap :: Grid GridBead -> String -> GameMap
-makeGameMap grid name = GameMap grid name doors
+makeGameMap :: Grid GridBead -> String -> Int -> GameMap
+makeGameMap grid name ambientLight = GameMap grid name doors ambientLight
   where
     filterFunc ((Door _ _), _) = True
     filterFunc _ = False
