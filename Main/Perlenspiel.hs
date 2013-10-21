@@ -3,7 +3,10 @@ module Main.Perlenspiel ( setPSEvent
                         , setPSMouseWheelEvent
                         , setPSKeyEvent
                         , psGridSize
+                        , psGridColor
                         , psBeadColor
+                        , psBorderColor
+                        , psAll
                         ) where
 
 import Prelude ( String
@@ -20,6 +23,12 @@ import GameLogic.Types ( GridX
                        )
 
 import FFI (ffi)
+
+psAll :: Int
+psAll = ffi "PS.ALL"
+
+psBorderColor :: Int -> Int -> [Int] -> Fay ()
+psBorderColor = ffi "PS.borderColor(%1, %2, %3)"
 
 setPSEvent :: String -> Fay () -> Fay ()
 setPSEvent = ffi "PS[%1] = %2"
@@ -38,3 +47,6 @@ psGridSize = ffi "PS.gridSize(%1, %2)"
 
 psBeadColor :: Int -> Int -> [Int] -> Fay ()
 psBeadColor = ffi "PS.color(%1, %2, %3)"
+
+psGridColor :: [Int] -> Fay ()
+psGridColor = ffi "PS.gridColor(%1)"

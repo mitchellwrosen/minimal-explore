@@ -19,7 +19,10 @@ import Main.Perlenspiel ( setPSEvent
                         , setPSMouseWheelEvent
                         , setPSKeyEvent
                         , psGridSize
+                        , psGridColor
                         , psBeadColor
+                        , psBorderColor
+                        , psAll
                         )
 
 import qualified Levels.Level1
@@ -61,6 +64,8 @@ main = do
             gameState <- readRef stateRef
             let (_, gridHeight, gridWidth) = gridDimensions (gameMapGrid (gameStateGameMap gameState))
             psGridSize gridWidth gridHeight
+            psGridColor [15, 15, 15]
+            psBorderColor psAll psAll [15, 15, 15]
             drawMap gameState
 
         psTouch :: GridX -> GridY -> BeadData -> Fay ()
