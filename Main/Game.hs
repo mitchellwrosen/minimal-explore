@@ -2,19 +2,14 @@ module Main.Game () where
 
 import Prelude ( Fay
                , Bool
-               , Int
                , id
-               , map
-               , flip
-               , zipWith
-               , sequence_
                , return
-               , print
-               , undefined
-               , (.)
+               , replicate
                , (>>=)
                )
 
+import Main.View ( drawMap
+                 )
 import Main.Ref ( modifyRef
                 , newRef
                 , readRef
@@ -56,34 +51,10 @@ import GameLogic.State ( GameState(..)
 import GameLogic.View ( getView
                       )
 
-beadColor :: Color -> [Int]
-beadColor (EmptyColor) = [255, 255, 255]
-beadColor (WallColor dist) =
-    case dist of
-        0 -> [0, 0, 0]
-        1 -> [64, 64, 64]
-        2 -> [128, 128, 128]
-        3 -> [192, 192, 192]
-        _ -> beadColor EmptyColor
-beadColor (PlayerColor) = [255, 0, 0]
-beadColor (DoorColor) = [0, 0, 255]
-
-drawMap :: GameState -> Fay ()
-drawMap gameState = do
-    let view = getView gameState
-        colorView = map (map beadColor) view
-    mapMInd_ (mapMInd_ . flip psBeadColor) colorView
-  where
-    mapMInd_ :: (Int -> a -> Fay b) -> [a] -> Fay ()
-    mapMInd_ f = zipWithM_ f [0..]
-
-    zipWithM_ :: (a -> b -> Fay c) -> [a] -> [b] -> Fay ()
-    zipWithM_ f xs ys = sequence_ (zipWith f xs ys)
-
 -- Everything is in main for the beautiful closure that it offers over stateRef.
 main :: Fay ()
 main = do
-    let player = Player (0, 1, 1) Positive
+    let player = Player (0, 2, 2) Positive
         gameState = GameState player Levels.Level1.gameMap
     stateRef <- newRef gameState
 

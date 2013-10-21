@@ -235,7 +235,7 @@ spec = do
 
             testMap = makeGameMap testGrid "test"
             viewAt :: GameState -> Int -> Int -> Color
-            viewAt state x y = (getView state !! x) !! y
+            viewAt state x y = map fst (getView state !! x) !! y
 
         describe "positive facing" $ do
             let gameState = GameState (Player (1, 0, 2) Positive) testMap

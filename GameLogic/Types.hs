@@ -18,13 +18,16 @@ type BeadMap = [[[BeadData]]]
 
 type DistanceX = Int
 data Color = WallColor DistanceX
+           | DoorColor DistanceX
            | EmptyColor
            | PlayerColor
-           | DoorColor
   deriving (Show, Eq)
 
 data GridBead = Wall
               | Empty
+              | Light { lightRadius :: Int
+                      , lightColor :: (Int, Int, Int)
+                      }
               | Door { doorMapName :: String
                      , doorId :: String
                      }
