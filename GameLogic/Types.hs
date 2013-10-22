@@ -23,11 +23,14 @@ data Color = WallColor DistanceX
            | PlayerColor
   deriving (Show, Eq)
 
+data Light = Light { lightRadius :: Int
+                   , lightColor :: (Int, Int, Int)
+                   }
+  deriving (Show, Eq)
+
 data GridBead = Wall
               | Empty
-              | Light { lightRadius :: Int
-                      , lightColor :: (Int, Int, Int)
-                      }
+              | LightBead Light
               | Door { doorMapName :: String
                      , doorId :: String
                      }

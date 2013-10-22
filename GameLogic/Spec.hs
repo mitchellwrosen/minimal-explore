@@ -7,6 +7,7 @@ import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
                        , GridBead(..)
+                       , Light(..)
                        , Color(..)
                        )
 import GameLogic.Grid ( replace
