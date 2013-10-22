@@ -62,6 +62,7 @@ import GameLogic.Grid ( Grid(..)
                       )
 import GameLogic.Types ( GridY
                        , GridZ
+                       , Door(..)
                        , Color(..)
                        , Light(..)
                        , GridBead(..)
@@ -158,7 +159,7 @@ getView (GameState player gameMap) =
             distance dist index =
                 case xSlice !! index of
                     Wall -> (dist, Wall)
-                    door@(Door _ _) -> (dist, door)
+                    door@(DoorBead _) -> (dist, door)
                     _ -> distance (dist + 1) (delta index)
         in  distance 0 $ playerX + 1
 
@@ -169,4 +170,4 @@ getView (GameState player gameMap) =
             let (dist, bead) = distanceToBead y z
             in  case bead of
                     Wall -> (WallColor dist, nearbyLightBeads y z)
-                    (Door _ _) -> (DoorColor dist, nearbyLightBeads y z)
+                    (DoorBead (Door _ _)) -> (DoorColor dist, nearbyLightBeads y z)

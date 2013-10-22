@@ -7,6 +7,7 @@ import GameLogic.GameMap ( GameMap(..)
                          )
 import GameLogic.Types ( GridBead(..)
                        , Light(..)
+                       , Door(..)
                        )
 import GameLogic.Grid ( Grid(..) )
 
@@ -28,7 +29,7 @@ grid = [ [ [ Wall, Empty, Wall, Empty, Wall, Empty, Wall, Empty, Wall ]
        , [ [ Empty, Wall, Empty, Empty, Empty, Empty, Empty, Wall, Empty ]
          , [ Wall, Empty, Wall, Wall, Empty, Wall, Wall, Empty, Wall ]
          , [ Empty, Wall, Empty, Wall, Wall, Wall, Empty, Wall, Empty ]
-         , [ Empty, Wall, Empty, Wall, Empty, Wall, Empty, Wall, Door "level1" "a" ]
+         , [ Empty, Wall, Empty, Wall, Empty, Wall, Empty, Wall, DoorBead $ Door "level1" "a" ]
          , [ Empty, Empty, Empty, Wall, Empty, Wall, Empty, LightBead $ Light 3 (255, 255, 255), Empty ]
          , [ Empty, Empty, Empty, Wall, Empty, Wall, Empty, Empty, Empty ]
          ]

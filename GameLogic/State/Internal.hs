@@ -31,6 +31,7 @@ import GameLogic.Grid ( Grid(..)
                       , gridGet
                       )
 import GameLogic.Types ( GridBead(..)
+                       , Door(..)
                        )
 import GameLogic.GameMap ( getGameMapFromDoor
                          , getMatchingDoorPosition
@@ -56,7 +57,7 @@ processPlayerMove :: (Player -> Player) -> GameState -> GameState
 processPlayerMove playerMove gameState@(GameState player grid) =
     case maybeGridBead of
         Just Empty -> gameState'
-        Just door@(Door _ _) -> loadNewRoom gameState door
+        Just door@(DoorBead _) -> loadNewRoom gameState door
         _ -> gameState
   where
     gameState' = GameState (playerMove player) grid

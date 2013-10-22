@@ -7,6 +7,7 @@ import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
                        , GridBead(..)
+                       , Door(..)
                        , Light(..)
                        , Color(..)
                        )
@@ -65,11 +66,11 @@ spec = do
             doorId door `shouldBe` "id"
 
         describe "player steps on door" $ do
-            let doorA = Door "mapB" "unique"
+            let doorA = DoorBead $ Door "mapB" "unique"
                 gridA = [ [ [ doorA ] ] ]
                 gameMapA = makeGameMap gridA "mapA" [] 255
 
-                doorB = Door "mapA" "unique"
+                doorB = DoorBead $ Door "mapA" "unique"
                 gridB = [ [ [ doorB ] ] ]
                 gameMapB = makeGameMap gridB "mapB" [] 255
 
@@ -85,7 +86,7 @@ spec = do
 
     describe "gameMap" $ do
         let name = "mapA"
-            door = Door "mapB" "unique"
+            door = DoorBead $ Door "mapB" "unique"
             grid = [ [ [ door ] ] ]
             gameMap = makeGameMap grid name [] 255
 

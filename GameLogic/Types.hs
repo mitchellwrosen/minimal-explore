@@ -28,10 +28,13 @@ data Light = Light { lightRadius :: Int
                    }
   deriving (Show, Eq)
 
+data Door = Door { doorMapName :: String
+                 , doorId :: String
+                 }
+  deriving (Show, Eq)
+
 data GridBead = Wall
               | Empty
               | LightBead Light
-              | Door { doorMapName :: String
-                     , doorId :: String
-                     }
+              | DoorBead Door
   deriving (Show, Eq)
