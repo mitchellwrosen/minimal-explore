@@ -31,4 +31,4 @@ grid = [ [ [ Wall, Empty, Wall, Empty, Wall, Empty, Wall, Empty, Wall ]
        ]
 
 gameMap :: GameMap
-gameMap = makeGameMap grid "level2" 192
+gameMap = makeGameMap grid "level2" [] 192

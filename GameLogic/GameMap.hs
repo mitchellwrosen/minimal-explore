@@ -34,9 +34,14 @@ import GameLogic.Types ( GridBead(..)
                        , GridZ
                        )
 
+data PushableBlock = PushableBlock { pushableBlockPosition :: (GridX, GridY, GridZ)
+                                   }
+    deriving (Eq, Show)
+
 data GameMap = GameMap { gameMapGrid :: Grid GridBead
                        , gameMapName :: String
                        , gameMapDoors :: [(GridBead, (GridX, GridY, GridZ))]
+                       , gameMapPushableBlocks :: [PushableBlock]
                        , gameMapAmbientLight :: Int
                        }
   deriving (Eq, Show)
@@ -53,8 +58,9 @@ getMatchingDoorPosition fromMap toMap (Door name ident) =
     findFirst :: (a -> Bool) -> [a] -> a
     findFirst filt list = head $ filter filt list
 
-makeGameMap :: Grid GridBead -> String -> Int -> GameMap
-makeGameMap grid name ambientLight = GameMap grid name doors ambientLight
+makeGameMap :: Grid GridBead -> String -> [PushableBlock] -> Int -> GameMap
+makeGameMap grid name pushableBlocks ambientLight =
+    GameMap grid name doors pushableBlocks ambientLight
   where
     filterFunc ((Door _ _), _) = True
     filterFunc _ = False
