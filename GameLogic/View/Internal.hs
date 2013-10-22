@@ -1,10 +1,7 @@
 module GameLogic.View.Internal ( getColorView
                                , getView
-                               , multLights
+                               , phongLighting
                                , lightIntensity
-                               , getR
-                               , getG
-                               , getB
                                ) where
 
 import Prelude ( Maybe(..)
@@ -38,12 +35,9 @@ import Prelude ( Maybe(..)
                , (-)
                , (!!)
                )
-import GameLogic.View.Light ( multLights
+import GameLogic.View.Light ( phongLighting
                             , beadDiffuse
                             , lightIntensity
-                            , getR
-                            , getG
-                            , getB
                             )
 
 import GameLogic.State ( GameState(..)
@@ -90,13 +84,13 @@ getColorView gameState = map (map (calculateBeadColor)) $ getView gameState
 
     calculateBeadColor :: (BeadColor, [(Light, Int)]) -> Color
     calculateBeadColor (color@(EmptyColor), lights) =
-        multLights (beadDiffuse color) (maxLight, maxLight, maxLight) lights
+        phongLighting (beadDiffuse color) (maxLight, maxLight, maxLight) lights
     calculateBeadColor (color@(PlayerColor), lights) =
-        multLights (beadDiffuse color) (maxLight, 0, 0) lights
+        phongLighting (beadDiffuse color) (maxLight, 0, 0) lights
     calculateBeadColor (color@(WallColor dist), lights) =
-        multLights (beadDiffuse color) (fadeValue dist, fadeValue dist, fadeValue dist) lights
+        phongLighting (beadDiffuse color) (fadeValue dist, fadeValue dist, fadeValue dist) lights
     calculateBeadColor (color@(DoorColor dist), lights) =
-        multLights (beadDiffuse color) (fadeValue dist, fadeValue dist, maxLight) lights
+        phongLighting (beadDiffuse color) (fadeValue dist, fadeValue dist, maxLight) lights
 
 
 getView :: GameState -> [[(BeadColor, [(Light, Int)])]]

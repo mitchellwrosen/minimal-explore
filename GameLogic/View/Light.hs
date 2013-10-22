@@ -1,9 +1,6 @@
-module GameLogic.View.Light ( multLights
+module GameLogic.View.Light ( phongLighting
                             , beadDiffuse
                             , lightIntensity
-                            , getR
-                            , getG
-                            , getB
                             ) where
 
 import Prelude ( Int
@@ -17,6 +14,7 @@ import Prelude ( Int
                , (>)
                , (/)
                , (*)
+               , (.)
                , (+)
                )
 
@@ -27,30 +25,39 @@ import GameLogic.Color ( Color(..)
 import GameLogic.Types ( Light(..)
                        )
 
-getR, getG, getB :: (Light, Int) -> Int
-getR (Light _ (r, _, _), _) = r
-getG (Light _ (_, g, _), _) = g
-getB (Light _ (_, _, b), _) = b
+zeroTriple :: (Double, Double, Double)
+zeroTriple = (0.0, 0.0, 0.0)
 
-lightIntensity :: ((Light, Int) -> Int) -> (Light, Int) -> Double
-lightIntensity f light@(Light radius _, _)
-    | getDist light > radius = 0.0
-    | otherwise = fromIntegral (f light) / fromIntegral (getDist light + 1)
+mapTriple :: (a -> b) -> (a, a, a) -> (b, b, b)
+mapTriple f (a, b, c) = (f a, f b, f c)
+
+opTriple :: (a -> a -> a) -> (a, a, a) -> (a, a, a) -> (a, a, a)
+opTriple f (a, b, c) (x, y, z) = (f a x, f b y, f c z)
+
+lightIntensity :: (Light, Int) -> (Double, Double, Double)
+lightIntensity (Light radius (r, g, b), dist)
+    | dist > radius = zeroTriple
+    | otherwise = (i r, i g, i b)
   where
-    getDist = snd
+    i v = fromIntegral v / fromIntegral (dist + 1)
 
-multLights :: (Double, Double, Double) -> Color -> [(Light, Int)] -> Color
-multLights (dr, dg, db) (r, g, b) lights = (sumR, sumG, sumB)
+-- Phong Model
+-- a*ka + sum [d*kd]
+phongLighting :: (Double, Double, Double) -> Color -> [(Light, Int)] -> Color
+phongLighting diffuseConstant ambientColor lights = color
   where
-    sum :: Double -> ((Light, Int) -> Int) -> Int
-    sum diffuse f = round $ diffuse * ((foldr (\light -> (+ intensity light))) 0.0 lights)
-      where
-        intensity :: (Light, Int) -> Double
-        intensity light = lightIntensity f light
+    color :: Color
+    color = mapTriple round $ addTriple ambientComponent diffuseComponent
 
-    sumR = r + sum dr getR
-    sumG = g + sum dg getG
-    sumB = b + sum db getB
+    ambientComponent = mapTriple fromIntegral ambientColor
+    diffuseComponent = multTriple diffuseConstant lightContribution
+
+    lightContribution :: (Double, Double, Double)
+    lightContribution =
+        foldr (addTriple . lightIntensity) zeroTriple lights
+
+    addTriple = opTriple (+)
+    multTriple = opTriple (*)
 
 beadDiffuse :: BeadColor -> (Double, Double, Double)
 beadDiffuse (EmptyColor) = (1.0, 1.0, 1.0)

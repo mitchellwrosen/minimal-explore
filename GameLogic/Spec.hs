@@ -36,11 +36,8 @@ import GameLogic.State ( GameState(..)
                        , reverseButtonPressed
                        )
 import GameLogic.View.Internal ( getView
-                               , multLights
+                               , phongLighting
                                , lightIntensity
-                               , getR
-                               , getG
-                               , getB
                                )
 import GameLogic.GameMap ( GameMap(..)
                          , getGameMapFromDoor
@@ -249,24 +246,22 @@ spec = do
 
         describe "lightIntensity" $ do
             let light dist = (Light 3 (255, 0, 0), dist)
+                ir (r, _, _) = r
             it "is at 100% when distance is 0" $ do
-                lightIntensity getR (light 0) `shouldBe` 255.0
+                ir (lightIntensity $ light 0) `shouldBe` 255.0
 
             it "is at 0% when distance is greater than 3" $ do
-                lightIntensity getR (light 4) `shouldBe` 0.0
+                ir (lightIntensity $ light 4) `shouldBe` 0.0
 
-        describe "multLights" $ do
+        describe "phongLighting" $ do
             let ambient@(ar, ag, ab) = (8, 9, 10)
                 lights = [ (Light 3 (255, 255, 255), 2) ]
-                [(ir, ig, ib)] =
-                    map (\light -> (lightIntensity getR light,
-                                    lightIntensity getG light,
-                                    lightIntensity getB light)) lights
+                [(ir, ig, ib)] = map lightIntensity lights
             it "0 diffuse means no extra light" $ do
-                multLights (0.0, 0.0, 0.0) ambient lights `shouldBe` ambient
+                phongLighting (0.0, 0.0, 0.0) ambient lights `shouldBe` ambient
 
             it "1.0 diffuse means 100% light" $ do
-                multLights (1.0, 0.0, 1.0) ambient lights `shouldBe`
+                phongLighting (1.0, 0.0, 1.0) ambient lights `shouldBe`
                     Color.fromList (map round [fromIntegral ar + ir, fromIntegral ag, fromIntegral ab + ib])
 
         describe "positive facing" $ do
