@@ -63,9 +63,11 @@ import GameLogic.Grid ( Grid(..)
 import GameLogic.Types ( GridY
                        , GridZ
                        , Door(..)
-                       , Color(..)
                        , Light(..)
                        , GridBead(..)
+                       )
+import GameLogic.Color ( BeadColor(..)
+                       , Color(..)
                        )
 
 fromMaybe :: a -> Maybe a -> a
@@ -74,7 +76,7 @@ fromMaybe = flip maybe id
 mapInd :: (Int -> a -> b) -> [a] -> [b]
 mapInd f = zipWith f [0..]
 
-getColorView :: GameState -> [[[Int]]]
+getColorView :: GameState -> [[Color]]
 getColorView gameState = map (map (calculateBeadColor)) $ getView gameState
   where
     maxLight = gameMapAmbientLight $ gameStateGameMap gameState
@@ -86,18 +88,18 @@ getColorView gameState = map (map (calculateBeadColor)) $ getView gameState
     fadeValue 3 = round $ fromIntegral maxLight * 192 / 255
     fadeValue _ = maxLight
 
-    calculateBeadColor :: (Color, [(Light, Int)]) -> [Int]
+    calculateBeadColor :: (BeadColor, [(Light, Int)]) -> Color
     calculateBeadColor (color@(EmptyColor), lights) =
-        multLights (beadDiffuse color) [maxLight, maxLight, maxLight] lights
+        multLights (beadDiffuse color) (maxLight, maxLight, maxLight) lights
     calculateBeadColor (color@(PlayerColor), lights) =
-        multLights (beadDiffuse color) [maxLight, 0, 0] lights
+        multLights (beadDiffuse color) (maxLight, 0, 0) lights
     calculateBeadColor (color@(WallColor dist), lights) =
-        multLights (beadDiffuse color) (replicate 3 $ fadeValue dist) lights
+        multLights (beadDiffuse color) (fadeValue dist, fadeValue dist, fadeValue dist) lights
     calculateBeadColor (color@(DoorColor dist), lights) =
-        multLights (beadDiffuse color) ((replicate 2 $ fadeValue dist) ++ [maxLight]) lights
+        multLights (beadDiffuse color) (fadeValue dist, fadeValue dist, maxLight) lights
 
 
-getView :: GameState -> [[(Color, [(Light, Int)])]]
+getView :: GameState -> [[(BeadColor, [(Light, Int)])]]
 getView (GameState player gameMap) =
     mapInd (mapInd . beadColor) viewSection
   where
@@ -163,7 +165,7 @@ getView (GameState player gameMap) =
                     _ -> distance (dist + 1) (delta index)
         in  distance 0 $ playerX + 1
 
-    beadColor :: GridY -> GridZ -> GridBead -> (Color, [(Light, Int)])
+    beadColor :: GridY -> GridZ -> GridBead -> (BeadColor, [(Light, Int)])
     beadColor y z bead
         | (y, z) == (playerY, playerZ) = (PlayerColor, nearbyLightBeads y z)
         | otherwise =

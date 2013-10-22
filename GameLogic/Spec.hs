@@ -9,7 +9,6 @@ import GameLogic.Types ( GridX
                        , GridBead(..)
                        , Door(..)
                        , Light(..)
-                       , Color(..)
                        )
 import GameLogic.Grid ( replace
                       , gridGet
@@ -48,6 +47,9 @@ import GameLogic.GameMap ( GameMap(..)
                          , makeGameMap
                          , getMatchingDoorPosition
                          )
+import GameLogic.Color as Color ( BeadColor(..)
+                                , fromList
+                                )
 
 spec :: Spec
 spec = do
@@ -242,21 +244,19 @@ spec = do
                        ]
 
             testMap = makeGameMap testGrid "test" [] 255
-            viewAt :: GameState -> Int -> Int -> Color
+            viewAt :: GameState -> Int -> Int -> BeadColor
             viewAt state x y = map fst (getView state !! x) !! y
 
         describe "lightIntensity" $ do
             let light dist = (Light 3 (255, 0, 0), dist)
             it "is at 100% when distance is 0" $ do
-                --lightIntensity :: ((GridBead, Int) -> Int) -> (GridBead, Int) -> Double
                 lightIntensity getR (light 0) `shouldBe` 255.0
 
             it "is at 0% when distance is greater than 3" $ do
-                --lightIntensity :: ((GridBead, Int) -> Int) -> (GridBead, Int) -> Double
                 lightIntensity getR (light 4) `shouldBe` 0.0
 
         describe "multLights" $ do
-            let ambient@[ar, ag, ab] = [8, 9, 10]
+            let ambient@(ar, ag, ab) = (8, 9, 10)
                 lights = [ (Light 3 (255, 255, 255), 2) ]
                 [(ir, ig, ib)] =
                     map (\light -> (lightIntensity getR light,
@@ -267,7 +267,7 @@ spec = do
 
             it "1.0 diffuse means 100% light" $ do
                 multLights (1.0, 0.0, 1.0) ambient lights `shouldBe`
-                    map round [fromIntegral ar + ir, fromIntegral ag, fromIntegral ab + ib]
+                    Color.fromList (map round [fromIntegral ar + ir, fromIntegral ag, fromIntegral ab + ib])
 
         describe "positive facing" $ do
             let gameState = GameState (Player (1, 0, 2) Positive) testMap

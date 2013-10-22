@@ -20,8 +20,11 @@ import Prelude ( Int
                , (+)
                )
 
-import GameLogic.Types ( Color(..)
-                       , Light(..)
+import GameLogic.Color ( Color(..)
+                       , BeadColor(..)
+                       )
+
+import GameLogic.Types ( Light(..)
                        )
 
 getR, getG, getB :: (Light, Int) -> Int
@@ -36,8 +39,8 @@ lightIntensity f light@(Light radius _, _)
   where
     getDist = snd
 
-multLights :: (Double, Double, Double) -> [Int] -> [(Light, Int)] -> [Int]
-multLights (dr, dg, db) [r, g, b] lights = [sumR, sumG, sumB]
+multLights :: (Double, Double, Double) -> Color -> [(Light, Int)] -> Color
+multLights (dr, dg, db) (r, g, b) lights = (sumR, sumG, sumB)
   where
     sum :: Double -> ((Light, Int) -> Int) -> Int
     sum diffuse f = round $ diffuse * ((foldr (\light -> (+ intensity light))) 0.0 lights)
@@ -49,7 +52,7 @@ multLights (dr, dg, db) [r, g, b] lights = [sumR, sumG, sumB]
     sumG = g + sum dg getG
     sumB = b + sum db getB
 
-beadDiffuse :: Color -> (Double, Double, Double)
+beadDiffuse :: BeadColor -> (Double, Double, Double)
 beadDiffuse (EmptyColor) = (1.0, 1.0, 1.0)
 beadDiffuse (PlayerColor) = (1.0, 0.1, 0.1)
 beadDiffuse (WallColor dist) =

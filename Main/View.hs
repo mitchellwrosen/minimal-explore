@@ -27,8 +27,7 @@ import Prelude ( Int
 import Main.Perlenspiel ( psBeadColor
                         )
 
-import GameLogic.Types ( Color(..)
-                       , GridBead(..)
+import GameLogic.Types ( GridBead(..)
                        )
 import GameLogic.State ( GameState(..)
                        )

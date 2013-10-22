@@ -6,6 +6,9 @@ import Prelude ( Int
                , String
                )
 
+import GameLogic.Color ( Color(..)
+                       )
+
 type GridX = Int
 type GridY = Int
 type GridZ = Int
@@ -16,15 +19,8 @@ type KeyValue = Int
 
 type BeadMap = [[[BeadData]]]
 
-type DistanceX = Int
-data Color = WallColor DistanceX
-           | DoorColor DistanceX
-           | EmptyColor
-           | PlayerColor
-  deriving (Show, Eq)
-
 data Light = Light { lightRadius :: Int
-                   , lightColor :: (Int, Int, Int)
+                   , lightColor :: Color
                    }
   deriving (Show, Eq)
 
