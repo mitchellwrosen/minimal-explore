@@ -14,6 +14,7 @@ import Prelude ( String
                , head
                , maybe
                , filter
+               , foldr
                , error
                , id
                , fst
@@ -27,22 +28,20 @@ import Prelude ( String
 
 import GameLogic.Grid ( Grid(..)
                       , gridElems
+                      , gridSet
                       )
 import GameLogic.Types ( GridBead(..)
                        , GridX
                        , GridY
                        , GridZ
+                       , Light(..)
                        , Door(..)
                        )
 
-data PushableBlock = PushableBlock { pushableBlockPosition :: (GridX, GridY, GridZ)
-                                   }
-    deriving (Eq, Show)
-
 data GameMap = GameMap { gameMapGrid :: Grid GridBead
                        , gameMapName :: String
-                       , gameMapDoors :: [(GridBead, (GridX, GridY, GridZ))]
-                       , gameMapPushableBlocks :: [PushableBlock]
+                       , gameMapDoors :: [(Door, (GridX, GridY, GridZ))]
+                       , gameMapLights :: [(Light, (GridX, GridY, GridZ))]
                        , gameMapAmbientLight :: Int
                        }
   deriving (Eq, Show)
@@ -54,15 +53,26 @@ getGameMapFromDoor gameMaps (DoorBead (Door roomName _)) =
 
 getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> (GridX, GridY, GridZ)
 getMatchingDoorPosition fromMap toMap (DoorBead (Door name ident)) =
-    snd $ findFirst ((== DoorBead (Door (gameMapName fromMap) ident)) . fst) (gameMapDoors toMap)
+    snd $ findFirst ((== Door (gameMapName fromMap) ident) . fst) (gameMapDoors toMap)
   where
     findFirst :: (a -> Bool) -> [a] -> a
     findFirst filt list = head $ filter filt list
 
-makeGameMap :: Grid GridBead -> String -> [PushableBlock] -> Int -> GameMap
-makeGameMap grid name pushableBlocks ambientLight =
-    GameMap grid name doors pushableBlocks ambientLight
+makeGameMap :: Grid GridBead -> String -> Int -> GameMap
+makeGameMap grid name ambientLight =
+    GameMap grid' name doors lights ambientLight
   where
-    filterFunc (DoorBead (Door _ _), _) = True
-    filterFunc _ = False
-    doors = filter filterFunc $ gridElems grid
+    lights = foldr lightFold [] (gridElems grid)
+      where
+        lightFold (LightBead light, pos) xs = (light, pos):xs
+        lightFold _ xs = xs
+
+    grid' = removeLightBeads
+    removeLightBeads = foldr removeLightBead grid lights
+      where
+        removeLightBead (_, (x, y, z)) grd = gridSet grd x y z Empty
+
+    doors = foldr doorFold [] (gridElems grid)
+      where
+        doorFold (DoorBead door, pos) xs = (door, pos):xs
+        doorFold _ xs = xs

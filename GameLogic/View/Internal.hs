@@ -44,6 +44,7 @@ import GameLogic.State ( GameState(..)
                        )
 import GameLogic.GameMap ( gameMapGrid
                          , gameMapAmbientLight
+                         , GameMap(..)
                          )
 import GameLogic.Player ( Facing(..)
                         , playerGetFacing
@@ -71,7 +72,7 @@ mapInd :: (Int -> a -> b) -> [a] -> [b]
 mapInd f = zipWith f [0..]
 
 getColorView :: GameState -> [[Color]]
-getColorView gameState = map (map (calculateBeadColor)) $ getView gameState
+getColorView gameState = map (map calculateBeadColor) $ getView gameState
   where
     maxLight = gameMapAmbientLight $ gameStateGameMap gameState
 
@@ -119,15 +120,12 @@ getView (GameState player gameMap) =
         z = if positiveFacing
             then z'
             else invertZ z'
-        lightBeadFilter (LightBead (Light _ _), _) = True
-        lightBeadFilter _ = False
-        lightBeads = filter lightBeadFilter (gridElems grid)
+        lightBeads = gameMapLights gameMap
 
         lightsWithDistance :: [(Light, Int)]
         lightsWithDistance = map lightWithDistance lightBeads
           where
-            lightWithDistance (LightBead light@(Light _ _), lightPos) =
-                (light, distance lightPos (playerX, y, z))
+            lightWithDistance (light, lightPos) = (light, distance lightPos (playerX, y, z))
 
         nearbyFilter (light, dist) = dist <= lightRadius light
         nearbyLightBeads' = filter nearbyFilter lightsWithDistance

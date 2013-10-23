@@ -67,11 +67,11 @@ spec = do
         describe "player steps on door" $ do
             let doorA = DoorBead $ Door "mapB" "unique"
                 gridA = [ [ [ doorA ] ] ]
-                gameMapA = makeGameMap gridA "mapA" [] 255
+                gameMapA = makeGameMap gridA "mapA" 255
 
                 doorB = DoorBead $ Door "mapA" "unique"
                 gridB = [ [ [ doorB ] ] ]
-                gameMapB = makeGameMap gridB "mapB" [] 255
+                gameMapB = makeGameMap gridB "mapB" 255
 
                 maps = [ (gameMapName gameMapA, gameMapA)
                        , (gameMapName gameMapB, gameMapB)
@@ -85,9 +85,9 @@ spec = do
 
     describe "gameMap" $ do
         let name = "mapA"
-            door = DoorBead $ Door "mapB" "unique"
-            grid = [ [ [ door ] ] ]
-            gameMap = makeGameMap grid name [] 255
+            door = Door "mapB" "unique"
+            grid = [ [ [ DoorBead door ] ] ]
+            gameMap = makeGameMap grid name 255
 
         it "has a grid" $ do
             gameMapGrid gameMap `shouldBe` grid
@@ -115,7 +115,7 @@ spec = do
                          , [ Empty, Empty, Empty ]
                          ]
                        ]
-            testMap = makeGameMap testGrid "test" [] 255
+            testMap = makeGameMap testGrid "test" 255
 
             gameState :: (GridX, GridY, GridZ) -> GameState
             gameState pos = GameState (Player pos Positive) testMap
@@ -240,7 +240,7 @@ spec = do
                          ]
                        ]
 
-            testMap = makeGameMap testGrid "test" [] 255
+            testMap = makeGameMap testGrid "test" 255
             viewAt :: GameState -> Int -> Int -> BeadColor
             viewAt state x y = map fst (getView state !! x) !! y
 
