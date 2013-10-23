@@ -13,8 +13,11 @@ import Prelude ( Show
                , Maybe(..)
                , (==)
                , (++)
+               , ($)
                , maybe
+               , flip
                , lookup
+               , filter
                , id
                , error
                )
@@ -54,15 +57,23 @@ loadNewRoom gameState door = gameState'
     newMap = getGameMapFromDoor Levels.GameMaps.gameMaps door
 
 processPlayerMove :: (Player -> Player) -> GameState -> GameState
-processPlayerMove playerMove gameState@(GameState player grid) =
-    case maybeGridBead of
-        Just Empty -> gameState'
-        Just door@(DoorBead _) -> loadNewRoom gameState door
-        _ -> gameState
+processPlayerMove playerMove gameState@(GameState player gameMap) =
+    case gridBead of
+        Empty -> checkLightBeadCollisions
+        door@(DoorBead _) -> loadNewRoom gameState door
+        Wall -> gameState
   where
-    gameState' = GameState (playerMove player) grid
-    (x, y, z) = playerGetPosition (playerMove (_player gameState))
-    maybeGridBead = gridGet (gameMapGrid (gameStateGameMap gameState)) x y z
+    fromMaybe = flip maybe id
+
+    gameState' = GameState (playerMove player) gameMap
+    (x, y, z) = playerGetPosition $ playerMove player
+    gridBead = fromMaybe Wall $ gridGet (gameMapGrid $ gameMap) x y z
+
+    checkLightBeadCollisions = case light of
+        [light] -> gameState
+        []      -> gameState'
+      where
+        light = filter (\(_, lightPos) -> lightPos == (x, y, z)) $ gameMapLights gameMap
 
 leftButtonPressed :: GameState -> GameState
 leftButtonPressed = processPlayerMove playerMoveLeft
