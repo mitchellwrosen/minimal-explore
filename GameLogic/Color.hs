@@ -16,6 +16,7 @@ data BeadColor = WallColor DistanceX
                | DoorColor DistanceX
                | EmptyColor
                | PlayerColor
+               | LightColor Color
   deriving (Show, Eq)
 
 toList :: Color -> [Int]

@@ -21,6 +21,7 @@ import Main.Perlenspiel ( setPSEvent
                         , psGridSize
                         , psGridColor
                         , psBeadColor
+                        , psBorderWidth
                         , psBorderColor
                         , psAll
                         )
@@ -98,6 +99,8 @@ main = do
                     _ -> id
             modifyRef stateRef move
             readRef stateRef >>= drawMap
+            {-psBorderWidth 4 2 4-}
+            {-psBorderColor 4 2 (192, 192, 192)-}
 
         psKeyUp :: KeyValue -> Bool -> Bool -> Fay ()
         psKeyUp keyValue shift ctrl = return ()

@@ -19,6 +19,7 @@ import Prelude ( Maybe(..)
                , otherwise
                , filter
                , round
+               , div
                , sqrt
                , fromIntegral
                , replicate
@@ -30,6 +31,7 @@ import Prelude ( Maybe(..)
                , (+)
                , (++)
                , (==)
+               , (/=)
                , (<=)
                , (>)
                , (-)
@@ -47,6 +49,7 @@ import GameLogic.GameMap ( gameMapGrid
                          , GameMap(..)
                          )
 import GameLogic.Move ( Facing(..)
+                      , Position(..)
                       )
 import GameLogic.Player ( playerGetFacing
                         , playerGetPosition
@@ -92,8 +95,8 @@ getColorView gameState = map (map calculateBeadColor) $ getView gameState
     calculateBeadColor (color@(WallColor dist), lights) =
         phongLighting (beadDiffuse color) (fadeValue dist, fadeValue dist, fadeValue dist) lights
     calculateBeadColor (color@(DoorColor dist), lights) =
-        phongLighting (beadDiffuse color) (fadeValue dist, fadeValue dist, maxLight) lights
-
+        phongLighting (beadDiffuse color) (maxLight, maxLight, maxLight) lights
+    calculateBeadColor (LightColor color, _) = color
 
 getView :: GameState -> [[(BeadColor, [(Light, Int)])]]
 getView (GameState player gameMap) =
@@ -104,11 +107,12 @@ getView (GameState player gameMap) =
 
     (maxX, _, maxZ) = gridDimensions grid
     invertZ z = maxZ - z - 1
+    invertZIfNegative z = if positiveFacing
+                          then z
+                          else invertZ z
 
     (playerX, playerY, playerZ') = playerGetPosition player
-    playerZ = if positiveFacing
-              then playerZ'
-              else invertZ playerZ'
+    playerZ = invertZIfNegative playerZ'
 
     viewSection' = grid !! playerX
     viewSection = if positiveFacing
@@ -118,9 +122,7 @@ getView (GameState player gameMap) =
     nearbyLightBeads :: GridY -> GridZ -> [(Light, Int)]
     nearbyLightBeads y z' = nearbyLightBeads'
       where
-        z = if positiveFacing
-            then z'
-            else invertZ z'
+        z = invertZIfNegative z'
         lightBeads = gameMapLights gameMap
 
         lightsWithDistance :: [(Light, Int)]
@@ -136,11 +138,9 @@ getView (GameState player gameMap) =
             let subSqr a b = (fromIntegral (a - b))*(fromIntegral (a - b))
             in  round . sqrt $ subSqr x2 x1 + subSqr y2 y1 + subSqr z2 z1
 
-    distanceToBead :: GridY -> GridZ -> (Int, GridBead)
-    distanceToBead y z' =
-        let z = if positiveFacing
-                then z'
-                else invertZ z'
+    xDistanceToBead :: GridY -> GridZ -> (Int, GridBead)
+    xDistanceToBead y z' =
+        let z = invertZIfNegative z'
 
             -- x slice with the given yz values
             xSlice :: [GridBead]
@@ -158,11 +158,28 @@ getView (GameState player gameMap) =
                     _ -> distance (dist + 1) (delta index)
         in  distance 0 $ playerX + 1
 
+    fromList :: [a] -> Maybe a
+    fromList (a:xs) = Just a
+    fromList [] = Nothing
+
+    isJust :: Maybe a -> Bool
+    isJust (Just _) = True
+    isJust _ = False
+
+    lightAt :: GridY -> GridZ -> Maybe (Light, Position)
+    lightAt y z =
+        let lights = filter (\(_, pos) -> pos == (playerX, y, z)) $ gameMapLights gameMap
+        in  fromList lights
+
     beadColor :: GridY -> GridZ -> GridBead -> (BeadColor, [(Light, Int)])
     beadColor y z bead
         | (y, z) == (playerY, playerZ) = (PlayerColor, nearbyLightBeads y z)
+        | isJust $ lightAt y (invertZIfNegative z) =
+            let Just (Light _ color, _) = lightAt y (invertZIfNegative z)
+            in  (LightColor color, [])
         | otherwise =
-            let (dist, bead) = distanceToBead y z
+            let (dist, bead) = xDistanceToBead y z
             in  case bead of
                     Wall -> (WallColor dist, nearbyLightBeads y z)
-                    (DoorBead (Door _ _)) -> (DoorColor dist, nearbyLightBeads y z)
+                    (DoorBead _) -> (DoorColor dist, nearbyLightBeads y z)
+    

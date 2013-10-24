@@ -6,6 +6,7 @@ module Main.Perlenspiel ( setPSEvent
                         , psGridColor
                         , psBeadColor
                         , psBorderColor
+                        , psBorderWidth
                         , psAll
                         ) where
 
@@ -33,6 +34,9 @@ psBorderColor' = ffi "PS.borderColor(%1, %2, %3)"
 
 psBorderColor :: Int -> Int -> Color.Color -> Fay ()
 psBorderColor x y color = psBorderColor' x y (Color.toList color)
+
+psBorderWidth :: Int -> Int -> Int -> Fay ()
+psBorderWidth = ffi "PS.border(%1, %2, %3)"
 
 setPSEvent :: String -> Fay () -> Fay ()
 setPSEvent = ffi "PS[%1] = %2"
