@@ -29,6 +29,8 @@ import GameLogic.Move ( moveLeft
                       , moveDown
                       , moveForward
                       , Move(..)
+                      , Facing(..)
+                      , Position(..)
                       )
 import GameLogic.Player ( Player(..)
                         , playerGetPosition
@@ -40,6 +42,7 @@ import GameLogic.Grid ( Grid(..)
                       )
 import GameLogic.Types ( GridBead(..)
                        , Door(..)
+                       , Light(..)
                        )
 import GameLogic.GameMap ( getGameMapFromDoor
                          , getMatchingDoorPosition
@@ -62,6 +65,26 @@ loadNewRoom gameState door = gameState'
     gameState' = GameState player newMap
     newMap = getGameMapFromDoor Levels.GameMaps.gameMaps door
 
+fromMaybe :: a -> Maybe a -> a
+fromMaybe = flip maybe id
+
+processLightMove :: GameState -> GameState -> (Light, Position) -> Facing -> Move -> GameState
+processLightMove defGameState playerMovedGameState light@(_, pos) facing move =
+    case gridBead of
+        Empty -> checkLightBeadCollisions
+        _ -> defGameState
+  where
+    (x, y, z) = move facing pos
+
+    gameMap = gameStateGameMap playerMovedGameState
+    gridBead = fromMaybe Wall $ gridGet (gameMapGrid gameMap) x y z
+    gameState = playerMovedGameState { gameStateGameMap = gameMapApplyMoveLight gameMap light facing move }
+    checkLightBeadCollisions = case lights of
+        [] -> gameState
+        _ -> defGameState
+      where
+        lights = filter (\(_, lightPos) -> lightPos == (x, y, z)) $ gameMapLights gameMap
+
 processPlayerMove :: Move -> GameState -> GameState
 processPlayerMove move gameState@(GameState player gameMap) =
     case gridBead of
@@ -69,20 +92,17 @@ processPlayerMove move gameState@(GameState player gameMap) =
         door@(DoorBead _) -> loadNewRoom gameState door
         Wall -> gameState
   where
-    fromMaybe = flip maybe id
     player' = playerApplyMove player move
-
     gameState' = GameState player' gameMap
     (x, y, z) = playerGetPosition player'
     gridBead = fromMaybe Wall $ gridGet (gameMapGrid $ gameMap) x y z
 
     checkLightBeadCollisions = case light of
-        [light] ->
-            gameState' { gameStateGameMap = gameMapApplyMoveLight gameMap light facing move }
-        []      -> gameState'
+        [light] -> processLightMove gameState gameState' light facing move
+        [] -> gameState'
       where
-        light = filter (\(_, lightPos) -> lightPos == (x, y, z)) $ gameMapLights gameMap
         facing = _facing player'
+        light = filter (\(_, lightPos) -> lightPos == (x, y, z)) $ gameMapLights gameMap
 
 leftButtonPressed :: GameState -> GameState
 leftButtonPressed = processPlayerMove moveLeft
