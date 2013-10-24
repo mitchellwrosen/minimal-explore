@@ -14,6 +14,7 @@ import Prelude ( Show
                , (==)
                , (++)
                , ($)
+               , (.)
                , maybe
                , flip
                , lookup
@@ -21,13 +22,17 @@ import Prelude ( Show
                , id
                , error
                )
+
+import GameLogic.Move ( moveLeft
+                      , moveRight
+                      , moveUp
+                      , moveDown
+                      , moveForward
+                      , Move(..)
+                      )
 import GameLogic.Player ( Player(..)
                         , playerGetPosition
-                        , playerMoveLeft
-                        , playerMoveRight
-                        , playerMoveUp
-                        , playerMoveDown
-                        , playerMoveForward
+                        , playerApplyMove
                         , playerChangeDirection
                         )
 import GameLogic.Grid ( Grid(..)
@@ -56,17 +61,18 @@ loadNewRoom gameState door = gameState'
     gameState' = GameState player newMap
     newMap = getGameMapFromDoor Levels.GameMaps.gameMaps door
 
-processPlayerMove :: (Player -> Player) -> GameState -> GameState
-processPlayerMove playerMove gameState@(GameState player gameMap) =
+processPlayerMove :: Move -> GameState -> GameState
+processPlayerMove move gameState@(GameState player gameMap) =
     case gridBead of
         Empty -> checkLightBeadCollisions
         door@(DoorBead _) -> loadNewRoom gameState door
         Wall -> gameState
   where
     fromMaybe = flip maybe id
+    player' = playerApplyMove player move
 
-    gameState' = GameState (playerMove player) gameMap
-    (x, y, z) = playerGetPosition $ playerMove player
+    gameState' = GameState player' gameMap
+    (x, y, z) = playerGetPosition player'
     gridBead = fromMaybe Wall $ gridGet (gameMapGrid $ gameMap) x y z
 
     checkLightBeadCollisions = case light of
@@ -76,19 +82,20 @@ processPlayerMove playerMove gameState@(GameState player gameMap) =
         light = filter (\(_, lightPos) -> lightPos == (x, y, z)) $ gameMapLights gameMap
 
 leftButtonPressed :: GameState -> GameState
-leftButtonPressed = processPlayerMove playerMoveLeft
+leftButtonPressed = processPlayerMove moveLeft
 
 rightButtonPressed :: GameState -> GameState
-rightButtonPressed = processPlayerMove playerMoveRight
+rightButtonPressed = processPlayerMove moveRight
 
 upButtonPressed :: GameState -> GameState
-upButtonPressed = processPlayerMove playerMoveUp
+upButtonPressed = processPlayerMove moveUp
 
 downButtonPressed :: GameState -> GameState
-downButtonPressed = processPlayerMove playerMoveDown
+downButtonPressed = processPlayerMove moveDown
 
 forwardButtonPressed :: GameState -> GameState
-forwardButtonPressed = processPlayerMove playerMoveForward
+forwardButtonPressed = processPlayerMove moveForward
 
 reverseButtonPressed :: GameState -> GameState
-reverseButtonPressed = processPlayerMove playerChangeDirection
+reverseButtonPressed gameState =
+    gameState { _player = playerChangeDirection $ _player gameState }

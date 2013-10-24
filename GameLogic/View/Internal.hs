@@ -46,8 +46,9 @@ import GameLogic.GameMap ( gameMapGrid
                          , gameMapAmbientLight
                          , GameMap(..)
                          )
-import GameLogic.Player ( Facing(..)
-                        , playerGetFacing
+import GameLogic.Move ( Facing(..)
+                      )
+import GameLogic.Player ( playerGetFacing
                         , playerGetPosition
                         )
 import GameLogic.Grid ( Grid(..)

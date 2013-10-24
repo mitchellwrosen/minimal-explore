@@ -37,8 +37,9 @@ import GameLogic.Types ( GridX
 import GameLogic.Grid ( Grid(..)
                       , gridDimensions
                       )
+import GameLogic.Move ( Facing(..)
+                      )
 import GameLogic.Player ( Player(..)
-                        , Facing(..)
                         )
 import GameLogic.GameMap ( gameMapGrid
                          )

@@ -1,12 +1,7 @@
-module GameLogic.Player ( Facing(..)
-                        , Player(..)
+module GameLogic.Player ( Player(..)
                         , playerGetFacing
                         , playerGetPosition
-                        , playerMoveUp
-                        , playerMoveDown
-                        , playerMoveLeft
-                        , playerMoveRight
-                        , playerMoveForward
+                        , playerApplyMove
                         , playerChangeDirection
                         ) where
 
@@ -16,13 +11,13 @@ import Prelude ( Show
                , (-)
                , (==)
                )
+import GameLogic.Move ( Move(..)
+                      , Facing(..)
+                      )
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
                        )
-
-data Facing = Positive | Negative
-  deriving (Show, Eq)
 
 data Player = Player { _position :: (GridX, GridY, GridZ)
                      , _facing :: Facing
@@ -39,39 +34,10 @@ playerChangeDirection player = player { _facing = oppositeFacing facing }
     oppositeFacing Negative = Positive
     facing = playerGetFacing player
 
-playerMoveForward :: Player -> Player
-playerMoveForward player = player { _position = (delta x, y, z) }
+playerApplyMove :: Player -> Move -> Player
+playerApplyMove player move = player { _position = position }
   where
-    delta = if playerGetFacing player == Positive
-            then (+1)
-            else (+ (-1))
-    (x, y, z) = playerGetPosition player
-
-playerMoveUp :: Player -> Player
-playerMoveUp player = player { _position = (x, y-1, z) }
-  where
-    (x, y, z) = playerGetPosition player
-
-playerMoveDown :: Player -> Player
-playerMoveDown player = player { _position = (x, y+1, z) }
-  where
-    (x, y, z) = playerGetPosition player
-
-playerMoveLeft :: Player -> Player
-playerMoveLeft player = player { _position = (x, y, delta z) }
-  where
-    delta = if playerGetFacing player == Positive
-            then (+ (-1))
-            else (+ 1)
-    (x, y, z) = playerGetPosition player
-
-playerMoveRight :: Player -> Player
-playerMoveRight player = player { _position = (x, y, delta z) }
-  where
-    delta = if playerGetFacing player == Positive
-            then (+ 1)
-            else (+ (-1))
-    (x, y, z) = playerGetPosition player
+    position = move (_facing player) (_position player)
 
 playerGetPosition :: Player -> (GridX, GridY, GridZ)
 playerGetPosition = _position

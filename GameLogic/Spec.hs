@@ -16,16 +16,18 @@ import GameLogic.Grid ( replace
                       , gridElems
                       , Grid(..)
                       )
+import GameLogic.Move ( Facing(..)
+                      , moveUp
+                      , moveDown
+                      , moveLeft
+                      , moveRight
+                      , moveForward
+                      )
 import GameLogic.Player ( Player(..)
-                        , Facing(..)
                         , playerGetPosition
                         , playerGetFacing
+                        , playerApplyMove
                         , playerChangeDirection
-                        , playerMoveUp
-                        , playerMoveDown
-                        , playerMoveLeft
-                        , playerMoveRight
-                        , playerMoveForward
                         )
 import GameLogic.State ( GameState(..)
                        , leftButtonPressed
@@ -196,15 +198,15 @@ spec = do
             playerGetPosition testPlayer `shouldBe` (1, 1, 1)
 
         it "moves up and down in the y direction one unit" $ do
-            playerGetPosition (playerMoveDown testPlayer) `shouldBe` (1, 2, 1)
-            playerGetPosition (playerMoveUp testPlayer) `shouldBe` (1, 0, 1)
+            playerGetPosition (playerApplyMove testPlayer moveDown) `shouldBe` (1, 2, 1)
+            playerGetPosition (playerApplyMove testPlayer moveUp) `shouldBe` (1, 0, 1)
 
         it "moves left and right in the z direction one unit" $ do
-            playerGetPosition (playerMoveLeft testPlayer) `shouldBe` (1, 1, 0)
-            playerGetPosition (playerMoveRight testPlayer) `shouldBe` (1, 1, 2)
+            playerGetPosition (playerApplyMove testPlayer moveLeft) `shouldBe` (1, 1, 0)
+            playerGetPosition (playerApplyMove testPlayer moveRight) `shouldBe` (1, 1, 2)
 
         it "can move forward in the x direction one unit" $ do
-            playerGetPosition (playerMoveForward testPlayer) `shouldBe` (2, 1, 1)
+            playerGetPosition (playerApplyMove testPlayer moveForward) `shouldBe` (2, 1, 1)
 
         it "faces +x direction" $ do
             playerGetFacing testPlayer `shouldBe` Positive
@@ -215,12 +217,11 @@ spec = do
                 playerGetFacing player' `shouldBe` Negative
 
             it "reverses left/right for the z direction" $ do
-                playerGetPosition (playerMoveLeft player') `shouldBe` (1, 1, 2)
-                playerGetPosition (playerMoveRight player') `shouldBe` (1, 1, 0)
+                playerGetPosition (playerApplyMove player' moveLeft) `shouldBe` (1, 1, 2)
+                playerGetPosition (playerApplyMove player' moveRight) `shouldBe` (1, 1, 0)
 
             it "moves forward in the -x direction" $ do
-                playerGetPosition (playerMoveForward player') `shouldBe` (0, 1, 1)
-
+                playerGetPosition (playerApplyMove player' moveForward) `shouldBe` (0, 1, 1)
 
     describe "GameView" $ do
         let testGrid :: Grid GridBead
