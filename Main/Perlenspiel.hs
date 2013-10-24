@@ -8,6 +8,7 @@ module Main.Perlenspiel ( setPSEvent
                         , psBorderColor
                         , psBorderWidth
                         , psAll
+                        , psRadius
                         ) where
 
 import Prelude ( String
@@ -37,6 +38,9 @@ psBorderColor x y color = psBorderColor' x y (Color.toList color)
 
 psBorderWidth :: Int -> Int -> Int -> Fay ()
 psBorderWidth = ffi "PS.border(%1, %2, %3)"
+
+psRadius :: Int -> Int -> Int -> Fay ()
+psRadius = ffi "PS.radius(%1, %2, %3)"
 
 setPSEvent :: String -> Fay () -> Fay ()
 setPSEvent = ffi "PS[%1] = %2"
