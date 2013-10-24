@@ -1,6 +1,7 @@
 module GameLogic.GameMap ( GameMap(..)
                          , getGameMapFromDoor
                          , getMatchingDoorPosition
+                         , gameMapApplyMoveLight
                          , makeGameMap
                          ) where
 
@@ -19,6 +20,7 @@ import Prelude ( String
                , id
                , fst
                , snd
+               , otherwise
                , map
                , (==)
                , (++)
@@ -29,6 +31,11 @@ import Prelude ( String
 import GameLogic.Grid ( Grid(..)
                       , gridElems
                       , gridSet
+                      , replace
+                      )
+import GameLogic.Move ( Move(..)
+                      , Facing(..)
+                      , Position(..)
                       )
 import GameLogic.Types ( GridBead(..)
                        , GridX
@@ -46,10 +53,20 @@ data GameMap = GameMap { gameMapGrid :: Grid GridBead
                        }
   deriving (Eq, Show)
 
+gameMapApplyMoveLight :: GameMap -> (Light, Position) -> Facing -> Move -> GameMap
+gameMapApplyMoveLight gameMap light facing move =
+    gameMap { gameMapLights = lights' }
+  where
+    lights' = map moveLight $ gameMapLights gameMap
+    moveLight l
+        | l == light = applyMove light
+        | otherwise = l
+
+    applyMove (l, pos) = (l, move facing  pos)
+
 getGameMapFromDoor :: [(String, GameMap)] -> GridBead -> GameMap
 getGameMapFromDoor gameMaps (DoorBead (Door roomName _)) =
     maybe (error $ "Bad RoomName " ++ roomName) id $ lookup roomName gameMaps
-
 
 getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> (GridX, GridY, GridZ)
 getMatchingDoorPosition fromMap toMap (DoorBead (Door name ident)) =

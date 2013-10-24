@@ -43,6 +43,7 @@ import GameLogic.Types ( GridBead(..)
                        )
 import GameLogic.GameMap ( getGameMapFromDoor
                          , getMatchingDoorPosition
+                         , gameMapApplyMoveLight
                          , GameMap(..)
                          )
 import qualified Levels.GameMaps
@@ -76,10 +77,12 @@ processPlayerMove move gameState@(GameState player gameMap) =
     gridBead = fromMaybe Wall $ gridGet (gameMapGrid $ gameMap) x y z
 
     checkLightBeadCollisions = case light of
-        [light] -> gameState
+        [light] ->
+            gameState' { gameStateGameMap = gameMapApplyMoveLight gameMap light facing move }
         []      -> gameState'
       where
         light = filter (\(_, lightPos) -> lightPos == (x, y, z)) $ gameMapLights gameMap
+        facing = _facing player'
 
 leftButtonPressed :: GameState -> GameState
 leftButtonPressed = processPlayerMove moveLeft

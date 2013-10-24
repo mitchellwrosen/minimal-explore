@@ -44,6 +44,7 @@ import GameLogic.View.Internal ( getView
 import GameLogic.GameMap ( GameMap(..)
                          , getGameMapFromDoor
                          , makeGameMap
+                         , gameMapApplyMoveLight
                          , getMatchingDoorPosition
                          )
 import GameLogic.Color as Color ( BeadColor(..)
@@ -99,6 +100,20 @@ spec = do
 
         it "has a list of doors" $ do
             map fst (gameMapDoors gameMap) `shouldBe` [ door ]
+
+    describe "light movement" $ do
+        let name = "mapA"
+            light = Light 255 (255, 255, 255)
+            grid = [ [ [ LightBead light, Empty ] ] ]
+            gameMap = makeGameMap grid name 255
+            [mapLight] = gameMapLights gameMap
+
+            grid' = [ [ [ Empty, LightBead light ] ] ]
+            gameMap' = makeGameMap grid' name 255
+
+        it "can move" $ do
+            gameMapApplyMoveLight gameMap mapLight Positive moveRight
+                `shouldBe` gameMap'
 
     describe "grid state" $ do
         let testGrid :: Grid GridBead
