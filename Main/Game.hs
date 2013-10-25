@@ -16,14 +16,9 @@ import Main.Ref ( modifyRef
                 )
 import Main.Perlenspiel ( setPSEvent
                         , setPSMouseEvent
-                        , setPSMouseWheelEvent
                         , setPSKeyEvent
                         , psGridSize
                         , psGridColor
-                        , psBeadColor
-                        , psBorderWidth
-                        , psBorderColor
-                        , psAll
                         )
 
 import qualified Levels.Level1
@@ -66,7 +61,6 @@ main = do
             let (_, viewHeight, viewWidth) = gridDimensions (gameMapGrid (gameStateGameMap gameState))
             psGridSize viewWidth viewHeight
             psGridColor (15, 15, 15)
-            psBorderColor psAll psAll (15, 15, 15)
             drawMap gameState
 
         psTouch :: GridX -> GridY -> BeadData -> Fay ()
@@ -99,8 +93,6 @@ main = do
                     _ -> id
             modifyRef stateRef move
             readRef stateRef >>= drawMap
-            {-psBorderWidth 4 2 8-}
-            {-psBorderColor 4 2 (192, 64, 64)-}
 
         psKeyUp :: KeyValue -> Bool -> Bool -> Fay ()
         psKeyUp keyValue shift ctrl = return ()

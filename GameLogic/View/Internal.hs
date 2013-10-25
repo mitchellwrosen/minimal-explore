@@ -98,9 +98,21 @@ getColorView gameState = map (map calculateBeadColor) $ getView gameState
         phongLighting (beadDiffuse color) (maxLight, maxLight, maxLight) lights
     calculateBeadColor (LightColor color, _) = color
 
+getBeadView :: GameState -> [[GridBead]]
+getBeadView (GameState player gameMap) = viewSection
+  where
+    grid = (gameMapGrid gameMap)
+    (playerX, _, _) = playerGetPosition player
+    positiveFacing = playerGetFacing player == Positive
+
+    viewSection' = grid !! playerX
+    viewSection = if positiveFacing
+                  then viewSection'
+                  else map reverse viewSection'
+
 getView :: GameState -> [[(BeadColor, [(Light, Int)])]]
-getView (GameState player gameMap) =
-    mapInd (mapInd . beadColor) viewSection
+getView gameState@(GameState player gameMap) =
+    mapInd (mapInd . beadColor) (getBeadView gameState)
   where
     grid = gameMapGrid gameMap
     positiveFacing = playerGetFacing player == Positive
@@ -113,11 +125,6 @@ getView (GameState player gameMap) =
 
     (playerX, playerY, playerZ') = playerGetPosition player
     playerZ = invertZIfNegative playerZ'
-
-    viewSection' = grid !! playerX
-    viewSection = if positiveFacing
-                  then viewSection'
-                  else map reverse viewSection'
 
     nearbyLightBeads :: GridY -> GridZ -> [(Light, Int)]
     nearbyLightBeads y z' = nearbyLightBeads'
