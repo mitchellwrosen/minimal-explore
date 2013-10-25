@@ -59,6 +59,7 @@ import GameLogic.GameMap ( getGameMapFromDoor
                          )
 import qualified Levels.GameMaps
 
+import Data.Util.Maybe ( fromMaybe )
 import Control.Lens ( (^.)
                     , over
                     , Lens(..)
@@ -85,10 +86,6 @@ loadNewRoom gameState door = gameState'
     player = makePlayer position oldFacing
     gameState' = GameState player newMap
     newMap = getGameMapFromDoor Levels.GameMaps.gameMaps door
-
--- TODO(R): helper module
-fromMaybe :: a -> Maybe a -> a
-fromMaybe = flip maybe id
 
 processLightMove :: GameState -> GameState -> (Light, Position) -> Facing -> Move -> GameState
 processLightMove defGameState playerMovedGameState light@(_, pos) facing move =

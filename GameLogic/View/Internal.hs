@@ -73,10 +73,7 @@ import GameLogic.Types ( GridY
                        )
 
 import Control.Lens ( (^.) )
-
---TODO(R): Helper module
-fromMaybe :: a -> Maybe a -> a
-fromMaybe = flip maybe id
+import Data.Util.Maybe ( fromMaybe )
 
 --TODO(R): Helper module
 mapInd :: (Int -> a -> b) -> [a] -> [b]

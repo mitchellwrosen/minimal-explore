@@ -50,6 +50,7 @@ import GameLogic.Types ( GridBead(..)
                        , Position(..)
                        )
 
+import Data.Util.Maybe ( fromMaybe )
 import Control.Lens ( (^.)
                     , over
                     , Lens(..)
@@ -91,10 +92,9 @@ gameMapApplyMoveLight gameMap light facing move =
 
     applyMove (l, pos) = (l, move facing  pos)
 
--- TODO(R): fromMaybe
 getGameMapFromDoor :: [(String, GameMap)] -> GridBead -> GameMap
 getGameMapFromDoor gameMaps (DoorBead (Door roomName _)) =
-    maybe (error $ "Bad RoomName " ++ roomName) id $ lookup roomName gameMaps
+    fromMaybe (error $ "Bad RoomName " ++ roomName) $ lookup roomName gameMaps
 
 -- TODO(R): compare on door ident/map
 getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> Position
