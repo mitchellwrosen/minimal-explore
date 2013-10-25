@@ -42,7 +42,9 @@ import GameLogic.View.Light ( phongLighting
                             , lightIntensity
                             )
 
-import GameLogic.State ( GameState(..)
+import GameLogic.State ( GameState
+                       , gameStateGameMap
+                       , gameStatePlayer
                        )
 import GameLogic.GameMap ( gameMapGrid
                          , gameMapAmbientLight
@@ -50,7 +52,9 @@ import GameLogic.GameMap ( gameMapGrid
                          )
 import GameLogic.Move ( Facing(..)
                       )
-import GameLogic.Player ( Player(..)
+import GameLogic.Player ( Player
+                        , playerPosition
+                        , playerFacing
                         )
 import GameLogic.Grid ( Grid(..)
                       , gridDimensions
@@ -67,6 +71,8 @@ import GameLogic.Types ( GridY
                        , Position(..)
                        )
 
+import Control.Lens ( (^.) )
+
 --TODO(R): Helper module
 fromMaybe :: a -> Maybe a -> a
 fromMaybe = flip maybe id
@@ -78,8 +84,7 @@ mapInd f = zipWith f [0..]
 getColorView :: GameState -> [[Color]]
 getColorView gameState = map (map calculateBeadColor) $ getView gameState
   where
-    -- TODO(R): lens
-    maxLight = gameMapAmbientLight $ gameStateGameMap gameState
+    maxLight = gameMapAmbientLight $ gameState ^. gameStateGameMap
 
     -- TODO(R): only appropriate for walls
     fadeValue :: Int -> Int
@@ -102,11 +107,13 @@ getColorView gameState = map (map calculateBeadColor) $ getView gameState
     calculateBeadColor (LightColor color, _) = color
 
 getBeadView :: GameState -> [[GridBead]]
-getBeadView (GameState player gameMap) = viewSection
+getBeadView gameState = viewSection
   where
+    player = gameState ^. gameStatePlayer
+    gameMap = gameState ^. gameStateGameMap
     grid = (gameMapGrid gameMap)
-    (playerX, _, _) = _playerPosition player
-    positiveFacing = _playerFacing player == Positive
+    (playerX, _, _) = player ^. playerPosition
+    positiveFacing = player ^. playerFacing == Positive
 
     viewSection' = grid !! playerX
     viewSection = if positiveFacing
@@ -114,19 +121,21 @@ getBeadView (GameState player gameMap) = viewSection
                   else map reverse viewSection'
 
 getView :: GameState -> [[(BeadColor, [(Light, Int)])]]
-getView gameState@(GameState player gameMap) =
+getView gameState =
     mapInd (mapInd . beadColor) (getBeadView gameState)
   where
+    player = gameState ^. gameStatePlayer
+    gameMap = gameState ^. gameStateGameMap
     --TODO(R): Only invert z once.
     grid = gameMapGrid gameMap
-    positiveFacing = _playerFacing player == Positive
+    positiveFacing = player ^. playerFacing == Positive
 
     (maxX, _, maxZ) = gridDimensions grid
     invertZIfNegative z = if positiveFacing
                           then z
                           else maxZ - z - 1
 
-    (playerX, playerY, playerZ') = _playerPosition player
+    (playerX, playerY, playerZ') = player ^. playerPosition
     playerZ = invertZIfNegative playerZ'
 
     nearbyLightBeads :: GridY -> GridZ -> [(Light, Int)]

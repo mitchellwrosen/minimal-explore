@@ -1,4 +1,7 @@
-module GameLogic.State ( GameState(..)
+module GameLogic.State ( GameState
+                       , makeGameState
+                       , gameStateGameMap
+                       , gameStatePlayer
                        , leftButtonPressed
                        , rightButtonPressed
                        , upButtonPressed

@@ -25,13 +25,17 @@ import GameLogic.Move ( Facing(..)
                       , moveRight
                       , moveForward
                       )
-import GameLogic.Player ( Player(..)
+import GameLogic.Player ( Player
+                        , makePlayer
                         , playerPosition
                         , playerFacing
                         , playerApplyMove
                         , playerChangeDirection
                         )
-import GameLogic.State ( GameState(..)
+import GameLogic.State ( GameState
+                       , makeGameState
+                       , gameStatePlayer
+                       , gameStateGameMap
                        , leftButtonPressed
                        , rightButtonPressed
                        , upButtonPressed
@@ -139,7 +143,7 @@ spec = do
             testMap = makeGameMap testGrid "test" 255
 
             gameState :: Position -> GameState
-            gameState pos = GameState (Player pos Positive) testMap
+            gameState pos = makeGameState (makePlayer pos Positive) testMap
 
         describe "player movement" $ do
             it "allows player movement to a valid position" $ do
@@ -160,7 +164,7 @@ spec = do
                     forwardButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (2, 1, 1)
                 describe "reverse" $ do
                     let gameStateReverse :: Position -> GameState
-                        gameStateReverse pos = GameState (Player pos Negative) testMap
+                        gameStateReverse pos = makeGameState (makePlayer pos Negative) testMap
                     it "change directions" $ do
                         reverseButtonPressed (gameState (1, 1, 1)) `shouldBe`
                             gameStateReverse (1, 1, 1)
@@ -212,7 +216,7 @@ spec = do
 
     describe "the player" $ do
         let testPlayer :: Player
-            testPlayer = Player (1, 1, 1) Positive
+            testPlayer = makePlayer (1, 1, 1) Positive
         it "has an xyz position" $ do
             testPlayer ^. playerPosition `shouldBe` (1, 1, 1)
 
@@ -285,7 +289,7 @@ spec = do
                     Color.fromList (map round [fromIntegral ar + ir, fromIntegral ag, fromIntegral ab + ib])
 
         describe "positive facing" $ do
-            let gameState = GameState (Player (1, 0, 2) Positive) testMap
+            let gameState = makeGameState (makePlayer (1, 0, 2) Positive) testMap
             it "draws walls with the wall foreground color" $ do
                 viewAt gameState 1 1 `shouldBe` WallColor 0
             it "draws the player with player color with Positive facing" $ do
@@ -294,7 +298,7 @@ spec = do
                 viewAt gameState 0 0 `shouldBe` WallColor 2
 
         describe "negative facing" $ do
-            let gameState = GameState (Player (2, 0, 0) Negative) testMap
+            let gameState = makeGameState (makePlayer (2, 0, 0) Negative) testMap
             it "draws the player with player color with Negative facing" $ do
                 viewAt gameState 0 2 `shouldBe` PlayerColor
                 viewAt gameState 0 0 `shouldBe` WallColor 0

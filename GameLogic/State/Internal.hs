@@ -4,7 +4,10 @@ module GameLogic.State.Internal ( leftButtonPressed
                                 , downButtonPressed
                                 , forwardButtonPressed
                                 , reverseButtonPressed
-                                , GameState(..)
+                                , gameStatePlayer
+                                , gameStateGameMap
+                                , makeGameState
+                                , GameState
                                 ) where
 
 import Prelude ( Show
@@ -32,7 +35,10 @@ import GameLogic.Move ( moveLeft
                       , Move(..)
                       , Facing(..)
                       )
-import GameLogic.Player ( Player(..)
+import GameLogic.Player ( Player
+                        , makePlayer
+                        , playerFacing
+                        , playerPosition
                         , playerApplyMove
                         , playerChangeDirection
                         )
@@ -51,19 +57,30 @@ import GameLogic.GameMap ( getGameMapFromDoor
                          )
 import qualified Levels.GameMaps
 
--- TODO(R): _player => gameStatePlayer
-data GameState = GameState { _player :: Player
-                           , gameStateGameMap :: GameMap
+import Control.Lens ( (^.)
+                    , over
+                    , Lens(..)
+                    )
+
+data GameState = GameState { _gameStatePlayer :: Player
+                           , _gameStateGameMap :: GameMap
                            }
   deriving (Show, Eq)
+gameStatePlayer = Lens { view = \(GameState player _) -> player
+                       , set  = \player (GameState _ gameMap) -> GameState player gameMap
+                       }
+gameStateGameMap = Lens { view = \(GameState _ gameMap) -> gameMap
+                        , set  = \gameMap (GameState player _) -> GameState player gameMap
+                        }
+makeGameState = GameState
 
 loadNewRoom :: GameState -> GridBead -> GameState
 loadNewRoom gameState door = gameState'
   where
     -- TODO(R): lenses
-    oldFacing = _playerFacing (_player gameState)
-    position = getMatchingDoorPosition (gameStateGameMap gameState) newMap door
-    player = Player position oldFacing
+    oldFacing = gameState ^. gameStatePlayer ^. playerFacing
+    position = getMatchingDoorPosition (gameState ^. gameStateGameMap) newMap door
+    player = makePlayer position oldFacing
     gameState' = GameState player newMap
     newMap = getGameMapFromDoor Levels.GameMaps.gameMaps door
 
@@ -80,9 +97,9 @@ processLightMove defGameState playerMovedGameState light@(_, pos) facing move =
     -- TODO(R): nearly identical code below. refactor
     (x, y, z) = move facing pos
 
-    gameMap = gameStateGameMap playerMovedGameState
+    gameMap = playerMovedGameState ^. gameStateGameMap
     gridBead = fromMaybe Wall $ gridGet (gameMapGrid gameMap) x y z
-    gameState = playerMovedGameState { gameStateGameMap = gameMapApplyMoveLight gameMap light facing move }
+    gameState = playerMovedGameState { _gameStateGameMap = gameMapApplyMoveLight gameMap light facing move }
     resolveLightBeadCollisions = case lights of
         [] -> gameState
         _ -> defGameState
@@ -98,15 +115,14 @@ processPlayerMove move gameState@(GameState player gameMap) =
   where
     player' = playerApplyMove player move
     gameState' = GameState player' gameMap
-    (x, y, z) = _playerPosition player'
+    (x, y, z) = player' ^. playerPosition
     gridBead = fromMaybe Wall $ gridGet (gameMapGrid $ gameMap) x y z
 
     resolveLightBeadCollisions = case light of
         [light] -> processLightMove gameState gameState' light facing move
         []      -> gameState'
       where
-        --TODO(R): Lenses
-        facing = _playerFacing player'
+        facing = player' ^. playerFacing
         light = filter ((== (x, y, z)) . snd) $ gameMapLights gameMap
 
 leftButtonPressed :: GameState -> GameState
@@ -125,6 +141,4 @@ forwardButtonPressed :: GameState -> GameState
 forwardButtonPressed = processPlayerMove moveForward
 
 reverseButtonPressed :: GameState -> GameState
-reverseButtonPressed gameState =
-    --TODO(R): Lens
-    gameState { _player = playerChangeDirection $ _player gameState }
+reverseButtonPressed = over gameStatePlayer playerChangeDirection

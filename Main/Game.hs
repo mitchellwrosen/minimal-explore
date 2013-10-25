@@ -35,11 +35,14 @@ import GameLogic.Grid ( Grid(..)
                       )
 import GameLogic.Move ( Facing(..)
                       )
-import GameLogic.Player ( Player(..)
+import GameLogic.Player ( Player
+                        , makePlayer
                         )
 import GameLogic.GameMap ( gameMapGrid
                          )
-import GameLogic.State ( GameState(..)
+import GameLogic.State ( GameState
+                       , makeGameState
+                       , gameStateGameMap
                        , leftButtonPressed
                        , rightButtonPressed
                        , upButtonPressed
@@ -48,17 +51,19 @@ import GameLogic.State ( GameState(..)
                        , reverseButtonPressed
                        )
 
+import Control.Lens ( (^.) )
+
 -- Everything is in main for the beautiful closure that it offers over stateRef.
 main :: Fay ()
 main = do
-    let player = Player (0, 2, 2) Positive
-        gameState = GameState player Levels.Level1.gameMap
+    let player = makePlayer (0, 2, 2) Positive
+        gameState = makeGameState player Levels.Level1.gameMap
     stateRef <- newRef gameState
 
     let psInit :: Fay ()
         psInit = do
             gameState <- readRef stateRef
-            let (_, viewHeight, viewWidth) = gridDimensions (gameMapGrid (gameStateGameMap gameState))
+            let (_, viewHeight, viewWidth) = gridDimensions (gameMapGrid (gameState ^. gameStateGameMap))
             psGridSize viewWidth viewHeight
             psGridColor (15, 15, 15)
             drawMap gameState
