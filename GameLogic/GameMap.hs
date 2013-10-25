@@ -35,7 +35,6 @@ import Prelude ( String
 import GameLogic.Grid ( Grid(..)
                       , gridElems
                       , gridSet
-                      , replace
                       )
 import GameLogic.Move ( Move(..)
                       , Facing(..)
@@ -51,6 +50,9 @@ import GameLogic.Types ( GridBead(..)
                        )
 
 import Data.Util.Maybe ( fromMaybe )
+import Data.Util.List ( findFirst
+                      , replace
+                      )
 import Control.Lens ( (^.)
                     , over
                     , Lens(..)
@@ -100,10 +102,6 @@ getGameMapFromDoor gameMaps (DoorBead (Door roomName _)) =
 getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> Position
 getMatchingDoorPosition fromMap toMap (DoorBead (Door name ident)) =
     snd $ findFirst ((== Door (fromMap ^. gameMapName) ident) . fst) (toMap ^. gameMapDoors)
-  where
-    -- TODO(R): helper function
-    findFirst :: (a -> Bool) -> [a] -> a
-    findFirst filt list = head $ filter filt list
 
 makeGameMap :: Grid GridBead -> String -> Byte -> GameMap
 makeGameMap grid name ambientLight =
@@ -118,7 +116,7 @@ makeGameMap grid name ambientLight =
     grid' = removeLightBeads
     removeLightBeads = foldr removeLightBead grid lights
       where
-        removeLightBead (_, (x, y, z)) grd = gridSet grd x y z Empty
+        removeLightBead (_, pos) grd = gridSet grd pos Empty
 
     doors = foldr doorFold [] (gridElems grid)
       where

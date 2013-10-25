@@ -12,8 +12,7 @@ import GameLogic.Types ( GridX
                        , Light(..)
                        , Position(..)
                        )
-import GameLogic.Grid ( replace
-                      , gridGet
+import GameLogic.Grid ( gridGet
                       , gridSet
                       , gridElems
                       , Grid(..)
@@ -62,6 +61,7 @@ import GameLogic.Color as Color ( fromList
 
 import Control.Lens ( (^.)
                     )
+import Data.Util.List ( replace )
 
 spec :: Spec
 spec = do
@@ -187,15 +187,15 @@ spec = do
                          ]
                        ]
         it "can get the value at a given (x,y,z)" $ do
-            gridGet testGrid 0 1 1 `shouldBe` Just 011
-            gridGet testGrid 1 1 0 `shouldBe` Just 110
+            gridGet testGrid (0, 1, 1) `shouldBe` Just 011
+            gridGet testGrid (1, 1, 0) `shouldBe` Just 110
 
         it "can get Nothing out of bounds" $ do
-            gridGet testGrid (-1) 1 1 `shouldBe` Nothing
-            gridGet testGrid   0  1 2 `shouldBe` Nothing
+            gridGet testGrid ((-1), 1, 1) `shouldBe` Nothing
+            gridGet testGrid (0, 1, 2) `shouldBe` Nothing
 
         it "can set the value at a given (x,y,z)" $ do
-            gridSet testGrid 1 1 0 42 `shouldBe`
+            gridSet testGrid (1, 1, 0) 42 `shouldBe`
                 [ [ [ 000, 001 ]
                   , [ 010, 011 ]
                   ]
@@ -215,8 +215,8 @@ spec = do
                          , [ Empty, Wall ]
                          ]
                        ]
-            gridGet grid 0 1 1 `shouldBe` Just Wall
-            gridGet grid 1 0 0 `shouldBe` Just Empty
+            gridGet grid (0, 1, 1) `shouldBe` Just Wall
+            gridGet grid (1, 0, 0) `shouldBe` Just Empty
 
     describe "the player" $ do
         let testPlayer :: Player

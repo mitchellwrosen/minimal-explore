@@ -162,7 +162,7 @@ getView gameState =
             --TODO(R): Only invert z once.
             -- x slice with the given yz values
             xSlice :: [GridBead]
-            xSlice = map (\x -> fromMaybe Wall $ gridGet grid x y z) [(-1)..maxX]
+            xSlice = map (\x -> fromMaybe Wall $ gridGet grid (x, y, z)) [(-1)..maxX]
 
             delta = if positiveFacing
                     then (+ 1)
