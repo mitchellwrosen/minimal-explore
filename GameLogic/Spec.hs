@@ -18,6 +18,7 @@ import GameLogic.Grid ( replace
                       , Grid(..)
                       )
 import GameLogic.Move ( Facing(..)
+                      , Position(..)
                       , moveUp
                       , moveDown
                       , moveLeft
@@ -134,7 +135,7 @@ spec = do
                        ]
             testMap = makeGameMap testGrid "test" 255
 
-            gameState :: (GridX, GridY, GridZ) -> GameState
+            gameState :: Position -> GameState
             gameState pos = GameState (Player pos Positive) testMap
 
         describe "player movement" $ do
@@ -155,7 +156,7 @@ spec = do
                 it "forward" $ do
                     forwardButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (2, 1, 1)
                 describe "reverse" $ do
-                    let gameStateReverse :: (GridX, GridY, GridZ) -> GameState
+                    let gameStateReverse :: Position -> GameState
                         gameStateReverse pos = GameState (Player pos Negative) testMap
                     it "change directions" $ do
                         reverseButtonPressed (gameState (1, 1, 1)) `shouldBe`

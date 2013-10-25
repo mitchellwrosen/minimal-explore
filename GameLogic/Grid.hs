@@ -26,6 +26,8 @@ import Prelude ( Int
                , (&&)
                , ($)
                )
+
+import GameLogic.Move ( Position )
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
@@ -33,7 +35,7 @@ import GameLogic.Types ( GridX
 
 type Grid a = [[[a]]]
 
-gridDimensions :: Grid a -> (GridX, GridY, GridZ)
+gridDimensions :: Grid a -> Position
 gridDimensions grid = (sizeX, sizeY, sizeZ)
   where
     sizeX = length grid
@@ -48,7 +50,7 @@ validBounds grid x y z =
   where
     (sizeX, sizeY, sizeZ) = gridDimensions grid
 
-gridElems :: Grid a -> [(a, (GridX, GridY, GridZ))]
+gridElems :: Grid a -> [(a, Position)]
 gridElems grid = concat . concat $ indexedGrid
   where
     -- TODO(R): helper function

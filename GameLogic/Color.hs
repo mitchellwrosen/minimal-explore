@@ -8,11 +8,11 @@ import Prelude ( Int
                )
 
 import GameLogic.Types ( Color
+                       , Byte
                        )
 
-
-toList :: Color -> [Int]
+toList :: Color -> [Byte]
 toList (r, g, b) = [r, g, b]
 
-fromList :: [Int] -> Color
+fromList :: [Byte] -> Color
 fromList [r, g, b] = (r, g, b)

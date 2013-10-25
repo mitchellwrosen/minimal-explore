@@ -16,6 +16,8 @@ type KeyValue = Int
 
 type BeadMap = [[[BeadData]]]
 
+type Byte = Int
+
 data Light = Light { lightRadius :: Int
                    , lightColor :: Color
                    }
@@ -32,7 +34,7 @@ data GridBead = Wall
               | DoorBead Door
   deriving (Show, Eq)
 
-type Color = (Int, Int, Int)
+type Color = (Byte, Byte, Byte)
 type DistanceX = Int
 data BeadColor = WallColor DistanceX
                | DoorColor DistanceX

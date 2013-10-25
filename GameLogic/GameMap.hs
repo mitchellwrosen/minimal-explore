@@ -6,7 +6,6 @@ module GameLogic.GameMap ( GameMap(..)
                          ) where
 
 import Prelude ( String
-               , Int
                , Eq
                , Show
                , Maybe(..)
@@ -41,22 +40,24 @@ import GameLogic.Types ( GridBead(..)
                        , GridX
                        , GridY
                        , GridZ
+                       , Byte
                        , Light(..)
                        , Door(..)
                        )
 
--- TODO(R): Type for 0-255 values
 -- TODO(R): Only export the accessor functions
--- TODO(R): Introduce types: MapDoor MapLight
+-- TODO(R): Introduce types: Position MapDoor MapLight
+type MapDoor  = (Door, Position)
+type MapLight = (Light, Position)
 data GameMap = GameMap { gameMapGrid :: Grid GridBead
                        , gameMapName :: String
-                       , gameMapDoors :: [(Door, (GridX, GridY, GridZ))]
-                       , gameMapLights :: [(Light, (GridX, GridY, GridZ))]
-                       , gameMapAmbientLight :: Int
+                       , gameMapDoors :: [MapDoor]
+                       , gameMapLights :: [MapLight]
+                       , gameMapAmbientLight :: Byte
                        }
   deriving (Eq, Show)
 
-gameMapApplyMoveLight :: GameMap -> (Light, Position) -> Facing -> Move -> GameMap
+gameMapApplyMoveLight :: GameMap -> MapLight -> Facing -> Move -> GameMap
 gameMapApplyMoveLight gameMap light facing move =
     -- TODO(R): Lens
     gameMap { gameMapLights = lights' }
@@ -74,7 +75,7 @@ getGameMapFromDoor gameMaps (DoorBead (Door roomName _)) =
     maybe (error $ "Bad RoomName " ++ roomName) id $ lookup roomName gameMaps
 
 -- TODO(R): compare on door ident/map
-getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> (GridX, GridY, GridZ)
+getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> Position
 getMatchingDoorPosition fromMap toMap (DoorBead (Door name ident)) =
     snd $ findFirst ((== Door (gameMapName fromMap) ident) . fst) (gameMapDoors toMap)
   where
@@ -82,7 +83,7 @@ getMatchingDoorPosition fromMap toMap (DoorBead (Door name ident)) =
     findFirst :: (a -> Bool) -> [a] -> a
     findFirst filt list = head $ filter filt list
 
-makeGameMap :: Grid GridBead -> String -> Int -> GameMap
+makeGameMap :: Grid GridBead -> String -> Byte -> GameMap
 makeGameMap grid name ambientLight =
     GameMap grid' name doors lights ambientLight
   where

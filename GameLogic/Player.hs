@@ -13,6 +13,7 @@ import Prelude ( Show
                )
 import GameLogic.Move ( Move(..)
                       , Facing(..)
+                      , Position(..)
                       )
 import GameLogic.Types ( GridX
                        , GridY
@@ -21,7 +22,7 @@ import GameLogic.Types ( GridX
 
 -- TODO(R): _position => playerPosition
 -- TODO(R): _facing => playerFacing
-data Player = Player { _position :: (GridX, GridY, GridZ)
+data Player = Player { _position :: Position
                      , _facing :: Facing
                      }
   deriving (Show, Eq)
@@ -31,7 +32,7 @@ playerGetFacing :: Player -> Facing
 playerGetFacing = _facing
 
 -- TODO(R): remove playerGetPosition
-playerGetPosition :: Player -> (GridX, GridY, GridZ)
+playerGetPosition :: Player -> Position
 playerGetPosition = _position
 
 -- TODO(R): lenses
