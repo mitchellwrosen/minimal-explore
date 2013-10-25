@@ -63,7 +63,7 @@ main = do
     let psInit :: Fay ()
         psInit = do
             gameState <- readRef stateRef
-            let (_, viewHeight, viewWidth) = gridDimensions (gameMapGrid (gameState ^. gameStateGameMap))
+            let (_, viewHeight, viewWidth) = gridDimensions (gameState^.gameStateGameMap^.gameMapGrid)
             psGridSize viewWidth viewHeight
             psGridColor (15, 15, 15)
             drawMap gameState

@@ -37,7 +37,10 @@ import GameLogic.Move ( Facing(..)
                       )
 import GameLogic.Types ( GridBead(..)
                        )
-import GameLogic.GameMap ( GameMap(..) )
+import GameLogic.GameMap ( GameMap
+                         , gameMapGrid
+                         , gameMapLights
+                         )
 import GameLogic.Grid ( gridDimensions )
 import GameLogic.State ( GameState(..)
                        , gameStateGameMap
@@ -70,7 +73,7 @@ drawMap gameState = do
   where
     colorView = getColorView gameState
 
-    (_, _, maxZ) = gridDimensions . gameMapGrid $ gameState ^. gameStateGameMap
+    (_, _, maxZ) = gridDimensions $ gameState^.gameStateGameMap^.gameMapGrid
     maybeInvertZ z =  case gameState ^. gameStatePlayer ^. playerFacing of
         Positive -> z
         Negative -> maxZ - z - 1
@@ -78,5 +81,5 @@ drawMap gameState = do
     (playerX, playerY, playerZ') = gameState ^. gameStatePlayer ^. playerPosition
     playerZ = maybeInvertZ playerZ'
 
-    lights = filter (\(_, (x, _, _)) -> x == playerX) $ gameMapLights (gameState ^. gameStateGameMap)
+    lights = filter (\(_, (x, _, _)) -> x == playerX) $ gameState^.gameStateGameMap^.gameMapLights
     lightRadii _ (_, (_, y, z)) = psRadius (maybeInvertZ z) y 25

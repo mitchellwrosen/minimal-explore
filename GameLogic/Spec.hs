@@ -47,9 +47,13 @@ import GameLogic.View.Internal ( getView
                                , phongLighting
                                , lightIntensity
                                )
-import GameLogic.GameMap ( GameMap(..)
+import GameLogic.GameMap ( GameMap
                          , getGameMapFromDoor
                          , makeGameMap
+                         , gameMapName
+                         , gameMapGrid
+                         , gameMapDoors
+                         , gameMapLights
                          , gameMapApplyMoveLight
                          , getMatchingDoorPosition
                          )
@@ -84,8 +88,8 @@ spec = do
                 gridB = [ [ [ doorB ] ] ]
                 gameMapB = makeGameMap gridB "mapB" 255
 
-                maps = [ (gameMapName gameMapA, gameMapA)
-                       , (gameMapName gameMapB, gameMapB)
+                maps = [ (gameMapA^.gameMapName, gameMapA)
+                       , (gameMapB^.gameMapName, gameMapB)
                        ]
 
             it "finds the matching map" $ do
@@ -101,20 +105,20 @@ spec = do
             gameMap = makeGameMap grid name 255
 
         it "has a grid" $ do
-            gameMapGrid gameMap `shouldBe` grid
+            gameMap ^. gameMapGrid `shouldBe` grid
 
         it "has a name" $ do
-            gameMapName gameMap `shouldBe` name
+            gameMap ^. gameMapName `shouldBe` name
 
         it "has a list of doors" $ do
-            map fst (gameMapDoors gameMap) `shouldBe` [ door ]
+            map fst (gameMap ^. gameMapDoors) `shouldBe` [ door ]
 
     describe "light movement" $ do
         let name = "mapA"
             light = Light 255 (255, 255, 255)
             grid = [ [ [ LightBead light, Empty ] ] ]
             gameMap = makeGameMap grid name 255
-            [mapLight] = gameMapLights gameMap
+            [mapLight] = gameMap ^. gameMapLights
 
             grid' = [ [ [ Empty, LightBead light ] ] ]
             gameMap' = makeGameMap grid' name 255

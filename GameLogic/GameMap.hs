@@ -1,4 +1,9 @@
-module GameLogic.GameMap ( GameMap(..)
+module GameLogic.GameMap ( GameMap
+                         , gameMapGrid
+                         , gameMapName
+                         , gameMapLights
+                         , gameMapDoors
+                         , gameMapAmbientLight
                          , getGameMapFromDoor
                          , getMatchingDoorPosition
                          , gameMapApplyMoveLight
@@ -45,22 +50,41 @@ import GameLogic.Types ( GridBead(..)
                        , Position(..)
                        )
 
+import Control.Lens ( (^.)
+                    , over
+                    , Lens(..)
+                    )
+
 type MapDoor  = (Door, Position)
 type MapLight = (Light, Position)
-data GameMap = GameMap { gameMapGrid :: Grid GridBead
-                       , gameMapName :: String
-                       , gameMapDoors :: [MapDoor]
-                       , gameMapLights :: [MapLight]
-                       , gameMapAmbientLight :: Byte
+data GameMap = GameMap { _gameMapGrid :: Grid GridBead
+                       , _gameMapName :: String
+                       , _gameMapDoors :: [MapDoor]
+                       , _gameMapLights :: [MapLight]
+                       , _gameMapAmbientLight :: Byte
                        }
   deriving (Eq, Show)
 
+gameMapGrid = Lens { view = \gameState -> _gameMapGrid gameState
+                   , set  = \val gameState  -> gameState { _gameMapGrid = val }
+                   }
+gameMapName = Lens { view = \gameState -> _gameMapName gameState
+                   , set  = \val gameState  -> gameState { _gameMapName = val }
+                   }
+gameMapDoors = Lens { view = \gameState -> _gameMapDoors gameState
+                   , set  = \val gameState  -> gameState { _gameMapDoors = val }
+                   }
+gameMapLights = Lens { view = \gameState -> _gameMapLights gameState
+                   , set  = \val gameState  -> gameState { _gameMapLights = val }
+                   }
+gameMapAmbientLight = Lens { view = \gameState -> _gameMapAmbientLight gameState
+                   , set  = \val gameState  -> gameState { _gameMapAmbientLight = val }
+                   }
+
 gameMapApplyMoveLight :: GameMap -> MapLight -> Facing -> Move -> GameMap
 gameMapApplyMoveLight gameMap light facing move =
-    -- TODO(R): Lens
-    gameMap { gameMapLights = lights' }
+    over gameMapLights (map moveLight) gameMap
   where
-    lights' = map moveLight $ gameMapLights gameMap
     moveLight l
         | l == light = applyMove light
         | otherwise = l
@@ -75,7 +99,7 @@ getGameMapFromDoor gameMaps (DoorBead (Door roomName _)) =
 -- TODO(R): compare on door ident/map
 getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> Position
 getMatchingDoorPosition fromMap toMap (DoorBead (Door name ident)) =
-    snd $ findFirst ((== Door (gameMapName fromMap) ident) . fst) (gameMapDoors toMap)
+    snd $ findFirst ((== Door (fromMap ^. gameMapName) ident) . fst) (toMap ^. gameMapDoors)
   where
     -- TODO(R): helper function
     findFirst :: (a -> Bool) -> [a] -> a

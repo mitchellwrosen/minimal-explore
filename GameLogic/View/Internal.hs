@@ -47,8 +47,9 @@ import GameLogic.State ( GameState
                        , gameStatePlayer
                        )
 import GameLogic.GameMap ( gameMapGrid
+                         , gameMapLights
                          , gameMapAmbientLight
-                         , GameMap(..)
+                         , GameMap
                          )
 import GameLogic.Move ( Facing(..)
                       )
@@ -84,7 +85,7 @@ mapInd f = zipWith f [0..]
 getColorView :: GameState -> [[Color]]
 getColorView gameState = map (map calculateBeadColor) $ getView gameState
   where
-    maxLight = gameMapAmbientLight $ gameState ^. gameStateGameMap
+    maxLight = gameState ^. gameStateGameMap ^. gameMapAmbientLight
 
     -- TODO(R): only appropriate for walls
     fadeValue :: Int -> Int
@@ -111,7 +112,7 @@ getBeadView gameState = viewSection
   where
     player = gameState ^. gameStatePlayer
     gameMap = gameState ^. gameStateGameMap
-    grid = (gameMapGrid gameMap)
+    grid = gameMap ^. gameMapGrid
     (playerX, _, _) = player ^. playerPosition
     positiveFacing = player ^. playerFacing == Positive
 
@@ -127,7 +128,7 @@ getView gameState =
     player = gameState ^. gameStatePlayer
     gameMap = gameState ^. gameStateGameMap
     --TODO(R): Only invert z once.
-    grid = gameMapGrid gameMap
+    grid = gameMap ^. gameMapGrid
     positiveFacing = player ^. playerFacing == Positive
 
     (maxX, _, maxZ) = gridDimensions grid
@@ -142,7 +143,7 @@ getView gameState =
     nearbyLightBeads y z' = filter nearbyFilter lightsWithDistance
       where
         z = invertZIfNegative z'
-        lightBeads = gameMapLights gameMap
+        lightBeads = gameMap ^. gameMapLights
 
         lightsWithDistance :: [(Light, Int)]
         lightsWithDistance = map lightWithDistance lightBeads
@@ -193,7 +194,7 @@ getView gameState =
     lightAt y z =
         --TODO(R): where clause
         --TODO(R): pattern match pos or cool trick
-        let lights = filter (\(_, pos) -> pos == (playerX, y, z)) $ gameMapLights gameMap
+        let lights = filter (\(_, pos) -> pos == (playerX, y, z)) $ gameMap ^. gameMapLights
         in  fromList lights
 
     --TODO(R): complicated, clean

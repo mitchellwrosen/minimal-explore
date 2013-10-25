@@ -53,7 +53,9 @@ import GameLogic.Types ( GridBead(..)
 import GameLogic.GameMap ( getGameMapFromDoor
                          , getMatchingDoorPosition
                          , gameMapApplyMoveLight
-                         , GameMap(..)
+                         , gameMapGrid
+                         , gameMapLights
+                         , GameMap
                          )
 import qualified Levels.GameMaps
 
@@ -98,13 +100,13 @@ processLightMove defGameState playerMovedGameState light@(_, pos) facing move =
     (x, y, z) = move facing pos
 
     gameMap = playerMovedGameState ^. gameStateGameMap
-    gridBead = fromMaybe Wall $ gridGet (gameMapGrid gameMap) x y z
+    gridBead = fromMaybe Wall $ gridGet (gameMap ^. gameMapGrid) x y z
     gameState = playerMovedGameState { _gameStateGameMap = gameMapApplyMoveLight gameMap light facing move }
     resolveLightBeadCollisions = case lights of
         [] -> gameState
         _ -> defGameState
       where
-        lights = filter (\(_, lightPos) -> lightPos == (x, y, z)) $ gameMapLights gameMap
+        lights = filter (\(_, lightPos) -> lightPos == (x, y, z)) $ gameMap ^. gameMapLights
 
 processPlayerMove :: Move -> GameState -> GameState
 processPlayerMove move gameState@(GameState player gameMap) =
@@ -116,14 +118,14 @@ processPlayerMove move gameState@(GameState player gameMap) =
     player' = playerApplyMove player move
     gameState' = GameState player' gameMap
     (x, y, z) = player' ^. playerPosition
-    gridBead = fromMaybe Wall $ gridGet (gameMapGrid $ gameMap) x y z
+    gridBead = fromMaybe Wall $ gridGet (gameMap ^. gameMapGrid) x y z
 
     resolveLightBeadCollisions = case light of
         [light] -> processLightMove gameState gameState' light facing move
         []      -> gameState'
       where
         facing = player' ^. playerFacing
-        light = filter ((== (x, y, z)) . snd) $ gameMapLights gameMap
+        light = filter ((== (x, y, z)) . snd) $ gameMap ^. gameMapLights
 
 leftButtonPressed :: GameState -> GameState
 leftButtonPressed = processPlayerMove moveLeft
