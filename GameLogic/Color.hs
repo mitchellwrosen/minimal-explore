@@ -28,12 +28,11 @@ ambientColor :: Byte -> BeadColor -> Color
 ambientColor maxLight (EmptyColor) = (maxLight, maxLight, maxLight)
 ambientColor maxLight (PlayerColor) = (maxLight, 0, 0)
 ambientColor maxLight (DoorColor dist) = (maxLight, maxLight, maxLight)
-ambientColor maxLight (WallColor dist) = (fadeValue dist, fadeValue dist, fadeValue dist)
+ambientColor maxLight (WallColor dist) = (wallFadeValue dist, wallFadeValue dist, wallFadeValue dist)
   where
-    -- TODO(R): only appropriate for walls
-    fadeValue :: Int -> Int
-    fadeValue 0 = 0
-    fadeValue 1 = round $ fromIntegral maxLight * 64 / 255
-    fadeValue 2 = round $ fromIntegral maxLight * 128 / 255
-    fadeValue 3 = round $ fromIntegral maxLight * 192 / 255
-    fadeValue _ = maxLight
+    wallFadeValue :: Int -> Int
+    wallFadeValue 0 = 0
+    wallFadeValue 1 = round $ fromIntegral maxLight * 64 / 255
+    wallFadeValue 2 = round $ fromIntegral maxLight * 128 / 255
+    wallFadeValue 3 = round $ fromIntegral maxLight * 192 / 255
+    wallFadeValue _ = maxLight

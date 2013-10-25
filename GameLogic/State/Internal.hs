@@ -92,17 +92,15 @@ processLightMove defGameState playerMovedGameState light@(_, pos) facing move =
         Empty -> resolveLightBeadCollisions
         _     -> defGameState
   where
-    -- TODO(R): nearly identical code below. refactor
     pos' = move facing pos
+    gridBead = fromMaybe Wall $ gridGet (playerMovedGameState^.gameStateGameMap^.gameMapGrid) pos'
 
-    gameMap = playerMovedGameState ^. gameStateGameMap
-    gridBead = fromMaybe Wall $ gridGet (gameMap ^. gameMapGrid) pos'
-    gameState = playerMovedGameState { _gameStateGameMap = gameMapApplyMoveLight gameMap light facing move }
+    gameState = over gameStateGameMap (\gameMap -> gameMapApplyMoveLight gameMap light facing move) playerMovedGameState
+
+    lights = filter (\(_, lightPos) -> lightPos == pos') $ playerMovedGameState^.gameStateGameMap^.gameMapLights
     resolveLightBeadCollisions = case lights of
         [] -> gameState
-        _ -> defGameState
-      where
-        lights = filter (\(_, lightPos) -> lightPos == pos') $ gameMap ^. gameMapLights
+        _  -> defGameState
 
 processPlayerMove :: Move -> GameState -> GameState
 processPlayerMove move gameState@(GameState player gameMap) =
@@ -111,17 +109,14 @@ processPlayerMove move gameState@(GameState player gameMap) =
         door@(DoorBead _) -> loadNewRoom gameState door
         Wall -> gameState
   where
-    player' = playerApplyMove player move
-    gameState' = GameState player' gameMap
-    pos = player' ^. playerPosition
-    gridBead = fromMaybe Wall $ gridGet (gameMap ^. gameMapGrid) pos
+    gameState' = over gameStatePlayer (flip playerApplyMove move) gameState
+    player' = gameState'^.gameStatePlayer
+    gridBead = fromMaybe Wall $ gridGet (gameMap^.gameMapGrid) (player'^.playerPosition)
 
+    light = filter ((== player'^.playerPosition) . snd) $ gameMap^.gameMapLights
     resolveLightBeadCollisions = case light of
-        [light] -> processLightMove gameState gameState' light facing move
+        [light] -> processLightMove gameState gameState' light (player'^.playerFacing) move
         []      -> gameState'
-      where
-        facing = player' ^. playerFacing
-        light = filter ((== pos) . snd) $ gameMap ^. gameMapLights
 
 leftButtonPressed :: GameState -> GameState
 leftButtonPressed = processPlayerMove moveLeft
