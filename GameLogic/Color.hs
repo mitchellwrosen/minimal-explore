@@ -9,9 +9,11 @@ import Prelude ( Int
                , Eq
                )
 
+-- TODO(R): Move Color to types
 type Color = (Int, Int, Int)
 
 type DistanceX = Int
+-- TODO(R): Move BeadColor to types?
 data BeadColor = WallColor DistanceX
                | DoorColor DistanceX
                | EmptyColor

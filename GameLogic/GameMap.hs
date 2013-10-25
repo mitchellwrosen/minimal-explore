@@ -45,6 +45,9 @@ import GameLogic.Types ( GridBead(..)
                        , Door(..)
                        )
 
+-- TODO(R): Type for 0-255 values
+-- TODO(R): Only export the accessor functions
+-- TODO(R): Introduce types: MapDoor MapLight
 data GameMap = GameMap { gameMapGrid :: Grid GridBead
                        , gameMapName :: String
                        , gameMapDoors :: [(Door, (GridX, GridY, GridZ))]
