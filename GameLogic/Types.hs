@@ -45,8 +45,6 @@ data BeadColor = WallColor DistanceX
                | LightColor Color
   deriving (Show, Eq)
 
--- TODO(R): isPositive facing = ?
--- TODO(R): isNegative facing = ?
 data Facing = Positive | Negative
   deriving (Show, Eq)
 

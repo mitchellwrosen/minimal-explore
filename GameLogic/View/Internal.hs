@@ -62,6 +62,7 @@ import GameLogic.Grid ( Grid(..)
                       )
 import GameLogic.Types ( GridY
                        , GridZ
+                       , posX
                        , Door(..)
                        , Light(..)
                        , GridBead(..)
@@ -70,38 +71,24 @@ import GameLogic.Types ( GridY
                        , Position(..)
                        , Facing(..)
                        )
+import GameLogic.Color ( ambientColor )
 
 import Control.Lens ( (^.) )
-import Data.Util.Maybe ( fromMaybe )
-
---TODO(R): Helper module
-mapInd :: (Int -> a -> b) -> [a] -> [b]
-mapInd f = zipWith f [0..]
+import Data.Util.Maybe ( fromMaybe
+                       , fromList
+                       , isJust
+                       )
+import Data.Util.List ( mapInd )
 
 getColorView :: GameState -> [[Color]]
 getColorView gameState = map (map calculateBeadColor) $ getView gameState
   where
     maxLight = gameState ^. gameStateGameMap ^. gameMapAmbientLight
 
-    -- TODO(R): only appropriate for walls
-    fadeValue :: Int -> Int
-    fadeValue 0 = 0
-    fadeValue 1 = round $ fromIntegral maxLight * 64 / 255
-    fadeValue 2 = round $ fromIntegral maxLight * 128 / 255
-    fadeValue 3 = round $ fromIntegral maxLight * 192 / 255
-    fadeValue _ = maxLight
-
-    -- TODO(R): ambient colors for beads should be elsewhere
     calculateBeadColor :: (BeadColor, [(Light, Int)]) -> Color
-    calculateBeadColor (color@(EmptyColor), lights) =
-        phongLighting (beadDiffuse color) (maxLight, maxLight, maxLight) lights
-    calculateBeadColor (color@(PlayerColor), lights) =
-        phongLighting (beadDiffuse color) (maxLight, 0, 0) lights
-    calculateBeadColor (color@(WallColor dist), lights) =
-        phongLighting (beadDiffuse color) (fadeValue dist, fadeValue dist, fadeValue dist) lights
-    calculateBeadColor (color@(DoorColor dist), lights) =
-        phongLighting (beadDiffuse color) (maxLight, maxLight, maxLight) lights
     calculateBeadColor (LightColor color, _) = color
+    calculateBeadColor (color, lights) =
+        phongLighting (beadDiffuse color) (ambientColor maxLight color) lights
 
 getBeadView :: GameState -> [[GridBead]]
 getBeadView gameState = viewSection
@@ -109,7 +96,7 @@ getBeadView gameState = viewSection
     player = gameState ^. gameStatePlayer
     gameMap = gameState ^. gameStateGameMap
     grid = gameMap ^. gameMapGrid
-    (playerX, _, _) = player ^. playerPosition
+    playerX = player ^. playerPosition ^. posX
     positiveFacing = player ^. playerFacing == Positive
 
     viewSection' = grid !! playerX
@@ -158,7 +145,6 @@ getView gameState =
     xDistanceToBead y z' =
         let z = invertZIfNegative z'
 
-            --TODO(R): Only invert z once.
             -- x slice with the given yz values
             xSlice :: [GridBead]
             xSlice = map (\x -> fromMaybe Wall $ gridGet grid (x, y, z)) [(-1)..maxX]
@@ -175,16 +161,6 @@ getView gameState =
                     door@(DoorBead _) -> (dist, door)
                     _ -> distance (dist + 1) (delta index)
         in  distance 0 $ playerX + 1
-
-    --TODO(R): helper module
-    fromList :: [a] -> Maybe a
-    fromList (a:xs) = Just a
-    fromList [] = Nothing
-
-    --TODO(R): helper module
-    isJust :: Maybe a -> Bool
-    isJust (Just _) = True
-    isJust _ = False
 
     lightAt :: GridY -> GridZ -> Maybe (Light, Position)
     lightAt y z =
