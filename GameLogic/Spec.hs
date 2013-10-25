@@ -6,9 +6,11 @@ import Test.Hspec
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
+                       , doorMapName
+                       , doorId
+                       , Door(..)
                        , BeadColor(..)
                        , GridBead(..)
-                       , Door(..)
                        , Light(..)
                        , Facing(..)
                        , Position(..)
@@ -74,10 +76,10 @@ spec = do
     describe "door" $ do
         let door = Door "map" "id"
         it "has a map name" $ do
-            doorMapName door `shouldBe` "map"
+            door^.doorMapName `shouldBe` "map"
 
         it "has a unqiue id" $ do
-            doorId door `shouldBe` "id"
+            door^.doorId `shouldBe` "id"
 
         describe "player steps on door" $ do
             let doorA = DoorBead $ Door "mapB" "unique"

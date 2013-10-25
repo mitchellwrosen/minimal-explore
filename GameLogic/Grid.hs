@@ -36,6 +36,7 @@ import Data.Util.List ( mapInd
                       , replace
                       )
 
+-- TODO(R): Lens for Grid
 type Grid a = [[[a]]]
 
 gridDimensions :: Grid a -> Position

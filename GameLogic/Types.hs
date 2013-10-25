@@ -25,10 +25,17 @@ data Light = Light { lightRadius :: Int
                    }
   deriving (Show, Eq)
 
-data Door = Door { doorMapName :: String
-                 , doorId :: String
+data Door = Door { _doorMapName :: String
+                 , _doorId :: String
                  }
   deriving (Show, Eq)
+doorMapName = Lens { view = \(Door name _) -> name
+                   , set  = \name (Door _ ident) -> Door name ident
+                   }
+doorId = Lens { view = \(Door _ ident) -> ident
+              , set  = \ident (Door name _) -> Door name ident
+              }
+
 
 data GridBead = Wall
               | Empty

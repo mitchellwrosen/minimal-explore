@@ -28,6 +28,7 @@ import Prelude ( String
                , map
                , (==)
                , (++)
+               , (&&)
                , ($)
                , (.)
                )
@@ -43,8 +44,10 @@ import GameLogic.Types ( GridBead(..)
                        , GridY
                        , GridZ
                        , Byte
+                       , Door
+                       , doorMapName
+                       , doorId
                        , Light(..)
-                       , Door(..)
                        , Position(..)
                        , Facing(..)
                        )
@@ -94,13 +97,18 @@ gameMapApplyMoveLight gameMap light facing move =
     applyMove (l, pos) = (l, move facing  pos)
 
 getGameMapFromDoor :: [(String, GameMap)] -> GridBead -> GameMap
-getGameMapFromDoor gameMaps (DoorBead (Door roomName _)) =
+getGameMapFromDoor gameMaps (DoorBead door) =
     fromMaybe (error $ "Bad RoomName " ++ roomName) $ lookup roomName gameMaps
+  where
+    roomName = door^.doorMapName
 
--- TODO(R): compare on door ident/map
 getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> Position
-getMatchingDoorPosition fromMap toMap (DoorBead (Door name ident)) =
-    snd $ findFirst ((== Door (fromMap ^. gameMapName) ident) . fst) (toMap ^. gameMapDoors)
+getMatchingDoorPosition fromMap toMap (DoorBead door) =
+    snd $ findFirst (matchingDoor . fst) (toMap^.gameMapDoors)
+  where
+    ident = door^.doorId
+    matchingDoor door =
+        (door^.doorMapName == fromMap^.gameMapName) && (door^.doorId == ident)
 
 makeGameMap :: Grid GridBead -> String -> Byte -> GameMap
 makeGameMap grid name ambientLight =
@@ -108,7 +116,6 @@ makeGameMap grid name ambientLight =
   where
     lights = foldr lightFold [] (gridElems grid)
       where
-        -- TODO(R): LightBead could have record syntax
         lightFold (LightBead light, pos) xs = (light, pos):xs
         lightFold _ xs = xs
 
@@ -119,6 +126,5 @@ makeGameMap grid name ambientLight =
 
     doors = foldr doorFold [] (gridElems grid)
       where
-        -- TODO(R): DoorBead could have record syntax
         doorFold (DoorBead door, pos) xs = (door, pos):xs
         doorFold _ xs = xs
