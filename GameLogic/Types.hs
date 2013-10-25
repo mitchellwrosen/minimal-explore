@@ -47,11 +47,11 @@ data BeadColor = WallColor DistanceX
 
 type Position = (GridX, GridY, GridZ)
 posX = Lens { view = \(x, _, _) -> x
-            , set = \x (_, y, z) -> (x, y, z)
+            , set  = \x (_, y, z) -> (x, y, z)
             }
 posY = Lens { view = \(_, y, _) -> y
-            , set = \y (x, _, z) -> (x, y, z)
+            , set  = \y (x, _, z) -> (x, y, z)
             }
 posZ = Lens { view = \(_, _, z) -> z
-            , set = \z (x, y, _) -> (x, y, z)
+            , set  = \z (x, y, _) -> (x, y, z)
             }
