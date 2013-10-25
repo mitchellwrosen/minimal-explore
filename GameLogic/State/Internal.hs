@@ -4,7 +4,7 @@ module GameLogic.State.Internal ( leftButtonPressed
                                 , downButtonPressed
                                 , forwardButtonPressed
                                 , reverseButtonPressed
-                                , GameState(..)
+                               , GameState(..)
                                 ) where
 
 import Prelude ( Show
@@ -31,7 +31,6 @@ import GameLogic.Move ( moveLeft
                       , moveForward
                       , Move(..)
                       , Facing(..)
-                      , Position(..)
                       )
 import GameLogic.Player ( Player(..)
                         , playerGetPosition
@@ -44,6 +43,7 @@ import GameLogic.Grid ( Grid(..)
 import GameLogic.Types ( GridBead(..)
                        , Door(..)
                        , Light(..)
+                       , Position(..)
                        )
 import GameLogic.GameMap ( getGameMapFromDoor
                          , getMatchingDoorPosition

@@ -5,6 +5,8 @@ import Prelude ( Int
                , Eq
                , String
                )
+import Control.Lens ( Lens(..)
+                    )
 
 type GridX = Int
 type GridY = Int
@@ -42,3 +44,14 @@ data BeadColor = WallColor DistanceX
                | PlayerColor
                | LightColor Color
   deriving (Show, Eq)
+
+type Position = (GridX, GridY, GridZ)
+posX = Lens { view = \(x, _, _) -> x
+            , set = \x (_, y, z) -> (x, y, z)
+            }
+posY = Lens { view = \(_, y, _) -> y
+            , set = \y (x, _, z) -> (x, y, z)
+            }
+posZ = Lens { view = \(_, _, z) -> z
+            , set = \z (x, y, _) -> (x, y, z)
+            }

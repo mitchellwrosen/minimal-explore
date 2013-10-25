@@ -27,10 +27,10 @@ import Prelude ( Int
                , ($)
                )
 
-import GameLogic.Move ( Position )
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
+                       , Position
                        )
 
 type Grid a = [[[a]]]

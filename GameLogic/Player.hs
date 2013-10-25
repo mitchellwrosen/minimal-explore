@@ -13,11 +13,11 @@ import Prelude ( Show
                )
 import GameLogic.Move ( Move(..)
                       , Facing(..)
-                      , Position(..)
                       )
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
+                       , Position
                        )
 
 -- TODO(R): _position => playerPosition

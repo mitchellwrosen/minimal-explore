@@ -49,7 +49,6 @@ import GameLogic.GameMap ( gameMapGrid
                          , GameMap(..)
                          )
 import GameLogic.Move ( Facing(..)
-                      , Position(..)
                       )
 import GameLogic.Player ( playerGetFacing
                         , playerGetPosition
@@ -66,6 +65,7 @@ import GameLogic.Types ( GridY
                        , GridBead(..)
                        , BeadColor(..)
                        , Color(..)
+                       , Position(..)
                        )
 
 --TODO(R): Helper module

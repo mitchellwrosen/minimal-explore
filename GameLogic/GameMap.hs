@@ -34,7 +34,6 @@ import GameLogic.Grid ( Grid(..)
                       )
 import GameLogic.Move ( Move(..)
                       , Facing(..)
-                      , Position(..)
                       )
 import GameLogic.Types ( GridBead(..)
                        , GridX
@@ -43,6 +42,7 @@ import GameLogic.Types ( GridBead(..)
                        , Byte
                        , Light(..)
                        , Door(..)
+                       , Position(..)
                        )
 
 type MapDoor  = (Door, Position)
