@@ -67,7 +67,6 @@ data GameMap = GameMap { _gameMapGrid :: Grid GridBead
                        , _gameMapAmbientLight :: Byte
                        }
   deriving (Eq, Show)
-
 gameMapGrid = Lens { view = \gameState -> _gameMapGrid gameState
                    , set  = \val gameState  -> gameState { _gameMapGrid = val }
                    }
