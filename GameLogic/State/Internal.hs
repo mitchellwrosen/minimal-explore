@@ -33,7 +33,6 @@ import GameLogic.Move ( moveLeft
                       , moveDown
                       , moveForward
                       , Move(..)
-                      , Facing(..)
                       )
 import GameLogic.Player ( Player
                         , makePlayer
@@ -49,6 +48,7 @@ import GameLogic.Types ( GridBead(..)
                        , Door(..)
                        , Light(..)
                        , Position(..)
+                       , Facing(..)
                        )
 import GameLogic.GameMap ( getGameMapFromDoor
                          , getMatchingDoorPosition
@@ -80,7 +80,6 @@ makeGameState = GameState
 loadNewRoom :: GameState -> GridBead -> GameState
 loadNewRoom gameState door = gameState'
   where
-    -- TODO(R): lenses
     oldFacing = gameState ^. gameStatePlayer ^. playerFacing
     position = getMatchingDoorPosition (gameState ^. gameStateGameMap) newMap door
     player = makePlayer position oldFacing

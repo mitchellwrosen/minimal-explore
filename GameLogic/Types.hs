@@ -45,6 +45,11 @@ data BeadColor = WallColor DistanceX
                | LightColor Color
   deriving (Show, Eq)
 
+-- TODO(R): isPositive facing = ?
+-- TODO(R): isNegative facing = ?
+data Facing = Positive | Negative
+  deriving (Show, Eq)
+
 type Position = (GridX, GridY, GridZ)
 posX = Lens { view = \(x, _, _) -> x
             , set  = \x (_, y, z) -> (x, y, z)

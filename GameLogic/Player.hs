@@ -13,12 +13,12 @@ import Prelude ( Show
                , (==)
                )
 import GameLogic.Move ( Move(..)
-                      , Facing(..)
                       )
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
                        , Position
+                       , Facing(..)
                        )
 import Control.Lens ( (^.)
                     , over

@@ -31,6 +31,7 @@ import GameLogic.Types ( GridX
                        , GridZ
                        , Position
                        )
+import Data.Util.Maybe ( toMaybe )
 import Data.Util.List ( mapInd
                       , replace
                       )
@@ -58,10 +59,8 @@ gridElems grid = concat . concat $ indexedGrid
     indexedGrid = mapInd (\x -> mapInd (\y -> mapInd (\z val -> (val, (x, y, z))))) grid
 
 gridGet :: Grid a -> Position -> Maybe a
-gridGet grid (x, y, z)
-    -- TODO(R): toMaybe helper function
-    | validBounds grid x y z = Just $ ((grid !! x) !! y) !! z
-    | otherwise = Nothing
+gridGet grid (x, y, z) =
+    toMaybe (validBounds grid x y z) $ ((grid !! x) !! y) !! z
 
 gridSet :: Grid a -> Position -> a -> Grid a
 gridSet grid (x, y, z) value = newMap

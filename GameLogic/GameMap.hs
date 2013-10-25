@@ -37,7 +37,6 @@ import GameLogic.Grid ( Grid(..)
                       , gridSet
                       )
 import GameLogic.Move ( Move(..)
-                      , Facing(..)
                       )
 import GameLogic.Types ( GridBead(..)
                        , GridX
@@ -47,6 +46,7 @@ import GameLogic.Types ( GridBead(..)
                        , Light(..)
                        , Door(..)
                        , Position(..)
+                       , Facing(..)
                        )
 
 import Data.Util.Maybe ( fromMaybe )

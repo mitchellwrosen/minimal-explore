@@ -51,8 +51,6 @@ import GameLogic.GameMap ( gameMapGrid
                          , gameMapAmbientLight
                          , GameMap
                          )
-import GameLogic.Move ( Facing(..)
-                      )
 import GameLogic.Player ( Player
                         , playerPosition
                         , playerFacing
@@ -70,6 +68,7 @@ import GameLogic.Types ( GridY
                        , BeadColor(..)
                        , Color(..)
                        , Position(..)
+                       , Facing(..)
                        )
 
 import Control.Lens ( (^.) )

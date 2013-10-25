@@ -33,9 +33,8 @@ import Main.Perlenspiel ( psBeadColor
                         , psAll
                         )
 
-import GameLogic.Move ( Facing(..)
-                      )
 import GameLogic.Types ( GridBead(..)
+                       , Facing(..)
                        )
 import GameLogic.GameMap ( GameMap
                          , gameMapGrid

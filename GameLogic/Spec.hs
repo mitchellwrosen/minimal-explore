@@ -10,6 +10,7 @@ import GameLogic.Types ( GridX
                        , GridBead(..)
                        , Door(..)
                        , Light(..)
+                       , Facing(..)
                        , Position(..)
                        )
 import GameLogic.Grid ( gridGet
@@ -17,8 +18,7 @@ import GameLogic.Grid ( gridGet
                       , gridElems
                       , Grid(..)
                       )
-import GameLogic.Move ( Facing(..)
-                      , moveUp
+import GameLogic.Move ( moveUp
                       , moveDown
                       , moveLeft
                       , moveRight

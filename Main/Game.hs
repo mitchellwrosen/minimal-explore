@@ -29,11 +29,10 @@ import GameLogic.Types ( GridX
                        , MWheelDelta
                        , BeadData
                        , GridBead(..)
+                       , Facing(..)
                        )
 import GameLogic.Grid ( Grid(..)
                       , gridDimensions
-                      )
-import GameLogic.Move ( Facing(..)
                       )
 import GameLogic.Player ( Player
                         , makePlayer
