@@ -26,8 +26,8 @@ import GameLogic.Move ( Facing(..)
                       , moveForward
                       )
 import GameLogic.Player ( Player(..)
-                        , playerGetPosition
-                        , playerGetFacing
+                        , playerPosition
+                        , playerFacing
                         , playerApplyMove
                         , playerChangeDirection
                         )
@@ -51,6 +51,9 @@ import GameLogic.GameMap ( GameMap(..)
                          )
 import GameLogic.Color as Color ( fromList
                                 )
+
+import Control.Lens ( (^.)
+                    )
 
 spec :: Spec
 spec = do
@@ -211,33 +214,33 @@ spec = do
         let testPlayer :: Player
             testPlayer = Player (1, 1, 1) Positive
         it "has an xyz position" $ do
-            playerGetPosition testPlayer `shouldBe` (1, 1, 1)
+            testPlayer ^. playerPosition `shouldBe` (1, 1, 1)
 
         it "moves up and down in the y direction one unit" $ do
-            playerGetPosition (playerApplyMove testPlayer moveDown) `shouldBe` (1, 2, 1)
-            playerGetPosition (playerApplyMove testPlayer moveUp) `shouldBe` (1, 0, 1)
+            (playerApplyMove testPlayer moveDown) ^. playerPosition `shouldBe` (1, 2, 1)
+            (playerApplyMove testPlayer moveUp) ^. playerPosition `shouldBe` (1, 0, 1)
 
         it "moves left and right in the z direction one unit" $ do
-            playerGetPosition (playerApplyMove testPlayer moveLeft) `shouldBe` (1, 1, 0)
-            playerGetPosition (playerApplyMove testPlayer moveRight) `shouldBe` (1, 1, 2)
+            (playerApplyMove testPlayer moveLeft) ^. playerPosition `shouldBe` (1, 1, 0)
+            (playerApplyMove testPlayer moveRight) ^. playerPosition `shouldBe` (1, 1, 2)
 
         it "can move forward in the x direction one unit" $ do
-            playerGetPosition (playerApplyMove testPlayer moveForward) `shouldBe` (2, 1, 1)
+            (playerApplyMove testPlayer moveForward) ^. playerPosition `shouldBe` (2, 1, 1)
 
         it "faces +x direction" $ do
-            playerGetFacing testPlayer `shouldBe` Positive
+            testPlayer ^. playerFacing `shouldBe` Positive
 
         describe "changing direction" $ do
             let player' = playerChangeDirection testPlayer
             it "faces -x direction" $ do
-                playerGetFacing player' `shouldBe` Negative
+                player' ^. playerFacing `shouldBe` Negative
 
             it "reverses left/right for the z direction" $ do
-                playerGetPosition (playerApplyMove player' moveLeft) `shouldBe` (1, 1, 2)
-                playerGetPosition (playerApplyMove player' moveRight) `shouldBe` (1, 1, 0)
+                (playerApplyMove player' moveLeft) ^. playerPosition `shouldBe` (1, 1, 2)
+                (playerApplyMove player' moveRight) ^. playerPosition `shouldBe` (1, 1, 0)
 
             it "moves forward in the -x direction" $ do
-                playerGetPosition (playerApplyMove player' moveForward) `shouldBe` (0, 1, 1)
+                (playerApplyMove player' moveForward) ^. playerPosition `shouldBe` (0, 1, 1)
 
     describe "GameView" $ do
         let testGrid :: Grid GridBead
