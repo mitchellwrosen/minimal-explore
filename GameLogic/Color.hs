@@ -1,6 +1,4 @@
-module GameLogic.Color ( Color(..)
-                       , BeadColor(..)
-                       , toList
+module GameLogic.Color ( toList
                        , fromList
                        ) where
 
@@ -9,17 +7,9 @@ import Prelude ( Int
                , Eq
                )
 
--- TODO(R): Move Color to types
-type Color = (Int, Int, Int)
+import GameLogic.Types ( Color
+                       )
 
-type DistanceX = Int
--- TODO(R): Move BeadColor to types?
-data BeadColor = WallColor DistanceX
-               | DoorColor DistanceX
-               | EmptyColor
-               | PlayerColor
-               | LightColor Color
-  deriving (Show, Eq)
 
 toList :: Color -> [Int]
 toList (r, g, b) = [r, g, b]

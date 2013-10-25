@@ -18,11 +18,9 @@ import Prelude ( Int
                , (+)
                )
 
-import GameLogic.Color ( Color(..)
+import GameLogic.Types ( Color(..)
                        , BeadColor(..)
-                       )
-
-import GameLogic.Types ( Light(..)
+                       , Light(..)
                        )
 
 zeroTriple :: (Double, Double, Double)

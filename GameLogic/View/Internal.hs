@@ -64,8 +64,7 @@ import GameLogic.Types ( GridY
                        , Door(..)
                        , Light(..)
                        , GridBead(..)
-                       )
-import GameLogic.Color ( BeadColor(..)
+                       , BeadColor(..)
                        , Color(..)
                        )
 

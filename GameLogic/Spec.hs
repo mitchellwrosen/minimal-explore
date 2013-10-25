@@ -6,6 +6,7 @@ import Test.Hspec
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
+                       , BeadColor(..)
                        , GridBead(..)
                        , Door(..)
                        , Light(..)
@@ -47,8 +48,7 @@ import GameLogic.GameMap ( GameMap(..)
                          , gameMapApplyMoveLight
                          , getMatchingDoorPosition
                          )
-import GameLogic.Color as Color ( BeadColor(..)
-                                , fromList
+import GameLogic.Color as Color ( fromList
                                 )
 
 spec :: Spec
