@@ -58,6 +58,7 @@ data GameMap = GameMap { gameMapGrid :: Grid GridBead
 
 gameMapApplyMoveLight :: GameMap -> (Light, Position) -> Facing -> Move -> GameMap
 gameMapApplyMoveLight gameMap light facing move =
+    -- TODO(R): Lens
     gameMap { gameMapLights = lights' }
   where
     lights' = map moveLight $ gameMapLights gameMap
@@ -67,14 +68,17 @@ gameMapApplyMoveLight gameMap light facing move =
 
     applyMove (l, pos) = (l, move facing  pos)
 
+-- TODO(R): fromMaybe
 getGameMapFromDoor :: [(String, GameMap)] -> GridBead -> GameMap
 getGameMapFromDoor gameMaps (DoorBead (Door roomName _)) =
     maybe (error $ "Bad RoomName " ++ roomName) id $ lookup roomName gameMaps
 
+-- TODO(R): compare on door ident/map
 getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> (GridX, GridY, GridZ)
 getMatchingDoorPosition fromMap toMap (DoorBead (Door name ident)) =
     snd $ findFirst ((== Door (gameMapName fromMap) ident) . fst) (gameMapDoors toMap)
   where
+    -- TODO(R): helper function
     findFirst :: (a -> Bool) -> [a] -> a
     findFirst filt list = head $ filter filt list
 
@@ -84,6 +88,7 @@ makeGameMap grid name ambientLight =
   where
     lights = foldr lightFold [] (gridElems grid)
       where
+        -- TODO(R): LightBead could have record syntax
         lightFold (LightBead light, pos) xs = (light, pos):xs
         lightFold _ xs = xs
 
@@ -94,5 +99,6 @@ makeGameMap grid name ambientLight =
 
     doors = foldr doorFold [] (gridElems grid)
       where
+        -- TODO(R): DoorBead could have record syntax
         doorFold (DoorBead door, pos) xs = (door, pos):xs
         doorFold _ xs = xs

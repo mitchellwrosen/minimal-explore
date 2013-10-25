@@ -69,17 +69,21 @@ import GameLogic.Color ( BeadColor(..)
                        , Color(..)
                        )
 
+--TODO(R): Helper module
 fromMaybe :: a -> Maybe a -> a
 fromMaybe = flip maybe id
 
+--TODO(R): Helper module
 mapInd :: (Int -> a -> b) -> [a] -> [b]
 mapInd f = zipWith f [0..]
 
 getColorView :: GameState -> [[Color]]
 getColorView gameState = map (map calculateBeadColor) $ getView gameState
   where
+    -- TODO(R): lens
     maxLight = gameMapAmbientLight $ gameStateGameMap gameState
 
+    -- TODO(R): only appropriate for walls
     fadeValue :: Int -> Int
     fadeValue 0 = 0
     fadeValue 1 = round $ fromIntegral maxLight * 64 / 255
@@ -87,6 +91,7 @@ getColorView gameState = map (map calculateBeadColor) $ getView gameState
     fadeValue 3 = round $ fromIntegral maxLight * 192 / 255
     fadeValue _ = maxLight
 
+    -- TODO(R): ambient colors for beads should be elsewhere
     calculateBeadColor :: (BeadColor, [(Light, Int)]) -> Color
     calculateBeadColor (color@(EmptyColor), lights) =
         phongLighting (beadDiffuse color) (maxLight, maxLight, maxLight) lights
@@ -114,20 +119,20 @@ getView :: GameState -> [[(BeadColor, [(Light, Int)])]]
 getView gameState@(GameState player gameMap) =
     mapInd (mapInd . beadColor) (getBeadView gameState)
   where
+    --TODO(R): Only invert z once.
     grid = gameMapGrid gameMap
     positiveFacing = playerGetFacing player == Positive
 
     (maxX, _, maxZ) = gridDimensions grid
-    invertZ z = maxZ - z - 1
     invertZIfNegative z = if positiveFacing
                           then z
-                          else invertZ z
+                          else maxZ - z - 1
 
     (playerX, playerY, playerZ') = playerGetPosition player
     playerZ = invertZIfNegative playerZ'
 
     nearbyLightBeads :: GridY -> GridZ -> [(Light, Int)]
-    nearbyLightBeads y z' = nearbyLightBeads'
+    nearbyLightBeads y z' = filter nearbyFilter lightsWithDistance
       where
         z = invertZIfNegative z'
         lightBeads = gameMapLights gameMap
@@ -138,8 +143,8 @@ getView gameState@(GameState player gameMap) =
             lightWithDistance (light, lightPos) = (light, distance lightPos (playerX, y, z))
 
         nearbyFilter (light, dist) = dist <= lightRadius light
-        nearbyLightBeads' = filter nearbyFilter lightsWithDistance
 
+        -- TODO(R): helper module
         distance :: (Int, Int, Int) -> (Int, Int, Int) -> Int
         distance (x1, y1, z1) (x2, y2, z2) =
             let subSqr a b = (fromIntegral (a - b))*(fromIntegral (a - b))
@@ -149,6 +154,7 @@ getView gameState@(GameState player gameMap) =
     xDistanceToBead y z' =
         let z = invertZIfNegative z'
 
+            --TODO(R): Only invert z once.
             -- x slice with the given yz values
             xSlice :: [GridBead]
             xSlice = map (\x -> fromMaybe Wall $ gridGet grid x y z) [(-1)..maxX]
@@ -157,6 +163,7 @@ getView gameState@(GameState player gameMap) =
                     then (+ 1)
                     else (+ (-1))
 
+            -- TODO(R): helper module
             distance :: Int -> Int -> (Int, GridBead)
             distance dist index =
                 case xSlice !! index of
@@ -165,19 +172,24 @@ getView gameState@(GameState player gameMap) =
                     _ -> distance (dist + 1) (delta index)
         in  distance 0 $ playerX + 1
 
+    --TODO(R): helper module
     fromList :: [a] -> Maybe a
     fromList (a:xs) = Just a
     fromList [] = Nothing
 
+    --TODO(R): helper module
     isJust :: Maybe a -> Bool
     isJust (Just _) = True
     isJust _ = False
 
     lightAt :: GridY -> GridZ -> Maybe (Light, Position)
     lightAt y z =
+        --TODO(R): where clause
+        --TODO(R): pattern match pos or cool trick
         let lights = filter (\(_, pos) -> pos == (playerX, y, z)) $ gameMapLights gameMap
         in  fromList lights
 
+    --TODO(R): complicated, clean
     beadColor :: GridY -> GridZ -> GridBead -> (BeadColor, [(Light, Int)])
     beadColor y z bead
         | (y, z) == (playerY, playerZ) = (PlayerColor, nearbyLightBeads y z)
