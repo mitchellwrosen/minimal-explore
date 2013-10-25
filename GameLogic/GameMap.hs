@@ -45,8 +45,6 @@ import GameLogic.Types ( GridBead(..)
                        , Door(..)
                        )
 
--- TODO(R): Only export the accessor functions
--- TODO(R): Introduce types: Position MapDoor MapLight
 type MapDoor  = (Door, Position)
 type MapLight = (Light, Position)
 data GameMap = GameMap { gameMapGrid :: Grid GridBead
