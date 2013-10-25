@@ -50,8 +50,7 @@ import GameLogic.GameMap ( gameMapGrid
                          )
 import GameLogic.Move ( Facing(..)
                       )
-import GameLogic.Player ( playerGetFacing
-                        , playerGetPosition
+import GameLogic.Player ( Player(..)
                         )
 import GameLogic.Grid ( Grid(..)
                       , gridDimensions
@@ -106,8 +105,8 @@ getBeadView :: GameState -> [[GridBead]]
 getBeadView (GameState player gameMap) = viewSection
   where
     grid = (gameMapGrid gameMap)
-    (playerX, _, _) = playerGetPosition player
-    positiveFacing = playerGetFacing player == Positive
+    (playerX, _, _) = _playerPosition player
+    positiveFacing = _playerFacing player == Positive
 
     viewSection' = grid !! playerX
     viewSection = if positiveFacing
@@ -120,14 +119,14 @@ getView gameState@(GameState player gameMap) =
   where
     --TODO(R): Only invert z once.
     grid = gameMapGrid gameMap
-    positiveFacing = playerGetFacing player == Positive
+    positiveFacing = _playerFacing player == Positive
 
     (maxX, _, maxZ) = gridDimensions grid
     invertZIfNegative z = if positiveFacing
                           then z
                           else maxZ - z - 1
 
-    (playerX, playerY, playerZ') = playerGetPosition player
+    (playerX, playerY, playerZ') = _playerPosition player
     playerZ = invertZIfNegative playerZ'
 
     nearbyLightBeads :: GridY -> GridZ -> [(Light, Int)]

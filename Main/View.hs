@@ -41,8 +41,7 @@ import GameLogic.GameMap ( GameMap(..) )
 import GameLogic.Grid ( gridDimensions )
 import GameLogic.State ( GameState(..)
                        )
-import GameLogic.Player ( playerGetPosition
-                        , playerGetFacing
+import GameLogic.Player ( Player(..)
                         )
 import GameLogic.View ( getColorView
                       )
@@ -65,11 +64,11 @@ drawMap gameState = do
     colorView = getColorView gameState
 
     (_, _, maxZ) = gridDimensions . gameMapGrid . gameStateGameMap $ gameState
-    maybeInvertZ z =  case playerGetFacing . _player $ gameState of
+    maybeInvertZ z =  case _playerFacing . _player $ gameState of
         Positive -> z
         Negative -> maxZ - z - 1
 
-    (playerX, playerY, playerZ') = playerGetPosition . _player $ gameState
+    (playerX, playerY, playerZ') = _playerPosition . _player $ gameState
     playerZ = maybeInvertZ playerZ'
 
     lights = filter (\(_, (x, _, _)) -> x == playerX) $ (gameMapLights . gameStateGameMap) gameState

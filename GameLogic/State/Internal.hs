@@ -4,7 +4,7 @@ module GameLogic.State.Internal ( leftButtonPressed
                                 , downButtonPressed
                                 , forwardButtonPressed
                                 , reverseButtonPressed
-                               , GameState(..)
+                                , GameState(..)
                                 ) where
 
 import Prelude ( Show
@@ -33,7 +33,6 @@ import GameLogic.Move ( moveLeft
                       , Facing(..)
                       )
 import GameLogic.Player ( Player(..)
-                        , playerGetPosition
                         , playerApplyMove
                         , playerChangeDirection
                         )
@@ -62,7 +61,7 @@ loadNewRoom :: GameState -> GridBead -> GameState
 loadNewRoom gameState door = gameState'
   where
     -- TODO(R): lenses
-    oldFacing = _facing (_player gameState)
+    oldFacing = _playerFacing (_player gameState)
     position = getMatchingDoorPosition (gameStateGameMap gameState) newMap door
     player = Player position oldFacing
     gameState' = GameState player newMap
@@ -99,7 +98,7 @@ processPlayerMove move gameState@(GameState player gameMap) =
   where
     player' = playerApplyMove player move
     gameState' = GameState player' gameMap
-    (x, y, z) = playerGetPosition player'
+    (x, y, z) = _playerPosition player'
     gridBead = fromMaybe Wall $ gridGet (gameMapGrid $ gameMap) x y z
 
     resolveLightBeadCollisions = case light of
@@ -107,7 +106,7 @@ processPlayerMove move gameState@(GameState player gameMap) =
         []      -> gameState'
       where
         --TODO(R): Lenses
-        facing = _facing player'
+        facing = _playerFacing player'
         light = filter ((== (x, y, z)) . snd) $ gameMapLights gameMap
 
 leftButtonPressed :: GameState -> GameState

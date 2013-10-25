@@ -1,6 +1,6 @@
 module GameLogic.Player ( Player(..)
-                        , playerGetFacing
-                        , playerGetPosition
+                        {-, playerFacing-}
+                        {-, playerPosition-}
                         , playerApplyMove
                         , playerChangeDirection
                         ) where
@@ -20,31 +20,21 @@ import GameLogic.Types ( GridX
                        , Position
                        )
 
--- TODO(R): _position => playerPosition
--- TODO(R): _facing => playerFacing
-data Player = Player { _position :: Position
-                     , _facing :: Facing
+data Player = Player { _playerPosition :: Position
+                     , _playerFacing :: Facing
                      }
   deriving (Show, Eq)
 
--- TODO(R): remove playerGetFacing
-playerGetFacing :: Player -> Facing
-playerGetFacing = _facing
-
--- TODO(R): remove playerGetPosition
-playerGetPosition :: Player -> Position
-playerGetPosition = _position
-
 -- TODO(R): lenses
 playerChangeDirection :: Player -> Player
-playerChangeDirection player = player { _facing = oppositeFacing facing }
+playerChangeDirection player = player { _playerFacing = oppositeFacing facing }
   where
     oppositeFacing Positive = Negative
     oppositeFacing Negative = Positive
-    facing = playerGetFacing player
+    facing = _playerFacing player
 
 -- TODO(R): lenses
 playerApplyMove :: Player -> Move -> Player
-playerApplyMove player move = player { _position = position }
+playerApplyMove player move = player { _playerPosition = position }
   where
-    position = move (_facing player) (_position player)
+    position = move (_playerFacing player) (_playerPosition player)
