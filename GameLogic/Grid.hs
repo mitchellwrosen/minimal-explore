@@ -36,7 +36,6 @@ import Data.Util.List ( mapInd
                       , replace
                       )
 
--- TODO(R): Lens for Grid
 type Grid a = [[[a]]]
 
 gridDimensions :: Grid a -> Position
@@ -46,13 +45,14 @@ gridDimensions grid = (sizeX, sizeY, sizeZ)
     sizeY = length $ head grid
     sizeZ = length . head . head $ grid
 
-validBounds :: Grid a -> GridX -> GridY -> GridZ -> Bool
-validBounds grid x y z =
-    x >= 0 && x < sizeX &&
-    y >= 0 && y < sizeY &&
-    z >= 0 && z < sizeZ
+validPosition :: Grid a -> Position -> Bool
+validPosition grid (x, y, z) =
+    x `isBoundedBy` sizeX &&
+    y `isBoundedBy` sizeY &&
+    z `isBoundedBy` sizeZ
   where
     (sizeX, sizeY, sizeZ) = gridDimensions grid
+    isBoundedBy x hi = x >= 0 && x < hi
 
 gridElems :: Grid a -> [(a, Position)]
 gridElems grid = concat . concat $ indexedGrid
@@ -60,8 +60,8 @@ gridElems grid = concat . concat $ indexedGrid
     indexedGrid = mapInd (\x -> mapInd (\y -> mapInd (\z val -> (val, (x, y, z))))) grid
 
 gridGet :: Grid a -> Position -> Maybe a
-gridGet grid (x, y, z) =
-    toMaybe (validBounds grid x y z) $ ((grid !! x) !! y) !! z
+gridGet grid position@(x, y, z) =
+    toMaybe (validPosition grid position) $ ((grid !! x) !! y) !! z
 
 gridSet :: Grid a -> Position -> a -> Grid a
 gridSet grid (x, y, z) value = newMap

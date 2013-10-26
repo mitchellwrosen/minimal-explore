@@ -54,6 +54,7 @@ import GameLogic.Types ( GridBead(..)
 
 import Data.Util.Maybe ( fromMaybe )
 import Data.Util.List ( findFirst
+                      , filterMap
                       , replace
                       )
 import Control.Lens ( (^.)
@@ -114,17 +115,16 @@ makeGameMap :: Grid GridBead -> String -> Byte -> GameMap
 makeGameMap grid name ambientLight =
     GameMap grid' name doors lights ambientLight
   where
-    lights = foldr lightFold [] (gridElems grid)
+    lights = filterMap getMapLight $ gridElems grid
       where
-        lightFold (LightBead light, pos) xs = (light, pos):xs
-        lightFold _ xs = xs
+        getMapLight (LightBead light, pos) = Just (light, pos)
+        getMapLight _ = Nothing
 
-    grid' = removeLightBeads
-    removeLightBeads = foldr removeLightBead grid lights
+    doors = filterMap getMapDoor $ gridElems grid
+      where
+        getMapDoor (DoorBead door, pos) = Just (door, pos)
+        getMapDoor _ = Nothing
+
+    grid' = foldr removeLightBead grid lights
       where
         removeLightBead (_, pos) grd = gridSet grd pos Empty
-
-    doors = foldr doorFold [] (gridElems grid)
-      where
-        doorFold (DoorBead door, pos) xs = (door, pos):xs
-        doorFold _ xs = xs
