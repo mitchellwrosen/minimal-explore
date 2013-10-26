@@ -31,5 +31,5 @@ replace list index val =
 filterMap :: (a -> Maybe b) -> [a] -> [b]
 filterMap f = foldr foldFunc []
   where
-    foldFunc a acc = maybe acc (\b -> b:acc) (f a)
+    foldFunc a acc = maybe acc (:acc) (f a)
 

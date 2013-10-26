@@ -38,7 +38,7 @@ playerFacing = Lens { view = _playerFacing
                     }
 
 playerChangeDirection :: Player -> Player
-playerChangeDirection player = over playerFacing oppositeFacing player
+playerChangeDirection = over playerFacing oppositeFacing
   where
     oppositeFacing Positive = Negative
     oppositeFacing Negative = Positive

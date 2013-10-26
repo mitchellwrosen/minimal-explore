@@ -73,7 +73,7 @@ drawMap gameState = do
   where
     colorView = getColorView gameState
 
-    maxZ = (gridDimensions $ gameState^.gameStateGameMap^.gameMapGrid)^.posZ
+    maxZ = gridDimensions (gameState^.gameStateGameMap^.gameMapGrid) ^. posZ
     maybeInvertZ z =  case gameState ^. gameStatePlayer ^. playerFacing of
         Positive -> z
         Negative -> maxZ - z - 1

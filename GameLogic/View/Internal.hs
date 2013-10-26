@@ -139,7 +139,7 @@ getView gameState =
 
             delta = if isPositiveFacing gameState
                     then (+ 1)
-                    else (subtract 1)
+                    else subtract 1
 
             distance' dist index =
                 case xSlice !! index of
