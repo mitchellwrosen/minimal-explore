@@ -71,19 +71,20 @@ data GameMap = GameMap { _gameMapGrid :: Grid GridBead
                        , _gameMapAmbientLight :: Byte
                        }
   deriving (Eq, Show)
-gameMapGrid = Lens { view = \gameState -> _gameMapGrid gameState
+gameMapGrid = Lens { view = _gameMapGrid
                    , set  = \val gameState  -> gameState { _gameMapGrid = val }
                    }
-gameMapName = Lens { view = \gameState -> _gameMapName gameState
+gameMapName = Lens { view = _gameMapName
                    , set  = \val gameState  -> gameState { _gameMapName = val }
                    }
-gameMapDoors = Lens { view = \gameState -> _gameMapDoors gameState
-                   , set  = \val gameState  -> gameState { _gameMapDoors = val }
-                   }
-gameMapLights = Lens { view = \gameState -> _gameMapLights gameState
-                   , set  = \val gameState  -> gameState { _gameMapLights = val }
-                   }
-gameMapAmbientLight = Lens { view = \gameState -> _gameMapAmbientLight gameState
+gameMapDoors = Lens { view = _gameMapDoors
+                    , set  = \val gameState  -> gameState { _gameMapDoors = val }
+                    }
+gameMapLights = Lens { view = _gameMapLights
+                     , set  = \val gameState  -> gameState { _gameMapLights = val }
+                     }
+gameMapAmbientLight = Lens
+                   { view = _gameMapAmbientLight
                    , set  = \val gameState  -> gameState { _gameMapAmbientLight = val }
                    }
 
@@ -91,11 +92,9 @@ gameMapApplyMoveLight :: GameMap -> MapLight -> Facing -> Move -> GameMap
 gameMapApplyMoveLight gameMap light facing move =
     over gameMapLights (map moveLight) gameMap
   where
-    moveLight l
-        | l == light = applyMove light
-        | otherwise = l
-
-    applyMove (l, pos) = (l, move facing  pos)
+    moveLight lite@(l, pos)
+        | lite == light = (l, move facing pos)
+        | otherwise = lite
 
 getGameMapFromDoor :: [(String, GameMap)] -> GridBead -> GameMap
 getGameMapFromDoor gameMaps (DoorBead door) =
@@ -107,9 +106,8 @@ getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> Position
 getMatchingDoorPosition fromMap toMap (DoorBead door) =
     snd $ findFirst (matchingDoor . fst) (toMap^.gameMapDoors)
   where
-    ident = door^.doorId
-    matchingDoor door =
-        (door^.doorMapName == fromMap^.gameMapName) && (door^.doorId == ident)
+    matchingDoor d =
+        (d^.doorMapName == fromMap^.gameMapName) && (d^.doorId == door^.doorId)
 
 makeGameMap :: Grid GridBead -> String -> Byte -> GameMap
 makeGameMap grid name ambientLight =

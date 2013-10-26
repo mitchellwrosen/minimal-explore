@@ -58,7 +58,7 @@ phongLighting diffuseConstant ambientColor lights = color
     multTriple = opTriple (*)
 
 beadDiffuse :: BeadColor -> (Double, Double, Double)
-beadDiffuse (EmptyColor) = (1.0, 1.0, 1.0)
+beadDiffuse (EmptyColor)  = (1.0, 1.0, 1.0)
 beadDiffuse (PlayerColor) = (1.0, 0.1, 0.1)
 beadDiffuse (WallColor dist) =
     case dist of

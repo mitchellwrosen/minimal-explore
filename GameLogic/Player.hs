@@ -29,13 +29,12 @@ data Player = Player { _playerPosition :: Position
                      , _playerFacing :: Facing
                      }
   deriving (Show, Eq)
-
 makePlayer = Player
-playerPosition = Lens { view = \(Player pos _) -> pos
-                      , set  = \pos (Player _ fac) -> Player pos fac
+playerPosition = Lens { view = _playerPosition
+                      , set = \pos player -> player { _playerPosition = pos }
                       }
-playerFacing = Lens { view = \(Player _ fac) -> fac
-                    , set  = \fac (Player pos _) -> Player pos fac
+playerFacing = Lens { view = _playerFacing
+                    , set = \fac player -> player { _playerFacing = fac }
                     }
 
 playerChangeDirection :: Player -> Player
@@ -47,4 +46,4 @@ playerChangeDirection player = over playerFacing oppositeFacing player
 playerApplyMove :: Player -> Move -> Player
 playerApplyMove player move = over playerPosition changePosition player
   where
-    changePosition = move (player ^. playerFacing)
+    changePosition = move (player^.playerFacing)

@@ -29,11 +29,11 @@ data Door = Door { _doorMapName :: String
                  , _doorId :: String
                  }
   deriving (Show, Eq)
-doorMapName = Lens { view = \(Door name _) -> name
-                   , set  = \name (Door _ ident) -> Door name ident
+doorMapName = Lens { view = _doorMapName
+                   , set  = \name door -> door { _doorMapName = name }
                    }
-doorId = Lens { view = \(Door _ ident) -> ident
-              , set  = \ident (Door name _) -> Door name ident
+doorId = Lens { view = _doorId
+              , set  = \ident door -> door { _doorId = ident }
               }
 
 

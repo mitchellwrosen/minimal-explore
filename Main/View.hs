@@ -34,6 +34,7 @@ import Main.Perlenspiel ( psBeadColor
                         )
 
 import GameLogic.Types ( GridBead(..)
+                       , posZ
                        , Facing(..)
                        )
 import GameLogic.GameMap ( GameMap
@@ -72,7 +73,7 @@ drawMap gameState = do
   where
     colorView = getColorView gameState
 
-    (_, _, maxZ) = gridDimensions $ gameState^.gameStateGameMap^.gameMapGrid
+    maxZ = (gridDimensions $ gameState^.gameStateGameMap^.gameMapGrid)^.posZ
     maybeInvertZ z =  case gameState ^. gameStatePlayer ^. playerFacing of
         Positive -> z
         Negative -> maxZ - z - 1

@@ -9,10 +9,12 @@ import Prelude ( Int
                , Bool
                , Maybe(..)
                , length
+               , replicate
                , concat
                , otherwise
                , zipWith
                , take
+               , foldr
                , map
                , drop
                , head
@@ -41,8 +43,8 @@ type Grid a = [[[a]]]
 gridDimensions :: Grid a -> Position
 gridDimensions grid = (sizeX, sizeY, sizeZ)
   where
-    sizeX = length grid
-    sizeY = length $ head grid
+    sizeX = length $ grid
+    sizeY = length . head $ grid
     sizeZ = length . head . head $ grid
 
 validPosition :: Grid a -> Position -> Bool

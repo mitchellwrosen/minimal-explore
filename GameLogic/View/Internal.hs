@@ -101,8 +101,7 @@ getBeadView :: GameState -> [[GridBead]]
 getBeadView gameState = viewSection
   where
     grid = gameState^.gameStateGameMap^.gameMapGrid
-    player = gameState^.gameStatePlayer
-    playerX = player^.playerPosition^.posX
+    playerX = gameState^.gameStatePlayer^.playerPosition^.posX
 
     viewSection' = grid !! playerX
     viewSection = if isPositiveFacing gameState
