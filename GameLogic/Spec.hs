@@ -60,7 +60,7 @@ spec = do
             replace ["a", "b", "c"] 2 "d" `shouldBe` ["a", "b", "d"]
 
     describe "door" $ do
-        let door = Door "map" "id"
+        let door = Door "map" "id" (255, 255, 255)
         it "has a map name" $ do
             doorMapName door `shouldBe` "map"
 
@@ -68,11 +68,11 @@ spec = do
             doorId door `shouldBe` "id"
 
         describe "player steps on door" $ do
-            let doorA = DoorBead $ Door "mapB" "unique"
+            let doorA = DoorBead $ Door "mapB" "unique" (255, 255, 255)
                 gridA = [ [ [ doorA ] ] ]
                 gameMapA = makeGameMap gridA "mapA" 255
 
-                doorB = DoorBead $ Door "mapA" "unique"
+                doorB = DoorBead $ Door "mapA" "unique" (255, 255, 255)
                 gridB = [ [ [ doorB ] ] ]
                 gameMapB = makeGameMap gridB "mapB" 255
 
@@ -88,7 +88,7 @@ spec = do
 
     describe "gameMap" $ do
         let name = "mapA"
-            door = Door "mapB" "unique"
+            door = Door "mapB" "unique" (255, 255, 255)
             grid = [ [ [ DoorBead door ] ] ]
             gameMap = makeGameMap grid name 255
 

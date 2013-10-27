@@ -1,5 +1,6 @@
 module GameLogic.View.Internal ( getColorView
                                , getView
+                               , getBeadView
                                , phongLighting
                                , lightIntensity
                                ) where

@@ -65,13 +65,18 @@ gameMapApplyMoveLight gameMap light facing move =
     applyMove (l, pos) = (l, move facing  pos)
 
 getGameMapFromDoor :: [(String, GameMap)] -> GridBead -> GameMap
-getGameMapFromDoor gameMaps (DoorBead (Door roomName _)) =
+getGameMapFromDoor gameMaps (DoorBead door) =
     maybe (error $ "Bad RoomName " ++ roomName) id $ lookup roomName gameMaps
+  where
+    roomName = doorMapName door
 
 getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> (GridX, GridY, GridZ)
-getMatchingDoorPosition fromMap toMap (DoorBead (Door name ident)) =
-    snd $ findFirst ((== Door (gameMapName fromMap) ident) . fst) (gameMapDoors toMap)
+getMatchingDoorPosition fromMap toMap (DoorBead door) =
+    snd $ findFirst ((== (gameMapName fromMap, ident)) . toTuple . fst) (gameMapDoors toMap)
   where
+    ident = doorId door
+    toTuple door = (doorMapName door, doorId door)
+
     findFirst :: (a -> Bool) -> [a] -> a
     findFirst filt list = head $ filter filt list
 

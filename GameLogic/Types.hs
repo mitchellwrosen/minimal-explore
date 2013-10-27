@@ -26,6 +26,7 @@ data Light = Light { lightRadius :: Int
 
 data Door = Door { doorMapName :: String
                  , doorId :: String
+                 , doorColor :: Color
                  }
   deriving (Show, Eq)
 

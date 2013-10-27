@@ -7,6 +7,10 @@ module Main.Perlenspiel ( setPSEvent
                         , psBeadColor
                         , psBorderColor
                         , psBorderWidth
+                        , psGlyph
+                        , psGlyphFade
+                        , psGlyphAlpha
+                        , psGlyphColor
                         , psAll
                         , psRadius
                         ) where
@@ -68,3 +72,18 @@ psGridColor' = ffi "PS.gridColor(%1)"
 
 psGridColor :: Color.Color -> Fay ()
 psGridColor color = psGridColor' (Color.toList color)
+
+psGlyph :: Int -> Int -> String -> Fay ()
+psGlyph = ffi "PS.glyph(%1, %2, %3)"
+
+psGlyphFade :: Int -> Int -> Int -> Fay ()
+psGlyphFade = ffi "PS.glyphFade(%1, %2, %3)"
+
+psGlyphAlpha :: Int -> Int -> Int -> Fay ()
+psGlyphAlpha = ffi "PS.glyphAlpha(%1, %2, %3)"
+
+psGlyphColor' :: Int -> Int -> [Int] -> Fay ()
+psGlyphColor' = ffi "PS.glyphColor(%1, %2, %3)"
+
+psGlyphColor :: Int -> Int -> Color.Color -> Fay ()
+psGlyphColor x y color = psGlyphColor' x y (Color.toList color)
