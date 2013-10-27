@@ -1,6 +1,7 @@
-module GameLogic.Player ( Player(..)
-                        , playerGetFacing
-                        , playerGetPosition
+module GameLogic.Player ( Player
+                        , makePlayer
+                        , playerFacing
+                        , playerPosition
                         , playerApplyMove
                         , playerChangeDirection
                         ) where
@@ -12,32 +13,37 @@ import Prelude ( Show
                , (==)
                )
 import GameLogic.Move ( Move(..)
-                      , Facing(..)
                       )
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
+                       , Position
+                       , Facing(..)
                        )
+import Control.Lens ( (^.)
+                    , over
+                    , Lens(..)
+                    )
 
-data Player = Player { _position :: (GridX, GridY, GridZ)
-                     , _facing :: Facing
+data Player = Player { _playerPosition :: Position
+                     , _playerFacing :: Facing
                      }
   deriving (Show, Eq)
-
-playerGetFacing :: Player -> Facing
-playerGetFacing = _facing
+makePlayer = Player
+playerPosition = Lens { view = _playerPosition
+                      , set = \pos player -> player { _playerPosition = pos }
+                      }
+playerFacing = Lens { view = _playerFacing
+                    , set = \fac player -> player { _playerFacing = fac }
+                    }
 
 playerChangeDirection :: Player -> Player
-playerChangeDirection player = player { _facing = oppositeFacing facing }
+playerChangeDirection = over playerFacing oppositeFacing
   where
     oppositeFacing Positive = Negative
     oppositeFacing Negative = Positive
-    facing = playerGetFacing player
 
 playerApplyMove :: Player -> Move -> Player
-playerApplyMove player move = player { _position = position }
+playerApplyMove player move = over playerPosition changePosition player
   where
-    position = move (_facing player) (_position player)
-
-playerGetPosition :: Player -> (GridX, GridY, GridZ)
-playerGetPosition = _position
+    changePosition = move (player^.playerFacing)

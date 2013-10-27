@@ -39,21 +39,30 @@ import Main.Perlenspiel ( psBeadColor
                         , psAll
                         )
 
-import GameLogic.Move ( Facing(..)
-                      )
 import GameLogic.Types ( GridBead(..)
                        , Door(..)
+                       , posZ
+                       , Facing(..)
                        )
-import GameLogic.GameMap ( GameMap(..) )
+import GameLogic.GameMap ( GameMap
+                         , gameMapGrid
+                         , gameMapLights
+                         )
 import GameLogic.Grid ( gridDimensions )
 import GameLogic.State ( GameState(..)
+                       , gameStateGameMap
+                       , gameStatePlayer
                        )
-import GameLogic.Player ( playerGetPosition
-                        , playerGetFacing
+import GameLogic.Player ( Player
+                        , playerFacing
+                        , playerPosition
                         )
 import GameLogic.View ( getColorView
                       , getBeadView
                       )
+
+import Control.Lens ( (^.)
+                    )
 
 mapMInd_ :: (Int -> a -> Fay b) -> [a] -> Fay ()
 mapMInd_ f = zipWithM_ f [0..]
@@ -75,15 +84,15 @@ drawMap gameState = do
     colorView = getColorView gameState
     beadView = getBeadView gameState
 
-    (_, _, maxZ) = gridDimensions . gameMapGrid . gameStateGameMap $ gameState
-    maybeInvertZ z =  case playerGetFacing . _player $ gameState of
+    maxZ = gridDimensions (gameState^.gameStateGameMap^.gameMapGrid) ^. posZ
+    maybeInvertZ z =  case gameState ^. gameStatePlayer ^. playerFacing of
         Positive -> z
         Negative -> maxZ - z - 1
 
-    (playerX, playerY, playerZ') = playerGetPosition . _player $ gameState
+    (playerX, playerY, playerZ') = gameState ^. gameStatePlayer ^. playerPosition
     playerZ = maybeInvertZ playerZ'
 
-    lights = filter (\(_, (x, _, _)) -> x == playerX) $ (gameMapLights . gameStateGameMap) gameState
+    lights = filter (\(_, (x, _, _)) -> x == playerX) $ gameState^.gameStateGameMap^.gameMapLights
     lightRadii _ (_, (_, y, z)) = psRadius (maybeInvertZ z) y 25
 
     doorBorders x y bead = case bead of

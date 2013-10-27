@@ -6,30 +6,37 @@ import Test.Hspec
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
-                       , GridBead(..)
+                       , doorMapName
+                       , doorId
                        , Door(..)
+                       , BeadColor(..)
+                       , GridBead(..)
                        , Light(..)
+                       , Facing(..)
+                       , Position(..)
                        )
-import GameLogic.Grid ( replace
-                      , gridGet
+import GameLogic.Grid ( gridGet
                       , gridSet
                       , gridElems
                       , Grid(..)
                       )
-import GameLogic.Move ( Facing(..)
-                      , moveUp
+import GameLogic.Move ( moveUp
                       , moveDown
                       , moveLeft
                       , moveRight
                       , moveForward
                       )
-import GameLogic.Player ( Player(..)
-                        , playerGetPosition
-                        , playerGetFacing
+import GameLogic.Player ( Player
+                        , makePlayer
+                        , playerPosition
+                        , playerFacing
                         , playerApplyMove
                         , playerChangeDirection
                         )
-import GameLogic.State ( GameState(..)
+import GameLogic.State ( GameState
+                       , makeGameState
+                       , gameStatePlayer
+                       , gameStateGameMap
                        , leftButtonPressed
                        , rightButtonPressed
                        , upButtonPressed
@@ -41,15 +48,22 @@ import GameLogic.View.Internal ( getView
                                , phongLighting
                                , lightIntensity
                                )
-import GameLogic.GameMap ( GameMap(..)
+import GameLogic.GameMap ( GameMap
                          , getGameMapFromDoor
                          , makeGameMap
+                         , gameMapName
+                         , gameMapGrid
+                         , gameMapDoors
+                         , gameMapLights
                          , gameMapApplyMoveLight
                          , getMatchingDoorPosition
                          )
-import GameLogic.Color as Color ( BeadColor(..)
-                                , fromList
+import GameLogic.Color as Color ( fromList
                                 )
+
+import Control.Lens ( (^.)
+                    )
+import Data.Util.List ( replace )
 
 spec :: Spec
 spec = do
@@ -62,10 +76,10 @@ spec = do
     describe "door" $ do
         let door = Door "map" "id" (255, 255, 255)
         it "has a map name" $ do
-            doorMapName door `shouldBe` "map"
+            door^.doorMapName `shouldBe` "map"
 
         it "has a unqiue id" $ do
-            doorId door `shouldBe` "id"
+            door^.doorId `shouldBe` "id"
 
         describe "player steps on door" $ do
             let doorA = DoorBead $ Door "mapB" "unique" (255, 255, 255)
@@ -76,8 +90,8 @@ spec = do
                 gridB = [ [ [ doorB ] ] ]
                 gameMapB = makeGameMap gridB "mapB" 255
 
-                maps = [ (gameMapName gameMapA, gameMapA)
-                       , (gameMapName gameMapB, gameMapB)
+                maps = [ (gameMapA^.gameMapName, gameMapA)
+                       , (gameMapB^.gameMapName, gameMapB)
                        ]
 
             it "finds the matching map" $ do
@@ -93,20 +107,20 @@ spec = do
             gameMap = makeGameMap grid name 255
 
         it "has a grid" $ do
-            gameMapGrid gameMap `shouldBe` grid
+            gameMap ^. gameMapGrid `shouldBe` grid
 
         it "has a name" $ do
-            gameMapName gameMap `shouldBe` name
+            gameMap ^. gameMapName `shouldBe` name
 
         it "has a list of doors" $ do
-            map fst (gameMapDoors gameMap) `shouldBe` [ door ]
+            map fst (gameMap ^. gameMapDoors) `shouldBe` [ door ]
 
     describe "light movement" $ do
         let name = "mapA"
             light = Light 255 (255, 255, 255)
             grid = [ [ [ LightBead light, Empty ] ] ]
             gameMap = makeGameMap grid name 255
-            [mapLight] = gameMapLights gameMap
+            [mapLight] = gameMap ^. gameMapLights
 
             grid' = [ [ [ Empty, LightBead light ] ] ]
             gameMap' = makeGameMap grid' name 255
@@ -134,8 +148,8 @@ spec = do
                        ]
             testMap = makeGameMap testGrid "test" 255
 
-            gameState :: (GridX, GridY, GridZ) -> GameState
-            gameState pos = GameState (Player pos Positive) testMap
+            gameState :: Position -> GameState
+            gameState pos = makeGameState (makePlayer pos Positive) testMap
 
         describe "player movement" $ do
             it "allows player movement to a valid position" $ do
@@ -155,8 +169,8 @@ spec = do
                 it "forward" $ do
                     forwardButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (2, 1, 1)
                 describe "reverse" $ do
-                    let gameStateReverse :: (GridX, GridY, GridZ) -> GameState
-                        gameStateReverse pos = GameState (Player pos Negative) testMap
+                    let gameStateReverse :: Position -> GameState
+                        gameStateReverse pos = makeGameState (makePlayer pos Negative) testMap
                     it "change directions" $ do
                         reverseButtonPressed (gameState (1, 1, 1)) `shouldBe`
                             gameStateReverse (1, 1, 1)
@@ -175,15 +189,15 @@ spec = do
                          ]
                        ]
         it "can get the value at a given (x,y,z)" $ do
-            gridGet testGrid 0 1 1 `shouldBe` Just 011
-            gridGet testGrid 1 1 0 `shouldBe` Just 110
+            gridGet testGrid (0, 1, 1) `shouldBe` Just 011
+            gridGet testGrid (1, 1, 0) `shouldBe` Just 110
 
         it "can get Nothing out of bounds" $ do
-            gridGet testGrid (-1) 1 1 `shouldBe` Nothing
-            gridGet testGrid   0  1 2 `shouldBe` Nothing
+            gridGet testGrid ((-1), 1, 1) `shouldBe` Nothing
+            gridGet testGrid (0, 1, 2) `shouldBe` Nothing
 
         it "can set the value at a given (x,y,z)" $ do
-            gridSet testGrid 1 1 0 42 `shouldBe`
+            gridSet testGrid (1, 1, 0) 42 `shouldBe`
                 [ [ [ 000, 001 ]
                   , [ 010, 011 ]
                   ]
@@ -203,40 +217,40 @@ spec = do
                          , [ Empty, Wall ]
                          ]
                        ]
-            gridGet grid 0 1 1 `shouldBe` Just Wall
-            gridGet grid 1 0 0 `shouldBe` Just Empty
+            gridGet grid (0, 1, 1) `shouldBe` Just Wall
+            gridGet grid (1, 0, 0) `shouldBe` Just Empty
 
     describe "the player" $ do
         let testPlayer :: Player
-            testPlayer = Player (1, 1, 1) Positive
+            testPlayer = makePlayer (1, 1, 1) Positive
         it "has an xyz position" $ do
-            playerGetPosition testPlayer `shouldBe` (1, 1, 1)
+            testPlayer ^. playerPosition `shouldBe` (1, 1, 1)
 
         it "moves up and down in the y direction one unit" $ do
-            playerGetPosition (playerApplyMove testPlayer moveDown) `shouldBe` (1, 2, 1)
-            playerGetPosition (playerApplyMove testPlayer moveUp) `shouldBe` (1, 0, 1)
+            (playerApplyMove testPlayer moveDown) ^. playerPosition `shouldBe` (1, 2, 1)
+            (playerApplyMove testPlayer moveUp) ^. playerPosition `shouldBe` (1, 0, 1)
 
         it "moves left and right in the z direction one unit" $ do
-            playerGetPosition (playerApplyMove testPlayer moveLeft) `shouldBe` (1, 1, 0)
-            playerGetPosition (playerApplyMove testPlayer moveRight) `shouldBe` (1, 1, 2)
+            (playerApplyMove testPlayer moveLeft) ^. playerPosition `shouldBe` (1, 1, 0)
+            (playerApplyMove testPlayer moveRight) ^. playerPosition `shouldBe` (1, 1, 2)
 
         it "can move forward in the x direction one unit" $ do
-            playerGetPosition (playerApplyMove testPlayer moveForward) `shouldBe` (2, 1, 1)
+            (playerApplyMove testPlayer moveForward) ^. playerPosition `shouldBe` (2, 1, 1)
 
         it "faces +x direction" $ do
-            playerGetFacing testPlayer `shouldBe` Positive
+            testPlayer ^. playerFacing `shouldBe` Positive
 
         describe "changing direction" $ do
             let player' = playerChangeDirection testPlayer
             it "faces -x direction" $ do
-                playerGetFacing player' `shouldBe` Negative
+                player' ^. playerFacing `shouldBe` Negative
 
             it "reverses left/right for the z direction" $ do
-                playerGetPosition (playerApplyMove player' moveLeft) `shouldBe` (1, 1, 2)
-                playerGetPosition (playerApplyMove player' moveRight) `shouldBe` (1, 1, 0)
+                (playerApplyMove player' moveLeft) ^. playerPosition `shouldBe` (1, 1, 2)
+                (playerApplyMove player' moveRight) ^. playerPosition `shouldBe` (1, 1, 0)
 
             it "moves forward in the -x direction" $ do
-                playerGetPosition (playerApplyMove player' moveForward) `shouldBe` (0, 1, 1)
+                (playerApplyMove player' moveForward) ^. playerPosition `shouldBe` (0, 1, 1)
 
     describe "GameView" $ do
         let testGrid :: Grid GridBead
@@ -281,7 +295,7 @@ spec = do
                     Color.fromList (map round [fromIntegral ar + ir, fromIntegral ag, fromIntegral ab + ib])
 
         describe "positive facing" $ do
-            let gameState = GameState (Player (1, 0, 2) Positive) testMap
+            let gameState = makeGameState (makePlayer (1, 0, 2) Positive) testMap
             it "draws walls with the wall foreground color" $ do
                 viewAt gameState 1 1 `shouldBe` WallColor 0
             it "draws the player with player color with Positive facing" $ do
@@ -290,7 +304,7 @@ spec = do
                 viewAt gameState 0 0 `shouldBe` WallColor 2
 
         describe "negative facing" $ do
-            let gameState = GameState (Player (2, 0, 0) Negative) testMap
+            let gameState = makeGameState (makePlayer (2, 0, 0) Negative) testMap
             it "draws the player with player color with Negative facing" $ do
                 viewAt gameState 0 2 `shouldBe` PlayerColor
                 viewAt gameState 0 0 `shouldBe` WallColor 0

@@ -1,4 +1,9 @@
-module GameLogic.GameMap ( GameMap(..)
+module GameLogic.GameMap ( GameMap
+                         , gameMapGrid
+                         , gameMapName
+                         , gameMapLights
+                         , gameMapDoors
+                         , gameMapAmbientLight
                          , getGameMapFromDoor
                          , getMatchingDoorPosition
                          , gameMapApplyMoveLight
@@ -6,7 +11,6 @@ module GameLogic.GameMap ( GameMap(..)
                          ) where
 
 import Prelude ( String
-               , Int
                , Eq
                , Show
                , Maybe(..)
@@ -24,6 +28,7 @@ import Prelude ( String
                , map
                , (==)
                , (++)
+               , (&&)
                , ($)
                , (.)
                )
@@ -31,73 +36,93 @@ import Prelude ( String
 import GameLogic.Grid ( Grid(..)
                       , gridElems
                       , gridSet
-                      , replace
                       )
 import GameLogic.Move ( Move(..)
-                      , Facing(..)
-                      , Position(..)
                       )
 import GameLogic.Types ( GridBead(..)
                        , GridX
                        , GridY
                        , GridZ
+                       , Byte
+                       , Door
+                       , doorMapName
+                       , doorId
                        , Light(..)
-                       , Door(..)
+                       , Position(..)
+                       , Facing(..)
                        )
 
--- TODO(R): Type for 0-255 values
--- TODO(R): Only export the accessor functions
--- TODO(R): Introduce types: MapDoor MapLight
-data GameMap = GameMap { gameMapGrid :: Grid GridBead
-                       , gameMapName :: String
-                       , gameMapDoors :: [(Door, (GridX, GridY, GridZ))]
-                       , gameMapLights :: [(Light, (GridX, GridY, GridZ))]
-                       , gameMapAmbientLight :: Int
+import Data.Util.Maybe ( fromMaybe )
+import Data.Util.List ( findFirst
+                      , filterMap
+                      , replace
+                      )
+import Control.Lens ( (^.)
+                    , over
+                    , Lens(..)
+                    )
+
+type MapDoor  = (Door, Position)
+type MapLight = (Light, Position)
+data GameMap = GameMap { _gameMapGrid :: Grid GridBead
+                       , _gameMapName :: String
+                       , _gameMapDoors :: [MapDoor]
+                       , _gameMapLights :: [MapLight]
+                       , _gameMapAmbientLight :: Byte
                        }
   deriving (Eq, Show)
+gameMapGrid = Lens { view = _gameMapGrid
+                   , set  = \val gameState  -> gameState { _gameMapGrid = val }
+                   }
+gameMapName = Lens { view = _gameMapName
+                   , set  = \val gameState  -> gameState { _gameMapName = val }
+                   }
+gameMapDoors = Lens { view = _gameMapDoors
+                    , set  = \val gameState  -> gameState { _gameMapDoors = val }
+                    }
+gameMapLights = Lens { view = _gameMapLights
+                     , set  = \val gameState  -> gameState { _gameMapLights = val }
+                     }
+gameMapAmbientLight = Lens
+                   { view = _gameMapAmbientLight
+                   , set  = \val gameState  -> gameState { _gameMapAmbientLight = val }
+                   }
 
-gameMapApplyMoveLight :: GameMap -> (Light, Position) -> Facing -> Move -> GameMap
+gameMapApplyMoveLight :: GameMap -> MapLight -> Facing -> Move -> GameMap
 gameMapApplyMoveLight gameMap light facing move =
-    gameMap { gameMapLights = lights' }
+    over gameMapLights (map moveLight) gameMap
   where
-    lights' = map moveLight $ gameMapLights gameMap
-    moveLight l
-        | l == light = applyMove light
-        | otherwise = l
-
-    applyMove (l, pos) = (l, move facing  pos)
+    moveLight lite@(l, pos)
+        | lite == light = (l, move facing pos)
+        | otherwise = lite
 
 getGameMapFromDoor :: [(String, GameMap)] -> GridBead -> GameMap
 getGameMapFromDoor gameMaps (DoorBead door) =
-    maybe (error $ "Bad RoomName " ++ roomName) id $ lookup roomName gameMaps
+    fromMaybe (error $ "Bad RoomName " ++ roomName) $ lookup roomName gameMaps
   where
-    roomName = doorMapName door
+    roomName = door^.doorMapName
 
-getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> (GridX, GridY, GridZ)
+getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> Position
 getMatchingDoorPosition fromMap toMap (DoorBead door) =
-    snd $ findFirst ((== (gameMapName fromMap, ident)) . toTuple . fst) (gameMapDoors toMap)
+    snd $ findFirst (matchingDoor . fst) (toMap^.gameMapDoors)
   where
-    ident = doorId door
-    toTuple door = (doorMapName door, doorId door)
+    matchingDoor d =
+        (d^.doorMapName == fromMap^.gameMapName) && (d^.doorId == door^.doorId)
 
-    findFirst :: (a -> Bool) -> [a] -> a
-    findFirst filt list = head $ filter filt list
-
-makeGameMap :: Grid GridBead -> String -> Int -> GameMap
+makeGameMap :: Grid GridBead -> String -> Byte -> GameMap
 makeGameMap grid name ambientLight =
     GameMap grid' name doors lights ambientLight
   where
-    lights = foldr lightFold [] (gridElems grid)
+    lights = filterMap getMapLight $ gridElems grid
       where
-        lightFold (LightBead light, pos) xs = (light, pos):xs
-        lightFold _ xs = xs
+        getMapLight (LightBead light, pos) = Just (light, pos)
+        getMapLight _ = Nothing
 
-    grid' = removeLightBeads
-    removeLightBeads = foldr removeLightBead grid lights
+    doors = filterMap getMapDoor $ gridElems grid
       where
-        removeLightBead (_, (x, y, z)) grd = gridSet grd x y z Empty
+        getMapDoor (DoorBead door, pos) = Just (door, pos)
+        getMapDoor _ = Nothing
 
-    doors = foldr doorFold [] (gridElems grid)
+    grid' = foldr removeLightBead grid lights
       where
-        doorFold (DoorBead door, pos) xs = (door, pos):xs
-        doorFold _ xs = xs
+        removeLightBead (_, pos) grd = gridSet grd pos Empty

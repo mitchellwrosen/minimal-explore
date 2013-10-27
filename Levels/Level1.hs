@@ -2,7 +2,7 @@ module Levels.Level1 (gameMap) where
 
 import Prelude ( ($) )
 
-import GameLogic.GameMap ( GameMap(..)
+import GameLogic.GameMap ( GameMap
                          , makeGameMap
                          )
 import GameLogic.Types ( GridBead(..)

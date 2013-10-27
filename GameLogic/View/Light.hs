@@ -18,11 +18,9 @@ import Prelude ( Int
                , (+)
                )
 
-import GameLogic.Color ( Color(..)
+import GameLogic.Types ( Color(..)
                        , BeadColor(..)
-                       )
-
-import GameLogic.Types ( Light(..)
+                       , Light(..)
                        )
 
 zeroTriple :: (Double, Double, Double)
@@ -60,7 +58,7 @@ phongLighting diffuseConstant ambientColor lights = color
     multTriple = opTriple (*)
 
 beadDiffuse :: BeadColor -> (Double, Double, Double)
-beadDiffuse (EmptyColor) = (1.0, 1.0, 1.0)
+beadDiffuse (EmptyColor)  = (1.0, 1.0, 1.0)
 beadDiffuse (PlayerColor) = (1.0, 0.1, 0.1)
 beadDiffuse (WallColor dist) =
     case dist of

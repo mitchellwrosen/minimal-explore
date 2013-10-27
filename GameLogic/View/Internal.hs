@@ -16,6 +16,7 @@ import Prelude ( Maybe(..)
                , snd
                , foldr
                , flip
+               , subtract
                , map
                , otherwise
                , filter
@@ -43,17 +44,18 @@ import GameLogic.View.Light ( phongLighting
                             , lightIntensity
                             )
 
-import GameLogic.State ( GameState(..)
+import GameLogic.State ( GameState
+                       , gameStateGameMap
+                       , gameStatePlayer
                        )
 import GameLogic.GameMap ( gameMapGrid
+                         , gameMapLights
                          , gameMapAmbientLight
-                         , GameMap(..)
+                         , GameMap
                          )
-import GameLogic.Move ( Facing(..)
-                      , Position(..)
-                      )
-import GameLogic.Player ( playerGetFacing
-                        , playerGetPosition
+import GameLogic.Player ( Player
+                        , playerPosition
+                        , playerFacing
                         )
 import GameLogic.Grid ( Grid(..)
                       , gridDimensions
@@ -62,76 +64,66 @@ import GameLogic.Grid ( Grid(..)
                       )
 import GameLogic.Types ( GridY
                        , GridZ
+                       , posX
                        , Door(..)
                        , Light(..)
                        , GridBead(..)
-                       )
-import GameLogic.Color ( BeadColor(..)
+                       , BeadColor(..)
                        , Color(..)
+                       , Position(..)
+                       , Facing(..)
                        )
+import GameLogic.Color ( ambientColor )
 
-fromMaybe :: a -> Maybe a -> a
-fromMaybe = flip maybe id
-
-mapInd :: (Int -> a -> b) -> [a] -> [b]
-mapInd f = zipWith f [0..]
+import Control.Lens ( (^.)
+                    )
+import Data.Util.Maybe ( fromMaybe
+                       , fromList
+                       , isJust
+                       )
+import Data.Util.List ( mapInd )
+import Data.Util.Math ( distance )
 
 getColorView :: GameState -> [[Color]]
 getColorView gameState = map (map calculateBeadColor) $ getView gameState
   where
-    maxLight = gameMapAmbientLight $ gameStateGameMap gameState
-
-    fadeValue :: Int -> Int
-    fadeValue 0 = 0
-    fadeValue 1 = round $ fromIntegral maxLight * 64 / 255
-    fadeValue 2 = round $ fromIntegral maxLight * 128 / 255
-    fadeValue 3 = round $ fromIntegral maxLight * 192 / 255
-    fadeValue _ = maxLight
+    maxLight = gameState^.gameStateGameMap^.gameMapAmbientLight
 
     calculateBeadColor :: (BeadColor, [(Light, Int)]) -> Color
-    calculateBeadColor (color@(EmptyColor), lights) =
-        phongLighting (beadDiffuse color) (maxLight, maxLight, maxLight) lights
-    calculateBeadColor (color@(PlayerColor), lights) =
-        phongLighting (beadDiffuse color) (maxLight, 0, 0) lights
-    calculateBeadColor (color@(WallColor dist), lights) =
-        phongLighting (beadDiffuse color) (fadeValue dist, fadeValue dist, fadeValue dist) lights
-    calculateBeadColor (color@(DoorColor dist), lights) =
-        phongLighting (beadDiffuse color) (maxLight, maxLight, maxLight) lights
     calculateBeadColor (LightColor color, _) = color
+    calculateBeadColor (color, lights) =
+        phongLighting (beadDiffuse color) (ambientColor maxLight color) lights
+
+isPositiveFacing :: GameState -> Bool
+isPositiveFacing gameState =
+    gameState^.gameStatePlayer^.playerFacing == Positive
 
 getBeadView :: GameState -> [[GridBead]]
-getBeadView (GameState player gameMap) = viewSection
+getBeadView gameState = viewSection
   where
-    grid = (gameMapGrid gameMap)
-    (playerX, _, _) = playerGetPosition player
-    positiveFacing = playerGetFacing player == Positive
+    grid = gameState^.gameStateGameMap^.gameMapGrid
+    playerX = gameState^.gameStatePlayer^.playerPosition^.posX
 
     viewSection' = grid !! playerX
-    viewSection = if positiveFacing
+    viewSection = if isPositiveFacing gameState
                   then viewSection'
                   else map reverse viewSection'
 
 getView :: GameState -> [[(BeadColor, [(Light, Int)])]]
-getView gameState@(GameState player gameMap) =
+getView gameState =
     mapInd (mapInd . beadColor) (getBeadView gameState)
   where
-    grid = gameMapGrid gameMap
-    positiveFacing = playerGetFacing player == Positive
+    gameMap = gameState^.gameStateGameMap
+    grid = gameMap^.gameMapGrid
 
     (maxX, _, maxZ) = gridDimensions grid
-    invertZ z = maxZ - z - 1
-    invertZIfNegative z = if positiveFacing
-                          then z
-                          else invertZ z
 
-    (playerX, playerY, playerZ') = playerGetPosition player
-    playerZ = invertZIfNegative playerZ'
+    (playerX, playerY, playerZ) = gameState^.gameStatePlayer^.playerPosition
 
     nearbyLightBeads :: GridY -> GridZ -> [(Light, Int)]
-    nearbyLightBeads y z' = nearbyLightBeads'
+    nearbyLightBeads y z = filter nearbyFilter lightsWithDistance
       where
-        z = invertZIfNegative z'
-        lightBeads = gameMapLights gameMap
+        lightBeads = gameMap^.gameMapLights
 
         lightsWithDistance :: [(Light, Int)]
         lightsWithDistance = map lightWithDistance lightBeads
@@ -139,54 +131,52 @@ getView gameState@(GameState player gameMap) =
             lightWithDistance (light, lightPos) = (light, distance lightPos (playerX, y, z))
 
         nearbyFilter (light, dist) = dist <= lightRadius light
-        nearbyLightBeads' = filter nearbyFilter lightsWithDistance
-
-        distance :: (Int, Int, Int) -> (Int, Int, Int) -> Int
-        distance (x1, y1, z1) (x2, y2, z2) =
-            let subSqr a b = (fromIntegral (a - b))*(fromIntegral (a - b))
-            in  round . sqrt $ subSqr x2 x1 + subSqr y2 y1 + subSqr z2 z1
 
     xDistanceToBead :: GridY -> GridZ -> (Int, GridBead)
-    xDistanceToBead y z' =
-        let z = invertZIfNegative z'
-
-            -- x slice with the given yz values
+    xDistanceToBead y z =
+        let -- x slice with the given yz values
             xSlice :: [GridBead]
-            xSlice = map (\x -> fromMaybe Wall $ gridGet grid x y z) [(-1)..maxX]
+            xSlice = map (\x -> fromMaybe Wall $ gridGet grid (x, y, z)) [(-1)..maxX]
 
-            delta = if positiveFacing
+            delta = if isPositiveFacing gameState
                     then (+ 1)
-                    else (+ (-1))
+                    else subtract 1
 
-            distance :: Int -> Int -> (Int, GridBead)
-            distance dist index =
+            distance' dist index =
                 case xSlice !! index of
                     Wall -> (dist, Wall)
                     door@(DoorBead _) -> (dist, door)
-                    _ -> distance (dist + 1) (delta index)
-        in  distance 0 $ playerX + 1
+                    _ -> distance' (dist + 1) (delta index)
 
-    fromList :: [a] -> Maybe a
-    fromList (a:xs) = Just a
-    fromList [] = Nothing
+            distance :: Int -> (Int, GridBead)
+            distance = distance' 0
 
-    isJust :: Maybe a -> Bool
-    isJust (Just _) = True
-    isJust _ = False
-
-    lightAt :: GridY -> GridZ -> Maybe (Light, Position)
-    lightAt y z =
-        let lights = filter (\(_, pos) -> pos == (playerX, y, z)) $ gameMapLights gameMap
-        in  fromList lights
+        in  distance $ playerX + 1
 
     beadColor :: GridY -> GridZ -> GridBead -> (BeadColor, [(Light, Int)])
-    beadColor y z bead
-        | (y, z) == (playerY, playerZ) = (PlayerColor, nearbyLightBeads y z)
-        | isJust $ lightAt y (invertZIfNegative z) =
-            let Just (Light _ color, _) = lightAt y (invertZIfNegative z)
+    beadColor y z' bead
+        | (y, z) == (playerY, playerZ) = (PlayerColor, nearbyLightBeads')
+        | lightIsAt y z = lightBeadColor
+        | otherwise     = staticBeadColor
+      where
+        lightIsAt y = isJust . lightAt y
+        nearbyLightBeads' = nearbyLightBeads y z
+
+        lightAt :: GridY -> GridZ -> Maybe (Light, Position)
+        lightAt y z = fromList lights
+          where
+            lights = filter (\(_, pos) -> pos == (playerX, y, z)) $ gameMap^.gameMapLights
+
+        lightBeadColor =
+            let Just (Light _ color, _) = lightAt y z
             in  (LightColor color, [])
-        | otherwise =
-            let (dist, bead) = xDistanceToBead y z
-            in  case bead of
-                    Wall -> (WallColor dist, nearbyLightBeads y z)
-                    (DoorBead _) -> (DoorColor dist, nearbyLightBeads y z)
+
+        staticBeadColor = case bead of
+            Wall         -> (WallColor dist, nearbyLightBeads')
+            (DoorBead _) -> (DoorColor dist, nearbyLightBeads')
+          where
+            (dist, bead) = xDistanceToBead y z
+
+        z = if isPositiveFacing gameState
+            then z'
+            else maxZ - z' - 1

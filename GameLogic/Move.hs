@@ -3,8 +3,6 @@ module GameLogic.Move ( moveForward
                       , moveDown
                       , moveLeft
                       , moveRight
-                      , Position(..)
-                      , Facing(..)
                       , Move(..)
                       ) where
 
@@ -19,12 +17,9 @@ import Prelude ( Show
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
+                       , Facing(..)
+                       , Position(..)
                        )
-
-type Position = (GridX, GridY, GridZ)
-
-data Facing = Positive | Negative
-  deriving (Show, Eq)
 
 type Move = Facing -> Position -> Position
 
