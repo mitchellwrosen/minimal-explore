@@ -8,8 +8,8 @@ server := ${server.python.${python_version_major}}
 all: test fay
 
 fay:
-	fay Main/Game.hs
+	cd src; fay Main/Game.hs -o ../gen/game.js
 test:
-	runhaskell Spec.hs
+	runhaskell test/Spec.hs
 serve:
 	${server}
