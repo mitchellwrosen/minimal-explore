@@ -190,4 +190,3 @@ getView gameState@(GameState player gameMap) =
             in  case bead of
                     Wall -> (WallColor dist, nearbyLightBeads y z)
                     (DoorBead _) -> (DoorColor dist, nearbyLightBeads y z)
-    
