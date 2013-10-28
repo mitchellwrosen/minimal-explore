@@ -7,9 +7,12 @@ server := ${server.python.${python_version_major}}
 
 all: test fay
 
+test:
+	runhaskell -itest:src test/Spec.hs
 fay:
 	cd src; fay Main/Game.hs -o ../gen/game.js
-test:
-	runhaskell test/Spec.hs
 serve:
 	${server}
+
+.PHONY: all
+.PHONY: test
