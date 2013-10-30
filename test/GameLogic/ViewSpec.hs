@@ -2,13 +2,22 @@ module GameLogic.ViewSpec ( spec ) where
 
 import Test.Hspec
 
-import GameLogic.Player
-import GameLogic.Types
-import GameLogic.Color as Color
-import GameLogic.Grid
-import GameLogic.GameMap
-import GameLogic.State
-import GameLogic.View.Internal
+import GameLogic.Player ( makePlayer )
+import GameLogic.Types ( GridBead(..)
+                       , BeadColor(..)
+                       , Light(..)
+                       , Facing(..)
+                       )
+import qualified GameLogic.Color as Color
+import GameLogic.Grid ( Grid(..) )
+import GameLogic.GameMap ( makeGameMap )
+import GameLogic.State ( GameState
+                       , makeGameState
+                       )
+import GameLogic.View.Internal ( getView
+                               , lightIntensity
+                               , phongLighting
+                               )
 
 spec :: Spec
 spec =

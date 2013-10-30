@@ -2,10 +2,23 @@ module GameLogic.GameMapSpec ( spec ) where
 
 import Test.Hspec
 
-import GameLogic.Types
-import GameLogic.Move
-import GameLogic.GameMap
-import Control.Lens
+import GameLogic.Types ( Door(..)
+                       , GridBead(..)
+                       , Light(..)
+                       , Facing(..)
+                       )
+import GameLogic.Move ( moveRight )
+import GameLogic.GameMap ( makeGameMap
+                         , gameMapGrid
+                         , gameMapName
+                         , gameMapDoors
+                         , gameMapLights
+                         , gameMapApplyMoveLight
+                         , getGameMapFromDoor
+                         , getMatchingDoorPosition
+                         )
+
+import Control.Lens ( (^.) )
 
 spec :: Spec
 spec =

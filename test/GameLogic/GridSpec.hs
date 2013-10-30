@@ -2,8 +2,11 @@ module GameLogic.GridSpec ( spec ) where
 
 import Test.Hspec
 
-import GameLogic.Types
-import GameLogic.Grid
+import GameLogic.Types ( GridBead(..) )
+import GameLogic.Grid ( Grid(..)
+                      , gridGet
+                      , gridSet
+                      )
 
 spec :: Spec
 spec =

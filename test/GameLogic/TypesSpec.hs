@@ -1,8 +1,13 @@
 module GameLogic.TypesSpec ( spec ) where
 
 import Test.Hspec
-import GameLogic.Types
-import Control.Lens
+
+import GameLogic.Types ( Door(..)
+                       , doorMapName
+                       , doorId
+                       )
+
+import Control.Lens ( (^.) )
 
 spec :: Spec
 spec = do

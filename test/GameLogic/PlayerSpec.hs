@@ -2,11 +2,25 @@ module GameLogic.PlayerSpec ( spec ) where
 
 import Test.Hspec
 
-import GameLogic.Types
-import GameLogic.Move
-import GameLogic.Player
+import GameLogic.Types ( Facing(..) )
+import GameLogic.Move ( moveForward
+                      , moveUp
+                      , moveDown
+                      , moveLeft
+                      , moveRight
+                      )
+
+import GameLogic.Player ( Player
+                        , makePlayer
+                        , playerApplyMove
+                        , playerPosition
+                        , playerFacing
+                        , playerChangeDirection
+                        )
+
 import Control.Lens ( (^.) )
 
+-- TODO(R): split out into a MoveSpec.hs
 spec :: Spec
 spec = 
     describe "the player" $ do

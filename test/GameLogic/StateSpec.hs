@@ -2,11 +2,22 @@ module GameLogic.StateSpec ( spec ) where
 
 import Test.Hspec
 
-import GameLogic.Types
-import GameLogic.Grid
-import GameLogic.GameMap
-import GameLogic.State
-import GameLogic.Player
+import GameLogic.Types ( GridBead(..)
+                       , Facing(..)
+                       , Position
+                       )
+import GameLogic.Grid ( Grid(..) )
+import GameLogic.GameMap ( makeGameMap )
+import GameLogic.Player ( makePlayer )
+import GameLogic.State ( GameState
+                       , makeGameState
+                       , leftButtonPressed
+                       , rightButtonPressed
+                       , upButtonPressed
+                       , downButtonPressed
+                       , forwardButtonPressed
+                       , reverseButtonPressed
+                       )
 
 spec :: Spec
 spec =
