@@ -1,3 +1,4 @@
+#!/bin/bash
 minimumTopLevel=100
 minimumExpressions=95
 minimumAlternatives=95

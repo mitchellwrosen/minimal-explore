@@ -11,7 +11,10 @@ test:
 	ghc -fhpc -odir=obj -hidir=obj -itest:src test/Spec.hs
 	test/Spec
 clean:
-	rm obj/* Spec.tix
+	rm -rf obj/* Spec.tix
+coverage: clean test
+	-./coverage.sh
+	google-chrome "localhost:8000/code-coverage/hpc_index.html"
 fay:
 	cd src; fay Main/Game.hs -o ../gen/game.js
 serve:
