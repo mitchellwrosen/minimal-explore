@@ -31,17 +31,17 @@ alternatives=`eval $report | \
 exitCode=0
 if [ $topLevelDeclarations -lt $minimumTopLevel ]
    then
-      echo Top Level:    $topLevelDeclarations%
+      echo ERROR: Top Level coverage too low:    $topLevelDeclarations%
       exitCode=$(($exitCode + 1))
 fi
 if [ $expressions -lt $minimumExpressions ]
    then
-      echo Expressions:  $expressions%
+      echo ERROR: Expressions coverage too low:  $expressions%
       exitCode=$(($exitCode + 10))
 fi
 if [ $alternatives -lt $minimumAlternatives ]
    then
-      echo Alternatives: $alternatives%
+      echo ERROR: Alternatives coverage too low: $alternatives%
       exitCode=$(($exitCode + 100))
 fi
 exit $exitCode
