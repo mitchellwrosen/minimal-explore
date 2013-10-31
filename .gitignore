@@ -1,2 +1,7 @@
 node_modules/
 *.js
+TODO
+.hpc/
+code-coverage/
+Spec.tix
+test/Spec
