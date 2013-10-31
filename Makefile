@@ -8,7 +8,10 @@ server := ${server.python.${python_version_major}}
 all: test fay
 
 test:
-	runhaskell -itest:src test/Spec.hs
+	ghc -fhpc -odir=obj -hidir=obj -itest:src test/Spec.hs
+	test/Spec
+clean:
+	rm obj/* Spec.tix
 fay:
 	cd src; fay Main/Game.hs -o ../gen/game.js
 serve:
