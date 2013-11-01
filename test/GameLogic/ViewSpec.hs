@@ -19,6 +19,8 @@ import GameLogic.View.Internal ( getView
                                , phongLighting
                                )
 
+import qualified Levels.GameMaps
+
 spec :: Spec
 spec =
     describe "GameView" $ do
@@ -64,7 +66,7 @@ spec =
                     Color.fromList (map round [fromIntegral ar + ir, fromIntegral ag, fromIntegral ab + ib])
 
         describe "positive facing" $ do
-            let gameState = makeGameState (makePlayer (1, 0, 2) Positive) testMap
+            let gameState = makeGameState (makePlayer (1, 0, 2) Positive) testMap Levels.GameMaps.gameMaps
             it "draws walls with the wall foreground color" $ do
                 viewAt gameState 1 1 `shouldBe` WallColor 0
             it "draws the player with player color with Positive facing" $ do
@@ -73,7 +75,7 @@ spec =
                 viewAt gameState 0 0 `shouldBe` WallColor 2
 
         describe "negative facing" $ do
-            let gameState = makeGameState (makePlayer (2, 0, 0) Negative) testMap
+            let gameState = makeGameState (makePlayer (2, 0, 0) Negative) testMap Levels.GameMaps.gameMaps
             it "draws the player with player color with Negative facing" $ do
                 viewAt gameState 0 2 `shouldBe` PlayerColor
                 viewAt gameState 0 0 `shouldBe` WallColor 0
