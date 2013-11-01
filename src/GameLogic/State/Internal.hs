@@ -94,12 +94,13 @@ loadNewRoom gameState door = gameState'
     gameState' = GameState player newMap (gameState^.gameStateGameMaps)
     newMap = getGameMapFromDoor (gameState^.gameStateGameMaps) door
 
-processLightMove :: GameState -> GameState -> (Light, Position) -> Facing -> Move -> GameState
-processLightMove defGameState playerMovedGameState light@(_, pos) facing move =
+processLightMove :: GameState -> GameState -> (Light, Position) -> Move -> GameState
+processLightMove defGameState playerMovedGameState light@(_, pos) move =
     case gridBead of
         Empty -> resolveLightBeadCollisions
         _     -> defGameState
   where
+    facing = defGameState^.gameStatePlayer^.playerFacing
     pos' = move facing pos
     gridBead = fromMaybe Wall $ gridGet (playerMovedGameState^.gameStateGameMap^.gameMapGrid) pos'
 
@@ -123,7 +124,7 @@ processPlayerMove move gameState@(GameState player gameMap _) =
 
     light = filter ((== player'^.playerPosition) . snd) $ gameMap^.gameMapLights
     resolveLightBeadCollisions = case light of
-        [light] -> processLightMove gameState gameState' light (player'^.playerFacing) move
+        [light] -> processLightMove gameState gameState' light move
         []      -> gameState'
 
 leftButtonPressed :: GameState -> GameState

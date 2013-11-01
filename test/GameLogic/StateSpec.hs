@@ -5,11 +5,14 @@ import Test.Hspec
 import GameLogic.Types ( GridBead(..)
                        , Facing(..)
                        , Door(..)
+                       , Light(..)
                        , Position
                        , posZ
                        )
 import GameLogic.Grid ( Grid(..) )
-import GameLogic.GameMap ( makeGameMap )
+import GameLogic.GameMap ( makeGameMap
+                         , gameMapLights
+                         )
 import GameLogic.Player ( makePlayer
                         , playerPosition
                         , playerFacing
@@ -34,6 +37,8 @@ import Control.Lens ( (^.)
                     , (.~)
                     )
 
+defLight = Light 0 (0, 0, 0)
+
 spec :: Spec
 spec =
     describe "grid state" $ do
@@ -48,13 +53,16 @@ spec =
                          , [ Empty, Empty, Empty ]
                          ]
 
-                       , [ [ Wall,  Wall,  Wall ]
-                         , [ Empty, Empty, Empty ]
-                         , [ Empty, Empty, Empty ]
+                       , [ [ Empty,  Wall,  Wall ]
+                         , [ LightBead defLight, LightBead defLight, Empty ]
+                         , [ DoorBead $ Door "new map" "a" (0, 0, 0), Empty, Empty ]
                          ]
                        ]
+            gridB = [ [ [ DoorBead $ Door "test" "a" (0, 0, 0) ] ] ]
             testMap = makeGameMap testGrid "test" 255
+            mapB = makeGameMap gridB "new map" 255
             gameMaps = [ ("test", testMap)
+                       , ("new map", mapB)
                        ]
 
             gameState :: Position -> GameState
@@ -70,10 +78,6 @@ spec =
             it "gameStateGameMaps" $ do
                 let gameMaps' = []
                 (gameStateGameMaps .~ gameMaps' $ gameState (1, 1, 1))^.gameStateGameMaps `shouldBe` gameMaps'
-
-        describe "light movement" $ do
-            it "this is a test" $
-                False `shouldBe` True
 
         describe "load new room" $ do
             let gridA :: Grid GridBead
@@ -111,6 +115,27 @@ spec =
             it "disallows player movement to an invalid position" $ do
                 leftButtonPressed (gameState (1, 1, 0)) `shouldBe` gameState (1, 1, 0)
 
+            describe "moves into light" $ do
+                describe "can't move" $ do
+                    it "if light would be OoB" $
+                        forwardButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 1)
+                    it "if light would run into another light" $
+                        leftButtonPressed (gameState (2, 1, 2)) `shouldBe` gameState (2, 1, 2)
+                describe "can move" $ do
+                    it "moves the player" $
+                        (upButtonPressed (gameState (2, 2, 0)))^.gameStatePlayer^.playerPosition
+                            `shouldBe` (2, 1, 0)
+                    describe "moves the light" $ do
+                        let gameState' = upButtonPressed (gameState (2, 2, 0))
+                            lights = (gameState')^.gameStateGameMap^.gameMapLights
+                        it "has a new light position" $
+                            (defLight, (2, 0, 0)) `elem` lights `shouldBe` True
+
+            describe "moves into door" $ do
+                it "loads a new room" $
+                    leftButtonPressed (gameState (2, 2, 1))^.gameStateGameMap
+                        `shouldBe` mapB
+
             describe "directions" $ do
                 it "left" $ do
                     leftButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 0)
@@ -121,7 +146,7 @@ spec =
                 it "down" $ do
                     downButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 2, 1)
                 it "forward" $ do
-                    forwardButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (2, 1, 1)
+                    forwardButtonPressed (gameState (0, 1, 1)) `shouldBe` gameState (1, 1, 1)
                 describe "reverse" $ do
                     let gameStateReverse :: Position -> GameState
                         gameStateReverse pos = makeGameState (makePlayer pos Negative) testMap gameMaps
