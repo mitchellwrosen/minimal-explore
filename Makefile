@@ -7,12 +7,12 @@ server := ${server.python.${python_version_major}}
 
 all: test fay
 
-test:
+test: clean
 	ghc -fhpc -odir=obj -hidir=obj -itest:src test/Spec.hs
 	test/Spec
 clean:
 	rm -rf obj/* Spec.tix
-coverage: clean test
+coverage: test
 	-./coverage.sh
 	google-chrome "localhost:8000/code-coverage/hpc_index.html"
 fay:
