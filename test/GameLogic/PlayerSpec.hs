@@ -31,8 +31,12 @@ spec =
 
         describe "changing direction" $ do
             let player' = playerChangeDirection testPlayer
+                player'' = playerChangeDirection player'
             it "faces -x direction" $ do
                 player' ^. playerFacing `shouldBe` Negative
+
+            it "faces +x direction" $ do
+                player'' ^. playerFacing `shouldBe` Positive
 
             it "reverses left/right for the z direction" $ do
                 (playerApplyMove player' moveRight) ^. playerPosition `shouldBe` (1, 1, 0)

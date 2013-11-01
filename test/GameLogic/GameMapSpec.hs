@@ -13,12 +13,16 @@ import GameLogic.GameMap ( makeGameMap
                          , gameMapName
                          , gameMapDoors
                          , gameMapLights
+                         , gameMapAmbientLight
                          , gameMapApplyMoveLight
                          , getGameMapFromDoor
                          , getMatchingDoorPosition
                          )
 
-import Control.Lens ( (^.) )
+import Control.Lens ( (^.)
+                    , (.~)
+                    )
+import Control.Exception ( evaluate )
 
 spec :: Spec
 spec =
@@ -27,6 +31,26 @@ spec =
             door = Door "mapB" "unique" (255, 255, 255)
             grid = [ [ [ DoorBead door ] ] ]
             gameMap = makeGameMap grid name 255
+        describe "lenses" $ do
+            it "gameMapGrid" $ do
+                let grid' = [[[]]]
+                (gameMapGrid .~ grid' $ gameMap)^.gameMapGrid `shouldBe` grid'
+
+            it "gameMapName" $ do
+                let name' = "newName"
+                (gameMapName .~ name' $ gameMap)^.gameMapName `shouldBe` name'
+
+            it "gameMapDoors" $ do
+                let doors = []
+                (gameMapDoors .~ doors $ gameMap)^.gameMapDoors `shouldBe` doors
+
+            it "gameMapLights" $ do
+                let lights = []
+                (gameMapLights .~ lights $ gameMap)^.gameMapLights `shouldBe` lights
+
+            it "gameMapAmbeintLight" $ do
+                let ambientLight = 3
+                (gameMapAmbientLight .~ ambientLight $ gameMap)^.gameMapAmbientLight `shouldBe` ambientLight
 
         it "has a grid" $ do
             gameMap ^. gameMapGrid `shouldBe` grid
@@ -40,11 +64,11 @@ spec =
         describe "light movement" $ do
             let name = "mapA"
                 light = Light 255 (255, 255, 255)
-                grid = [ [ [ LightBead light, Empty ] ] ]
+                grid = [ [ [ LightBead light, Empty, LightBead light ] ] ]
                 gameMap = makeGameMap grid name 255
-                [mapLight] = gameMap ^. gameMapLights
+                mapLight = head $ gameMap ^. gameMapLights
 
-                grid' = [ [ [ Empty, LightBead light ] ] ]
+                grid' = [ [ [ Empty, LightBead light, LightBead light ] ] ]
                 gameMap' = makeGameMap grid' name 255
 
             it "can move" $ do
@@ -64,8 +88,15 @@ spec =
                        , (gameMapB^.gameMapName, gameMapB)
                        ]
 
-            it "finds the matching map" $ do
-                getGameMapFromDoor maps doorA `shouldBe` gameMapB
+                badDoor = DoorBead $ Door "mapC" "unique" (255, 255, 255)
+
+            describe "finding a matching map" $ do
+                it "finds the matching map" $
+                    getGameMapFromDoor maps doorA `shouldBe` gameMapB
+
+                it "throws an error if the map does not exist" $ do
+                    evaluate (getGameMapFromDoor maps badDoor) `shouldThrow`
+                        errorCall "Bad RoomName mapC"
 
             it "finds the matching door in a map" $ do
                 getMatchingDoorPosition gameMapA gameMapB doorA `shouldBe` (0, 0, 0)
