@@ -2,7 +2,7 @@ all: test fay
 
 .PHONY: test
 test:
-	runhaskell -itest:src test/Spec.hs
+	runhaskell -Wall -itest:src test/Spec.hs
 buildTest: clean
 	ghc -fhpc -odir=obj -hidir=obj -itest:src test/Spec.hs
 	test/Spec
