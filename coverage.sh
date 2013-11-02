@@ -37,17 +37,18 @@ alternatives=`eval coverage "alternatives"`
 exitCode=0
 if [ $topLevelDeclarations -lt $minimumTopLevel ]
    then
-      echo ERROR: Top Level coverage too low:    $topLevelDeclarations%
+      echo Top Level coverage:    $topLevelDeclarations%
       exitCode=$(($exitCode + 1))
 fi
 if [ $expressions -lt $minimumExpressions ]
    then
-      echo ERROR: Expressions coverage too low:  $expressions%
+      echo Expressions coverage:  $expressions%
       exitCode=$(($exitCode + 10))
 fi
 if [ $alternatives -lt $minimumAlternatives ]
    then
-      echo ERROR: Alternatives coverage too low: $alternatives%
+      echo Alternatives coverage: $alternatives%
       exitCode=$(($exitCode + 100))
 fi
+xdg-open code-coverage/hpc_index.html
 exit $exitCode
