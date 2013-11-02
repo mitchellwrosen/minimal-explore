@@ -1,1 +1,2 @@
-let g:hdevtools_options = '-g -isrc/'
+set wildignore+=code-coverage
+let g:hdevtools_options .= ' -g -isrc/'

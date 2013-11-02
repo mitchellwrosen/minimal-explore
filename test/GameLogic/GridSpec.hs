@@ -3,7 +3,7 @@ module GameLogic.GridSpec ( spec ) where
 import Test.Hspec
 
 import GameLogic.Types ( GridBead(..) )
-import GameLogic.Grid ( Grid(..)
+import GameLogic.Grid ( Grid
                       , gridGet
                       , gridSet
                       )

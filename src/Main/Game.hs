@@ -22,6 +22,7 @@ import Main.Perlenspiel ( setPSEvent
                         )
 
 import qualified Levels.Level1
+import qualified Levels.GameMaps
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
@@ -56,7 +57,7 @@ import Control.Lens ( (^.) )
 main :: Fay ()
 main = do
     let player = makePlayer (0, 2, 2) Positive
-        gameState = makeGameState player Levels.Level1.gameMap
+        gameState = makeGameState player Levels.Level1.gameMap Levels.GameMaps.gameMaps
     stateRef <- newRef gameState
 
     let psInit :: Fay ()

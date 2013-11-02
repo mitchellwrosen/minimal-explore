@@ -4,14 +4,18 @@ module GameLogic.State.Internal ( leftButtonPressed
                                 , downButtonPressed
                                 , forwardButtonPressed
                                 , reverseButtonPressed
+                                , loadNewRoom
+                                , processLightMove
                                 , gameStatePlayer
                                 , gameStateGameMap
+                                , gameStateGameMaps
                                 , makeGameState
                                 , GameState
                                 ) where
 
 import Prelude ( Show
                , Eq
+               , String
                , Bool(..)
                , Maybe(..)
                , (==)
@@ -32,7 +36,7 @@ import GameLogic.Move ( moveLeft
                       , moveUp
                       , moveDown
                       , moveForward
-                      , Move(..)
+                      , Move
                       )
 import GameLogic.Player ( Player
                         , makePlayer
@@ -41,14 +45,11 @@ import GameLogic.Player ( Player
                         , playerApplyMove
                         , playerChangeDirection
                         )
-import GameLogic.Grid ( Grid(..)
-                      , gridGet
+import GameLogic.Grid ( gridGet
                       )
 import GameLogic.Types ( GridBead(..)
-                       , Door(..)
                        , Light(..)
-                       , Position(..)
-                       , Facing(..)
+                       , Position
                        )
 import GameLogic.GameMap ( getGameMapFromDoor
                          , getMatchingDoorPosition
@@ -57,7 +58,6 @@ import GameLogic.GameMap ( getGameMapFromDoor
                          , gameMapLights
                          , GameMap
                          )
-import qualified Levels.GameMaps
 
 import Data.Util.Maybe ( fromMaybe )
 import Control.Lens ( (^.)
@@ -67,14 +67,22 @@ import Control.Lens ( (^.)
 
 data GameState = GameState { _gameStatePlayer :: Player
                            , _gameStateGameMap :: GameMap
+                           , _gameStateGameMaps :: [(String, GameMap)]
                            }
   deriving (Show, Eq)
-gameStatePlayer = Lens { view = \(GameState player _) -> player
-                       , set  = \player (GameState _ gameMap) -> GameState player gameMap
+gameStatePlayer :: Lens GameState Player
+gameStatePlayer = Lens { view = _gameStatePlayer
+                       , set = \player gameState -> gameState { _gameStatePlayer = player }
                        }
-gameStateGameMap = Lens { view = \(GameState _ gameMap) -> gameMap
-                        , set  = \gameMap (GameState player _) -> GameState player gameMap
+gameStateGameMap :: Lens GameState GameMap
+gameStateGameMap = Lens { view = _gameStateGameMap
+                        , set = \gameMap gameState -> gameState { _gameStateGameMap = gameMap }
                         }
+gameStateGameMaps :: Lens GameState [(String, GameMap)]
+gameStateGameMaps = Lens { view = _gameStateGameMaps
+                         , set = \gameMaps gameState -> gameState { _gameStateGameMaps = gameMaps }
+                         }
+makeGameState :: Player -> GameMap -> [(String, GameMap)] -> GameState
 makeGameState = GameState
 
 loadNewRoom :: GameState -> GridBead -> GameState
@@ -83,15 +91,16 @@ loadNewRoom gameState door = gameState'
     oldFacing = gameState ^. gameStatePlayer ^. playerFacing
     position = getMatchingDoorPosition (gameState ^. gameStateGameMap) newMap door
     player = makePlayer position oldFacing
-    gameState' = GameState player newMap
-    newMap = getGameMapFromDoor Levels.GameMaps.gameMaps door
+    gameState' = GameState player newMap (gameState^.gameStateGameMaps)
+    newMap = getGameMapFromDoor (gameState^.gameStateGameMaps) door
 
-processLightMove :: GameState -> GameState -> (Light, Position) -> Facing -> Move -> GameState
-processLightMove defGameState playerMovedGameState light@(_, pos) facing move =
+processLightMove :: GameState -> GameState -> (Light, Position) -> Move -> GameState
+processLightMove defGameState playerMovedGameState light@(_, pos) move =
     case gridBead of
         Empty -> resolveLightBeadCollisions
         _     -> defGameState
   where
+    facing = defGameState^.gameStatePlayer^.playerFacing
     pos' = move facing pos
     gridBead = fromMaybe Wall $ gridGet (playerMovedGameState^.gameStateGameMap^.gameMapGrid) pos'
 
@@ -103,20 +112,23 @@ processLightMove defGameState playerMovedGameState light@(_, pos) facing move =
         _  -> defGameState
 
 processPlayerMove :: Move -> GameState -> GameState
-processPlayerMove move gameState@(GameState player gameMap) =
+processPlayerMove move gameState =
     case gridBead of
         Empty -> resolveLightBeadCollisions
         door@(DoorBead _) -> loadNewRoom gameState door
         Wall -> gameState
+        _ -> error "Should not contain light beads"
   where
+    gameMap = gameState^.gameStateGameMap
     gameState' = over gameStatePlayer (flip playerApplyMove move) gameState
     player' = gameState'^.gameStatePlayer
     gridBead = fromMaybe Wall $ gridGet (gameMap^.gameMapGrid) (player'^.playerPosition)
 
     light = filter ((== player'^.playerPosition) . snd) $ gameMap^.gameMapLights
     resolveLightBeadCollisions = case light of
-        [light] -> processLightMove gameState gameState' light (player'^.playerFacing) move
+        [lite] -> processLightMove gameState gameState' lite move
         []      -> gameState'
+        _ -> error "2 lights should not have the same position"
 
 leftButtonPressed :: GameState -> GameState
 leftButtonPressed = processPlayerMove moveLeft

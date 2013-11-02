@@ -15,7 +15,7 @@ fromMaybe :: a -> Maybe a -> a
 fromMaybe = flip maybe id
 
 fromList :: [a] -> Maybe a
-fromList (a:xs) = Just a
+fromList (a:_) = Just a
 fromList [] = Nothing
 
 isJust :: Maybe a -> Bool

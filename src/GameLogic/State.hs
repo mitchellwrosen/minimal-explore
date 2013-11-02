@@ -1,6 +1,7 @@
 module GameLogic.State ( GameState
                        , makeGameState
                        , gameStateGameMap
+                       , gameStateGameMaps
                        , gameStatePlayer
                        , leftButtonPressed
                        , rightButtonPressed
