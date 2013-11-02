@@ -36,7 +36,7 @@ import GameLogic.Move ( moveLeft
                       , moveUp
                       , moveDown
                       , moveForward
-                      , Move(..)
+                      , Move
                       )
 import GameLogic.Player ( Player
                         , makePlayer
@@ -45,14 +45,11 @@ import GameLogic.Player ( Player
                         , playerApplyMove
                         , playerChangeDirection
                         )
-import GameLogic.Grid ( Grid(..)
-                      , gridGet
+import GameLogic.Grid ( gridGet
                       )
 import GameLogic.Types ( GridBead(..)
-                       , Door(..)
                        , Light(..)
-                       , Position(..)
-                       , Facing(..)
+                       , Position
                        )
 import GameLogic.GameMap ( getGameMapFromDoor
                          , getMatchingDoorPosition
@@ -61,7 +58,6 @@ import GameLogic.GameMap ( getGameMapFromDoor
                          , gameMapLights
                          , GameMap
                          )
-import qualified Levels.GameMaps
 
 import Data.Util.Maybe ( fromMaybe )
 import Control.Lens ( (^.)
@@ -74,15 +70,19 @@ data GameState = GameState { _gameStatePlayer :: Player
                            , _gameStateGameMaps :: [(String, GameMap)]
                            }
   deriving (Show, Eq)
+gameStatePlayer :: Lens GameState Player
 gameStatePlayer = Lens { view = _gameStatePlayer
                        , set = \player gameState -> gameState { _gameStatePlayer = player }
                        }
+gameStateGameMap :: Lens GameState GameMap
 gameStateGameMap = Lens { view = _gameStateGameMap
                         , set = \gameMap gameState -> gameState { _gameStateGameMap = gameMap }
                         }
+gameStateGameMaps :: Lens GameState [(String, GameMap)]
 gameStateGameMaps = Lens { view = _gameStateGameMaps
                          , set = \gameMaps gameState -> gameState { _gameStateGameMaps = gameMaps }
                          }
+makeGameState :: Player -> GameMap -> [(String, GameMap)] -> GameState
 makeGameState = GameState
 
 loadNewRoom :: GameState -> GridBead -> GameState
@@ -112,20 +112,23 @@ processLightMove defGameState playerMovedGameState light@(_, pos) move =
         _  -> defGameState
 
 processPlayerMove :: Move -> GameState -> GameState
-processPlayerMove move gameState@(GameState player gameMap _) =
+processPlayerMove move gameState =
     case gridBead of
         Empty -> resolveLightBeadCollisions
         door@(DoorBead _) -> loadNewRoom gameState door
         Wall -> gameState
+        _ -> error "Should not contain light beads"
   where
+    gameMap = gameState^.gameStateGameMap
     gameState' = over gameStatePlayer (flip playerApplyMove move) gameState
     player' = gameState'^.gameStatePlayer
     gridBead = fromMaybe Wall $ gridGet (gameMap^.gameMapGrid) (player'^.playerPosition)
 
     light = filter ((== player'^.playerPosition) . snd) $ gameMap^.gameMapLights
     resolveLightBeadCollisions = case light of
-        [light] -> processLightMove gameState gameState' light move
+        [lite] -> processLightMove gameState gameState' lite move
         []      -> gameState'
+        _ -> error "2 lights should not have the same position"
 
 leftButtonPressed :: GameState -> GameState
 leftButtonPressed = processPlayerMove moveLeft

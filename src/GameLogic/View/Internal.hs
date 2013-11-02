@@ -5,40 +5,8 @@ module GameLogic.View.Internal ( getColorView
                                , lightIntensity
                                ) where
 
-import Prelude ( Maybe(..)
-               , Int
-               , Double
-               , Bool(..)
-               , reverse
-               , zipWith
-               , maybe
-               , id
-               , snd
-               , foldr
-               , flip
-               , subtract
-               , map
-               , otherwise
-               , filter
-               , round
-               , div
-               , sqrt
-               , fromIntegral
-               , replicate
-               , undefined
-               , (.)
-               , (/)
-               , (*)
-               , ($)
-               , (+)
-               , (++)
-               , (==)
-               , (/=)
-               , (<=)
-               , (>)
-               , (-)
-               , (!!)
-               )
+import Prelude
+
 import GameLogic.View.Light ( phongLighting
                             , beadDiffuse
                             , lightIntensity
@@ -51,26 +19,21 @@ import GameLogic.State ( GameState
 import GameLogic.GameMap ( gameMapGrid
                          , gameMapLights
                          , gameMapAmbientLight
-                         , GameMap
                          )
-import GameLogic.Player ( Player
-                        , playerPosition
+import GameLogic.Player ( playerPosition
                         , playerFacing
                         )
-import GameLogic.Grid ( Grid(..)
-                      , gridDimensions
+import GameLogic.Grid ( gridDimensions
                       , gridGet
-                      , gridElems
                       )
 import GameLogic.Types ( GridY
                        , GridZ
                        , posX
-                       , Door(..)
                        , Light(..)
                        , GridBead(..)
                        , BeadColor(..)
-                       , Color(..)
-                       , Position(..)
+                       , Color
+                       , Position
                        , Facing(..)
                        )
 import GameLogic.Color ( ambientColor )
@@ -142,25 +105,25 @@ getView gameState =
                     then (+ 1)
                     else subtract 1
 
-            distance' dist index =
+            xDistance' dist index =
                 case xSlice !! index of
                     Wall -> (dist, Wall)
                     door@(DoorBead _) -> (dist, door)
-                    _ -> distance' (dist + 1) (delta index)
+                    _ -> xDistance' (dist + 1) (delta index)
 
-            distance :: Int -> (Int, GridBead)
-            distance = distance' 0
+            xDistance :: Int -> (Int, GridBead)
+            xDistance = xDistance' 0
 
-        in  distance $ playerX + 1
+        in  xDistance $ playerX + 1
 
     beadColor :: GridY -> GridZ -> GridBead -> (BeadColor, [(Light, Int)])
-    beadColor y z' bead
-        | (y, z) == (playerY, playerZ) = (PlayerColor, nearbyLightBeads')
-        | lightIsAt y z = lightBeadColor
+    beadColor beadY beadZ' _
+        | (beadY, beadZ) == (playerY, playerZ) = (PlayerColor, nearbyLightBeads')
+        | lightIsAt beadY beadZ = lightBeadColor
         | otherwise     = staticBeadColor
       where
         lightIsAt y = isJust . lightAt y
-        nearbyLightBeads' = nearbyLightBeads y z
+        nearbyLightBeads' = nearbyLightBeads beadY beadZ
 
         lightAt :: GridY -> GridZ -> Maybe (Light, Position)
         lightAt y z = fromList lights
@@ -168,15 +131,16 @@ getView gameState =
             lights = filter (\(_, pos) -> pos == (playerX, y, z)) $ gameMap^.gameMapLights
 
         lightBeadColor =
-            let Just (Light _ color, _) = lightAt y z
+            let Just (Light _ color, _) = lightAt beadY beadZ
             in  (LightColor color, [])
 
         staticBeadColor = case bead of
             Wall         -> (WallColor dist, nearbyLightBeads')
             (DoorBead _) -> (DoorColor dist, nearbyLightBeads')
+            _ -> error "Does not calculate BeadColors of LightBeads or Emptys"
           where
-            (dist, bead) = xDistanceToBead y z
+            (dist, bead) = xDistanceToBead beadY beadZ
 
-        z = if isPositiveFacing gameState
-            then z'
-            else maxZ - z' - 1
+        beadZ = if isPositiveFacing gameState
+            then beadZ'
+            else maxZ - beadZ' - 1

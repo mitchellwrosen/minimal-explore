@@ -6,18 +6,10 @@ module GameLogic.Player ( Player
                         , playerChangeDirection
                         ) where
 
-import Prelude ( Show
-               , Eq
-               , (+)
-               , (-)
-               , (==)
-               )
-import GameLogic.Move ( Move(..)
+import Prelude
+import GameLogic.Move ( Move
                       )
-import GameLogic.Types ( GridX
-                       , GridY
-                       , GridZ
-                       , Position
+import GameLogic.Types ( Position
                        , Facing(..)
                        )
 import Control.Lens ( (^.)
@@ -29,10 +21,15 @@ data Player = Player { _playerPosition :: Position
                      , _playerFacing :: Facing
                      }
   deriving (Show, Eq)
+makePlayer :: Position -> Facing -> Player
 makePlayer = Player
+
+playerPosition :: Lens Player Position
 playerPosition = Lens { view = _playerPosition
                       , set = \pos player -> player { _playerPosition = pos }
                       }
+
+playerFacing :: Lens Player Facing
 playerFacing = Lens { view = _playerFacing
                     , set = \fac player -> player { _playerFacing = fac }
                     }

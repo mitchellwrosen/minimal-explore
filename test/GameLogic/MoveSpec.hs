@@ -3,7 +3,6 @@ module GameLogic.MoveSpec ( spec ) where
 import Test.Hspec
 
 import GameLogic.Types ( Facing(..)
-                       , Position(..)
                        )
 import GameLogic.Move ( moveForward
                       , moveUp

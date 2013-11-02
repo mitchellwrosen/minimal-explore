@@ -3,22 +3,9 @@ module GameLogic.View.Light ( phongLighting
                             , lightIntensity
                             ) where
 
-import Prelude ( Int
-               , Double
-               , otherwise
-               , fromIntegral
-               , snd
-               , round
-               , foldr
-               , ($)
-               , (>)
-               , (/)
-               , (*)
-               , (.)
-               , (+)
-               )
+import Prelude
 
-import GameLogic.Types ( Color(..)
+import GameLogic.Types ( Color
                        , BeadColor(..)
                        , Light(..)
                        )
@@ -65,4 +52,5 @@ beadDiffuse (WallColor dist) =
         0 -> (0.1, 0.1, 0.1)
         1 -> (0.4, 0.4, 0.4)
         _ -> (0.5, 0.5, 0.5)
-beadDiffuse (DoorColor dist) = (1.0, 1.0, 1.0)
+beadDiffuse (DoorColor _) = (1.0, 1.0, 1.0)
+beadDiffuse _ = error "DoorBeads do not have a bead diffuse"

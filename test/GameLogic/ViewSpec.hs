@@ -9,7 +9,7 @@ import GameLogic.Types ( GridBead(..)
                        , Facing(..)
                        )
 import qualified GameLogic.Color as Color
-import GameLogic.Grid ( Grid(..) )
+import GameLogic.Grid ( Grid )
 import GameLogic.GameMap ( makeGameMap )
 import GameLogic.State ( GameState
                        , makeGameState
@@ -73,7 +73,7 @@ spec =
         describe "phongLighting" $ do
             let ambient@(ar, ag, ab) = (8, 9, 10)
                 lights = [ (Light 3 (255, 255, 255), 2) ]
-                [(ir, ig, ib)] = map lightIntensity lights
+                [(ir, _, ib)] = map lightIntensity lights
             it "0 diffuse means no extra light" $ do
                 phongLighting (0.0, 0.0, 0.0) ambient lights `shouldBe` ambient
 

@@ -2,14 +2,14 @@ module Levels.Level2 (gameMap) where
 
 import Prelude ( ($) )
 
-import GameLogic.GameMap ( GameMap(..)
+import GameLogic.GameMap ( GameMap
                          , makeGameMap
                          )
 import GameLogic.Types ( GridBead(..)
                        , Light(..)
                        , Door(..)
                        )
-import GameLogic.Grid ( Grid(..) )
+import GameLogic.Grid ( Grid )
 
 grid :: Grid GridBead
 grid = [ [ [ Wall, Empty, Wall, Empty, Wall, Empty, Wall, Empty, Wall ]

@@ -27,40 +27,6 @@ import Control.Exception ( evaluate )
 spec :: Spec
 spec =
     describe "gameMap" $ do
-        let name = "mapA"
-            door = Door "mapB" "unique" (255, 255, 255)
-            grid = [ [ [ DoorBead door ] ] ]
-            gameMap = makeGameMap grid name 255
-        describe "lenses" $ do
-            it "gameMapGrid" $ do
-                let grid' = [[[]]]
-                (gameMapGrid .~ grid' $ gameMap)^.gameMapGrid `shouldBe` grid'
-
-            it "gameMapName" $ do
-                let name' = "newName"
-                (gameMapName .~ name' $ gameMap)^.gameMapName `shouldBe` name'
-
-            it "gameMapDoors" $ do
-                let doors = []
-                (gameMapDoors .~ doors $ gameMap)^.gameMapDoors `shouldBe` doors
-
-            it "gameMapLights" $ do
-                let lights = []
-                (gameMapLights .~ lights $ gameMap)^.gameMapLights `shouldBe` lights
-
-            it "gameMapAmbeintLight" $ do
-                let ambientLight = 3
-                (gameMapAmbientLight .~ ambientLight $ gameMap)^.gameMapAmbientLight `shouldBe` ambientLight
-
-        it "has a grid" $ do
-            gameMap ^. gameMapGrid `shouldBe` grid
-
-        it "has a name" $ do
-            gameMap ^. gameMapName `shouldBe` name
-
-        it "has a list of doors" $ do
-            map fst (gameMap ^. gameMapDoors) `shouldBe` [ door ]
-
         describe "light movement" $ do
             let name = "mapA"
                 light = Light 255 (255, 255, 255)
@@ -100,3 +66,37 @@ spec =
 
             it "finds the matching door in a map" $ do
                 getMatchingDoorPosition gameMapA gameMapB doorA `shouldBe` (0, 0, 0)
+
+        let name = "mapA"
+            door = Door "mapB" "unique" (255, 255, 255)
+            grid = [ [ [ DoorBead door ] ] ]
+            gameMap = makeGameMap grid name 255
+        describe "lenses" $ do
+            it "gameMapGrid" $ do
+                let grid' = [[[]]]
+                (gameMapGrid .~ grid' $ gameMap)^.gameMapGrid `shouldBe` grid'
+
+            it "gameMapName" $ do
+                let name' = "newName"
+                (gameMapName .~ name' $ gameMap)^.gameMapName `shouldBe` name'
+
+            it "gameMapDoors" $ do
+                let doors = []
+                (gameMapDoors .~ doors $ gameMap)^.gameMapDoors `shouldBe` doors
+
+            it "gameMapLights" $ do
+                let lights = []
+                (gameMapLights .~ lights $ gameMap)^.gameMapLights `shouldBe` lights
+
+            it "gameMapAmbeintLight" $ do
+                let ambientLight = 3
+                (gameMapAmbientLight .~ ambientLight $ gameMap)^.gameMapAmbientLight `shouldBe` ambientLight
+
+        it "has a grid" $ do
+            gameMap ^. gameMapGrid `shouldBe` grid
+
+        it "has a name" $ do
+            gameMap ^. gameMapName `shouldBe` name
+
+        it "has a list of doors" $ do
+            map fst (gameMap ^. gameMapDoors) `shouldBe` [ door ]

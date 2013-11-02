@@ -33,29 +33,25 @@ import Prelude ( String
                , (.)
                )
 
-import GameLogic.Grid ( Grid(..)
+import GameLogic.Grid ( Grid
                       , gridElems
                       , gridSet
                       )
-import GameLogic.Move ( Move(..)
+import GameLogic.Move ( Move
                       )
 import GameLogic.Types ( GridBead(..)
-                       , GridX
-                       , GridY
-                       , GridZ
                        , Byte
                        , Door
                        , doorMapName
                        , doorId
                        , Light(..)
-                       , Position(..)
+                       , Position
                        , Facing(..)
                        )
 
 import Data.Util.Maybe ( fromMaybe )
 import Data.Util.List ( findFirst
                       , filterMap
-                      , replace
                       )
 import Control.Lens ( (^.)
                     , over
@@ -71,18 +67,23 @@ data GameMap = GameMap { _gameMapGrid :: Grid GridBead
                        , _gameMapAmbientLight :: Byte
                        }
   deriving (Eq, Show)
+gameMapGrid :: Lens GameMap (Grid GridBead)
 gameMapGrid = Lens { view = _gameMapGrid
                    , set  = \val gameState  -> gameState { _gameMapGrid = val }
                    }
+gameMapName :: Lens GameMap String
 gameMapName = Lens { view = _gameMapName
                    , set  = \val gameState  -> gameState { _gameMapName = val }
                    }
+gameMapDoors :: Lens GameMap [MapDoor]
 gameMapDoors = Lens { view = _gameMapDoors
                     , set  = \val gameState  -> gameState { _gameMapDoors = val }
                     }
+gameMapLights :: Lens GameMap [MapLight]
 gameMapLights = Lens { view = _gameMapLights
                      , set  = \val gameState  -> gameState { _gameMapLights = val }
                      }
+gameMapAmbientLight :: Lens GameMap Byte
 gameMapAmbientLight = Lens
                    { view = _gameMapAmbientLight
                    , set  = \val gameState  -> gameState { _gameMapAmbientLight = val }
@@ -101,6 +102,7 @@ getGameMapFromDoor gameMaps (DoorBead door) =
     fromMaybe (error $ "Bad RoomName " ++ roomName) $ lookup roomName gameMaps
   where
     roomName = door^.doorMapName
+getGameMapFromDoor _ _ = error "Should be a Door Bead"
 
 getMatchingDoorPosition :: GameMap -> GameMap -> GridBead -> Position
 getMatchingDoorPosition fromMap toMap (DoorBead door) =
@@ -108,6 +110,7 @@ getMatchingDoorPosition fromMap toMap (DoorBead door) =
   where
     matchingDoor d =
         (d^.doorMapName == fromMap^.gameMapName) && (d^.doorId == door^.doorId)
+getMatchingDoorPosition _ _ _ = error "Should be a Door Bead"
 
 makeGameMap :: Grid GridBead -> String -> Byte -> GameMap
 makeGameMap grid name ambientLight =

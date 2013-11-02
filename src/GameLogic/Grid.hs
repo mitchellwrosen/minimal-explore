@@ -1,4 +1,4 @@
-module GameLogic.Grid ( Grid(..)
+module GameLogic.Grid ( Grid
                       , gridGet
                       , gridSet
                       , gridElems
@@ -28,10 +28,7 @@ import Prelude ( Int
                , ($)
                )
 
-import GameLogic.Types ( GridX
-                       , GridY
-                       , GridZ
-                       , Position
+import GameLogic.Types ( Position
                        )
 import Data.Util.Maybe ( toMaybe )
 import Data.Util.List ( mapInd
@@ -54,7 +51,7 @@ validPosition grid (x, y, z) =
     z `isBoundedBy` sizeZ
   where
     (sizeX, sizeY, sizeZ) = gridDimensions grid
-    isBoundedBy x hi = x >= 0 && x < hi
+    isBoundedBy val hi = val >= 0 && val < hi
 
 gridElems :: Grid a -> [(a, Position)]
 gridElems grid = concat . concat $ indexedGrid

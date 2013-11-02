@@ -9,7 +9,7 @@ import GameLogic.Types ( GridBead(..)
                        , Light(..)
                        , Door(..)
                        )
-import GameLogic.Grid ( Grid(..) )
+import GameLogic.Grid ( Grid )
 
 grid :: Grid GridBead
 grid = [ [ [ Wall, Empty, Wall, Empty, Wall, Empty, Wall, Empty, Wall ]

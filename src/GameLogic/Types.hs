@@ -30,9 +30,11 @@ data Door = Door { _doorMapName :: String
                  , doorColor :: Color
                  }
   deriving (Show, Eq)
+doorMapName :: Lens Door String
 doorMapName = Lens { view = _doorMapName
                    , set  = \name door -> door { _doorMapName = name }
                    }
+doorId :: Lens Door String
 doorId = Lens { view = _doorId
               , set  = \ident door -> door { _doorId = ident }
               }
@@ -57,12 +59,15 @@ data Facing = Positive | Negative
   deriving (Show, Eq)
 
 type Position = (GridX, GridY, GridZ)
+posX :: Lens Position GridX
 posX = Lens { view = \(x, _, _) -> x
             , set  = \x (_, y, z) -> (x, y, z)
             }
+posY :: Lens Position GridY
 posY = Lens { view = \(_, y, _) -> y
             , set  = \y (x, _, z) -> (x, y, z)
             }
+posZ :: Lens Position GridZ
 posZ = Lens { view = \(_, _, z) -> z
             , set  = \z (x, y, _) -> (x, y, z)
             }
