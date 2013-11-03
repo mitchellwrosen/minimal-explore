@@ -3,6 +3,15 @@ minimumTopLevel=100
 minimumExpressions=95
 minimumAlternatives=95
 
+function excludeFile {
+   exclude=`eval echo $1 .hs | \
+      sed -e 's/\//./g' | \
+      sed -e 's/.hs//g' | \
+      sed -e 's/\(.*\)/--exclude=\1/g' | \
+      xargs`
+   echo $exclude
+}
+
 function excludeDir {
    excludes=`eval find $1/$2 -name \*.hs | \
       sed -e "s/$1\///g" | \
@@ -12,9 +21,18 @@ function excludeDir {
       xargs`
    echo $excludes
 }
-levelExcludes=`eval excludeDir "src" "Levels"`
+
+function excludeSubmodule {
+   file=`eval excludeFile $2`
+   dir=`eval excludeDir $1 $2`
+   echo $file $dir
+}
+
+levelExcludes=`eval excludeSubmodule "src" "Levels"`
+typeExcludes=`eval excludeSubmodule "src" "GameLogic/Types"`
+lensExcludes=`eval excludeSubmodule "src" "Control/Lens"`
 testExcludes=`eval excludeDir "test"`
-excludes=`eval echo $levelExcludes $testExcludes`
+excludes=`eval echo $typeExcludes $levelExcludes $testExcludes $lensExcludes`
 
 markup=`eval echo $excludes | \
    sed -e 's/\(.*\)/hpc markup \1 --destdir=code-coverage Spec.tix/g'`

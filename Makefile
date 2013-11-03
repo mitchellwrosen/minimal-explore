@@ -10,7 +10,6 @@ clean:
 	rm -rf obj/* Spec.tix
 coverage: buildTest
 	-./coverage.sh
-	xdg-open "code-coverage/hpc_index.html"
 fay:
 	cd src; fay Main/Game.hs -o ../gen/game.js
 serve:
