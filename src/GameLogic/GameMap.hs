@@ -23,14 +23,16 @@ import GameLogic.Types ( GridBead(..)
                        , doorId
                        , Position
                        , Facing(..)
-                       , MapLight
-                       , GameMap(..)
-                       , gameMapGrid
-                       , gameMapAmbientLight
-                       , gameMapLights
-                       , gameMapDoors
-                       , gameMapName
                        )
+import GameLogic.Types.GameMap
+    ( MapLight
+    , GameMap(..)
+    , gameMapGrid
+    , gameMapAmbientLight
+    , gameMapLights
+    , gameMapDoors
+    , gameMapName
+    )
 
 import Data.Util.Maybe ( fromMaybe )
 import Data.Util.List ( findFirst

@@ -17,10 +17,13 @@ import GameLogic.Types ( GridBead(..)
                        , Door(..)
                        , posZ
                        , Facing(..)
-                       , GameState(..)
-                       , gameStateGameMap
-                       , gameStatePlayer
                        )
+
+import GameLogic.Types.GameState
+    ( GameState(..)
+    , gameStateGameMap
+    , gameStatePlayer
+    )
 import GameLogic.GameMap ( GameMap
                          , gameMapGrid
                          , gameMapLights

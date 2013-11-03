@@ -9,10 +9,12 @@ import Prelude
 import GameLogic.Move ( Move
                       )
 import GameLogic.Types ( Facing(..)
-                       , Player
-                       , playerFacing
-                       , playerPosition
                        )
+import GameLogic.Types.Player
+    ( Player
+    , playerFacing
+    , playerPosition
+    )
 import Control.Lens ( (^.)
                     , over
                     )

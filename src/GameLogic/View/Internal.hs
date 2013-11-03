@@ -33,10 +33,12 @@ import GameLogic.Types ( GridY
                        , Color
                        , Position
                        , Facing(..)
-                       , GameState
-                       , gameStateGameMap
-                       , gameStatePlayer
                        )
+import GameLogic.Types.GameState
+    ( GameState
+    , gameStateGameMap
+    , gameStatePlayer
+    )
 import GameLogic.Color ( ambientColor )
 
 import Control.Lens ( (^.)
@@ -91,7 +93,7 @@ getView gameState =
     gameMap = gameState^.gameStateGameMap
     grid = gameMap^.gameMapGrid
 
-    (maxX, _, maxZ) = gridDimensions grid
+    maxX = (gridDimensions grid)^.posX
 
     (playerX, playerY, playerZ) = gameState^.gameStatePlayer^.playerPosition
 

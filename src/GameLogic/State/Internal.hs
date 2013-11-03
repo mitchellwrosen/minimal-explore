@@ -27,15 +27,22 @@ import GameLogic.Grid ( gridGet
 import GameLogic.Types ( GridBead(..)
                        , Light(..)
                        , Door(..)
-                       , GameState(..)
-                       , gameStatePlayer
-                       , gameStateGameMap
-                       , gameStateGameMaps
                        , Position
-                       , makePlayer
-                       , playerFacing
-                       , playerPosition
                        )
+import GameLogic.Types.GameState
+    ( GameState
+    , makeGameState
+    , gameStatePlayer
+    , gameStateGameMap
+    , gameStateGameMaps
+    )
+
+import GameLogic.Types.Player
+    ( makePlayer
+    , playerFacing
+    , playerPosition
+    )
+
 import GameLogic.GameMap ( getGameMapFromDoor
                          , getMatchingDoorPosition
                          , gameMapApplyMoveLight
@@ -54,7 +61,7 @@ loadNewRoom gameState door = gameState'
     oldFacing = gameState ^. gameStatePlayer ^. playerFacing
     position = getMatchingDoorPosition (gameState ^. gameStateGameMap) newMap door
     player = makePlayer position oldFacing
-    gameState' = GameState player newMap (gameState^.gameStateGameMaps)
+    gameState' = makeGameState player newMap (gameState^.gameStateGameMaps)
     newMap = getGameMapFromDoor (gameState^.gameStateGameMaps) door
 
 processLightMove :: GameState -> GameState -> (Light, Position) -> Move -> GameState

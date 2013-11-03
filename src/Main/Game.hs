@@ -31,10 +31,14 @@ import GameLogic.Types ( GridX
                        , BeadData
                        , GridBead(..)
                        , Facing(..)
-                       , makePlayer
-                       , makeGameState
-                       , gameStateGameMap
                        )
+import GameLogic.Types.Player
+    ( makePlayer
+    )
+import GameLogic.Types.GameState
+    ( makeGameState
+    , gameStateGameMap
+    )
 import GameLogic.Grid ( Grid(..)
                       , gridDimensions
                       )
