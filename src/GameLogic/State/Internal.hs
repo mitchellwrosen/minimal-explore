@@ -78,10 +78,17 @@ processPlayerMove :: Move -> GameState -> GameState
 processPlayerMove move gameState =
     case gridBead of
         Empty -> resolveLightBeadCollisions
-        door@(DoorBead _) -> loadNewRoom gameState door
+        doorBead@(DoorBead door) -> if checkDoorLighting door
+                                    then loadNewRoom gameState doorBead
+                                    else gameState
         Wall -> gameState
         _ -> error "Should not contain light beads"
   where
+    checkDoorLighting :: Door -> Bool
+    checkDoorLighting door = doorColor door == doorLightingColor
+      where
+        doorLightingColor = getColorViewAt gameState (player'^.playerPosition)
+
     gameMap = gameState^.gameStateGameMap
     gameState' = over gameStatePlayer (flip playerApplyMove move) gameState
     player' = gameState'^.gameStatePlayer

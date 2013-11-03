@@ -1,4 +1,5 @@
 module GameLogic.View.Internal ( getColorView
+                               , getColorViewAt
                                , getView
                                , getBeadView
                                , phongLighting
@@ -46,6 +47,17 @@ import Data.Util.Maybe ( fromMaybe
                        )
 import Data.Util.List ( mapInd )
 import Data.Util.Math ( distance )
+
+correctZ :: GameState -> GridZ -> GridZ
+correctZ gameState z =
+    let maxZ = (gridDimensions $ gameState^.gameStateGameMap^.gameMapGrid)^.posZ
+    in  if isPositiveFacing gameState
+        then z
+        else maxZ - z - 1
+
+getColorViewAt :: GameState -> Position -> Color
+getColorViewAt gameState (_, y, z) =
+    ((getColorView gameState) !! y) !! (correctZ gameState z)
 
 getColorView :: GameState -> [[Color]]
 getColorView gameState = map (map calculateBeadColor) $ getView gameState
@@ -141,6 +153,4 @@ getView gameState =
           where
             (dist, bead) = xDistanceToBead beadY beadZ
 
-        beadZ = if isPositiveFacing gameState
-            then beadZ'
-            else maxZ - beadZ' - 1
+        beadZ = correctZ gameState beadZ'
