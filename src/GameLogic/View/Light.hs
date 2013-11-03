@@ -53,4 +53,5 @@ beadDiffuse (WallColor dist) =
         1 -> (0.4, 0.4, 0.4)
         _ -> (0.5, 0.5, 0.5)
 beadDiffuse (DoorColor _) = (1.0, 1.0, 1.0)
+beadDiffuse (GateColor _) = (1.0, 1.0, 1.0)
 beadDiffuse _ = error "DoorBeads do not have a bead diffuse"

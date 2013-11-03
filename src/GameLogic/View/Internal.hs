@@ -68,8 +68,8 @@ getColorView gameState = map (map calculateBeadColor) $ getView gameState
 
     calculateBeadColor :: (BeadColor, [(Light, Int)]) -> Color
     calculateBeadColor (LightColor color, _) = color
-    calculateBeadColor (color, lights) =
-        phongLighting (beadDiffuse color) (ambientColor maxLight color) lights
+    calculateBeadColor (beadColor, lights) =
+        phongLighting (beadDiffuse beadColor) (ambientColor maxLight beadColor) lights
 
 isPositiveFacing :: GameState -> Bool
 isPositiveFacing gameState =
@@ -123,6 +123,7 @@ getView gameState =
                 case xSlice !! index of
                     Wall -> (dist, Wall)
                     door@(DoorBead _) -> (dist, door)
+                    gate@(GateBead _) -> (dist, gate)
                     _ -> xDistance' (dist + 1) (delta index)
 
             xDistance :: Int -> (Int, GridBead)
@@ -151,6 +152,7 @@ getView gameState =
         staticBeadColor = case bead of
             Wall         -> (WallColor dist, nearbyLightBeads')
             (DoorBead _) -> (DoorColor dist, nearbyLightBeads')
+            (GateBead _) -> (GateColor dist, nearbyLightBeads')
             _ -> error "Does not calculate BeadColors of LightBeads or Emptys"
           where
             (dist, bead) = xDistanceToBead beadY beadZ

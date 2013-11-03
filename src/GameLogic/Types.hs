@@ -25,6 +25,10 @@ data Light = Light { lightRadius :: Int
                    }
   deriving (Show, Eq)
 
+data Gate = Gate { gateColor :: Color
+                 }
+  deriving (Show, Eq)
+
 data Door = Door { _doorMapName :: String
                  , _doorId :: String
                  , doorColor :: Color
@@ -44,12 +48,14 @@ data GridBead = Wall
               | Empty
               | LightBead Light
               | DoorBead Door
+              | GateBead Gate
   deriving (Show, Eq)
 
 type Color = (Byte, Byte, Byte)
 type DistanceX = Int
 data BeadColor = WallColor DistanceX
                | DoorColor DistanceX
+               | GateColor DistanceX
                | EmptyColor
                | PlayerColor
                | LightColor Color

@@ -15,6 +15,7 @@ import Main.Perlenspiel ( psBeadColor
 
 import GameLogic.Types ( GridBead(..)
                        , Door(..)
+                       , Gate(..)
                        , posZ
                        , Facing(..)
                        )
@@ -51,11 +52,11 @@ drawMap gameState = do
     psBorderWidth psAll psAll 2
     psBorderColor psAll psAll (15, 15, 15)
     psRadius psAll psAll 0
-    psRadius playerZ playerY 50
 
     mapMInd_ (mapMInd_ . flip psBeadColor) colorView
-    mapMInd_ (mapMInd_ . flip doorBorders) beadView
+    mapMInd_ (mapMInd_ . flip colorBorders) beadView
     mapMInd_ lightRadii lights
+    psRadius playerZ playerY 50
   where
     colorView = getColorView gameState
     beadView = getBeadView gameState
@@ -71,8 +72,8 @@ drawMap gameState = do
     lights = filter (\(_, (x, _, _)) -> x == playerX) $ gameState^.gameStateGameMap^.gameMapLights
     lightRadii _ (_, (_, y, z)) = psRadius (maybeInvertZ z) y 25
 
-    doorBorders x y bead = case bead of
-        (DoorBead door) -> do
+    colorBorders x y bead = case bead of
+        DoorBead door -> do
             psBorderWidth x y 8
             psBorderColor x y (doorColor door)
 
@@ -81,8 +82,10 @@ drawMap gameState = do
             psGlyph x y "Q"
             psGlyphFade x y 60
 
-            if doorColor door == (colorView !! y) !! x
-            then do
+            when (doorColor door == (colorView !! y) !! x) $
                 psGlyphAlpha x y 255
-            else return ()
+        GateBead gate -> do
+            psBorderWidth x y 8
+            psBorderColor x y (gateColor gate)
+            psRadius x y 15
         _ -> return ()

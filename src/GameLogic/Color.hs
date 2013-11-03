@@ -20,6 +20,7 @@ fromList _ = error "Badly formed color list"
 ambientColor :: Byte -> BeadColor -> Color
 ambientColor maxLight (EmptyColor) = (maxLight, maxLight, maxLight)
 ambientColor maxLight (DoorColor _) = (maxLight, maxLight, maxLight)
+ambientColor maxLight (GateColor _) = (maxLight, maxLight, maxLight)
 ambientColor maxLight (PlayerColor) = (maxLight, 0, 0)
 ambientColor maxLight (WallColor dist) = (wallFadeValue dist, wallFadeValue dist, wallFadeValue dist)
   where
