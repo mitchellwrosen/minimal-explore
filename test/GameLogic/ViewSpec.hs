@@ -2,7 +2,8 @@ module GameLogic.ViewSpec ( spec ) where
 
 import Test.Hspec
 
-import GameLogic.Player ( makePlayer )
+import GameLogic.Types.Player
+    ( makePlayer )
 import GameLogic.Types ( GridBead(..)
                        , BeadColor(..)
                        , Light(..)
@@ -11,9 +12,10 @@ import GameLogic.Types ( GridBead(..)
 import qualified GameLogic.Color as Color
 import GameLogic.Grid ( Grid )
 import GameLogic.GameMap ( makeGameMap )
-import GameLogic.State ( GameState
-                       , makeGameState
-                       )
+import GameLogic.Types.GameState
+    ( GameState
+    , makeGameState
+    )
 import GameLogic.View.Internal ( getView
                                , lightIntensity
                                , phongLighting

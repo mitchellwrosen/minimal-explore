@@ -5,11 +5,13 @@ import Test.Hspec
 import GameLogic.Types ( Facing(..) )
 import GameLogic.Move ( moveRight )
 
-import GameLogic.Player ( Player
-                        , makePlayer
-                        , playerApplyMove
-                        , playerPosition
-                        , playerFacing
+import GameLogic.Types.Player
+    ( Player
+    , makePlayer
+    , playerPosition
+    , playerFacing
+    )
+import GameLogic.Player ( playerApplyMove
                         , playerChangeDirection
                         )
 

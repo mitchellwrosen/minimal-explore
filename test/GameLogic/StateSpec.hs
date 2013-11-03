@@ -13,16 +13,19 @@ import GameLogic.Grid ( Grid )
 import GameLogic.GameMap ( makeGameMap
                          , gameMapLights
                          )
-import GameLogic.Player ( makePlayer
-                        , playerPosition
-                        , playerFacing
-                        )
-import GameLogic.State ( GameState
-                       , makeGameState
-                       , gameStatePlayer
-                       , gameStateGameMaps
-                       , gameStateGameMap
-                       , leftButtonPressed
+import GameLogic.Types.Player
+    ( makePlayer
+    , playerPosition
+    , playerFacing
+    )
+import GameLogic.Types.GameState
+    ( GameState
+    , makeGameState
+    , gameStatePlayer
+    , gameStateGameMaps
+    , gameStateGameMap
+    )
+import GameLogic.State ( leftButtonPressed
                        , rightButtonPressed
                        , upButtonPressed
                        , downButtonPressed
@@ -84,7 +87,7 @@ spec = describe "grid state" $ do
 
                          , [ [ Empty,  Wall,  Wall ]
                            , [ LightBead defLight, LightBead defLight, Empty ]
-                           , [ DoorBead $ Door "new map" "a" (0, 0, 0), Empty, Empty ]
+                           , [ DoorBead $ Door "new map" "a" (255, 255, 255), Empty, Empty ]
                            ]
                          ]
               gridB = [ [ [ DoorBead $ Door "test" "a" (0, 0, 0) ] ] ]
