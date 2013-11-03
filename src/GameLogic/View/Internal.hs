@@ -12,10 +12,6 @@ import GameLogic.View.Light ( phongLighting
                             , lightIntensity
                             )
 
-import GameLogic.State ( GameState
-                       , gameStateGameMap
-                       , gameStatePlayer
-                       )
 import GameLogic.GameMap ( gameMapGrid
                          , gameMapLights
                          , gameMapAmbientLight
@@ -29,12 +25,16 @@ import GameLogic.Grid ( gridDimensions
 import GameLogic.Types ( GridY
                        , GridZ
                        , posX
+                       , posZ
                        , Light(..)
                        , GridBead(..)
                        , BeadColor(..)
                        , Color
                        , Position
                        , Facing(..)
+                       , GameState
+                       , gameStateGameMap
+                       , gameStatePlayer
                        )
 import GameLogic.Color ( ambientColor )
 

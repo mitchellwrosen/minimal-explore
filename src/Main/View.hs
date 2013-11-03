@@ -1,32 +1,6 @@
 module Main.View (drawMap) where
 
-import Prelude ( Int
-               , Double
-               , Fay
-               , replicate
-               , map
-               , fst
-               , snd
-               , flip
-               , div
-               , return
-               , foldr
-               , sequence_
-               , zipWith
-               , sum
-               , filter
-               , round
-               , fromIntegral
-               , (*)
-               , (+)
-               , (-)
-               , (/)
-               , (.)
-               , ($)
-               , (==)
-               , (++)
-               , (!!)
-               )
+import Prelude
 
 import Main.Perlenspiel ( psBeadColor
                         , psBorderWidth
@@ -43,16 +17,15 @@ import GameLogic.Types ( GridBead(..)
                        , Door(..)
                        , posZ
                        , Facing(..)
+                       , GameState(..)
+                       , gameStateGameMap
+                       , gameStatePlayer
                        )
 import GameLogic.GameMap ( GameMap
                          , gameMapGrid
                          , gameMapLights
                          )
 import GameLogic.Grid ( gridDimensions )
-import GameLogic.State ( GameState(..)
-                       , gameStateGameMap
-                       , gameStatePlayer
-                       )
 import GameLogic.Player ( Player
                         , playerFacing
                         , playerPosition
@@ -105,7 +78,7 @@ drawMap gameState = do
             psGlyph x y "Q"
             psGlyphFade x y 60
 
-            if doorColor door == ((colorView !! y) !! x)
+            if doorColor door == (colorView !! y) !! x
             then do
                 psGlyphAlpha x y 255
             else return ()

@@ -6,30 +6,9 @@ module GameLogic.State.Internal ( leftButtonPressed
                                 , reverseButtonPressed
                                 , loadNewRoom
                                 , processLightMove
-                                , gameStatePlayer
-                                , gameStateGameMap
-                                , gameStateGameMaps
-                                , makeGameState
-                                , GameState
                                 ) where
 
-import Prelude ( Show
-               , Eq
-               , String
-               , Bool(..)
-               , Maybe(..)
-               , (==)
-               , (++)
-               , ($)
-               , (.)
-               , maybe
-               , snd
-               , flip
-               , lookup
-               , filter
-               , id
-               , error
-               )
+import Prelude
 
 import GameLogic.Move ( moveLeft
                       , moveRight
@@ -38,52 +17,36 @@ import GameLogic.Move ( moveLeft
                       , moveForward
                       , Move
                       )
-import GameLogic.Player ( Player
-                        , makePlayer
-                        , playerFacing
-                        , playerPosition
-                        , playerApplyMove
+import GameLogic.Player ( playerApplyMove
                         , playerChangeDirection
                         )
+import GameLogic.View ( getColorViewAt
+                      )
 import GameLogic.Grid ( gridGet
                       )
 import GameLogic.Types ( GridBead(..)
                        , Light(..)
+                       , Door(..)
+                       , GameState(..)
+                       , gameStatePlayer
+                       , gameStateGameMap
+                       , gameStateGameMaps
                        , Position
+                       , makePlayer
+                       , playerFacing
+                       , playerPosition
                        )
 import GameLogic.GameMap ( getGameMapFromDoor
                          , getMatchingDoorPosition
                          , gameMapApplyMoveLight
                          , gameMapGrid
                          , gameMapLights
-                         , GameMap
                          )
 
 import Data.Util.Maybe ( fromMaybe )
 import Control.Lens ( (^.)
                     , over
-                    , Lens(..)
                     )
-
-data GameState = GameState { _gameStatePlayer :: Player
-                           , _gameStateGameMap :: GameMap
-                           , _gameStateGameMaps :: [(String, GameMap)]
-                           }
-  deriving (Show, Eq)
-gameStatePlayer :: Lens GameState Player
-gameStatePlayer = Lens { view = _gameStatePlayer
-                       , set = \player gameState -> gameState { _gameStatePlayer = player }
-                       }
-gameStateGameMap :: Lens GameState GameMap
-gameStateGameMap = Lens { view = _gameStateGameMap
-                        , set = \gameMap gameState -> gameState { _gameStateGameMap = gameMap }
-                        }
-gameStateGameMaps :: Lens GameState [(String, GameMap)]
-gameStateGameMaps = Lens { view = _gameStateGameMaps
-                         , set = \gameMaps gameState -> gameState { _gameStateGameMaps = gameMaps }
-                         }
-makeGameState :: Player -> GameMap -> [(String, GameMap)] -> GameState
-makeGameState = GameState
 
 loadNewRoom :: GameState -> GridBead -> GameState
 loadNewRoom gameState door = gameState'

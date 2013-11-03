@@ -1,1 +1,1 @@
-let g:hdevtools_options = '-g -package -g fay-base -g -hide-package -g base'
+let g:hdevtools_options = '-g -package -g fay-base -g -hide-package -g base -g -isrc/'

@@ -10,29 +10,7 @@ module GameLogic.GameMap ( GameMap
                          , makeGameMap
                          ) where
 
-import Prelude ( String
-               , Eq
-               , Show
-               , Maybe(..)
-               , Bool(..)
-               , lookup
-               , head
-               , maybe
-               , filter
-               , foldr
-               , error
-               , id
-               , fst
-               , snd
-               , otherwise
-               , map
-               , (==)
-               , (++)
-               , (&&)
-               , ($)
-               , (.)
-               )
-
+import Prelude 
 import GameLogic.Grid ( Grid
                       , gridElems
                       , gridSet
@@ -41,12 +19,17 @@ import GameLogic.Move ( Move
                       )
 import GameLogic.Types ( GridBead(..)
                        , Byte
-                       , Door
                        , doorMapName
                        , doorId
-                       , Light(..)
                        , Position
                        , Facing(..)
+                       , MapLight
+                       , GameMap(..)
+                       , gameMapGrid
+                       , gameMapAmbientLight
+                       , gameMapLights
+                       , gameMapDoors
+                       , gameMapName
                        )
 
 import Data.Util.Maybe ( fromMaybe )
@@ -55,39 +38,7 @@ import Data.Util.List ( findFirst
                       )
 import Control.Lens ( (^.)
                     , over
-                    , Lens(..)
                     )
-
-type MapDoor  = (Door, Position)
-type MapLight = (Light, Position)
-data GameMap = GameMap { _gameMapGrid :: Grid GridBead
-                       , _gameMapName :: String
-                       , _gameMapDoors :: [MapDoor]
-                       , _gameMapLights :: [MapLight]
-                       , _gameMapAmbientLight :: Byte
-                       }
-  deriving (Eq, Show)
-gameMapGrid :: Lens GameMap (Grid GridBead)
-gameMapGrid = Lens { view = _gameMapGrid
-                   , set  = \val gameState  -> gameState { _gameMapGrid = val }
-                   }
-gameMapName :: Lens GameMap String
-gameMapName = Lens { view = _gameMapName
-                   , set  = \val gameState  -> gameState { _gameMapName = val }
-                   }
-gameMapDoors :: Lens GameMap [MapDoor]
-gameMapDoors = Lens { view = _gameMapDoors
-                    , set  = \val gameState  -> gameState { _gameMapDoors = val }
-                    }
-gameMapLights :: Lens GameMap [MapLight]
-gameMapLights = Lens { view = _gameMapLights
-                     , set  = \val gameState  -> gameState { _gameMapLights = val }
-                     }
-gameMapAmbientLight :: Lens GameMap Byte
-gameMapAmbientLight = Lens
-                   { view = _gameMapAmbientLight
-                   , set  = \val gameState  -> gameState { _gameMapAmbientLight = val }
-                   }
 
 gameMapApplyMoveLight :: GameMap -> MapLight -> Facing -> Move -> GameMap
 gameMapApplyMoveLight gameMap light facing move =

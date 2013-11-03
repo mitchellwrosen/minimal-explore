@@ -76,12 +76,12 @@ spec = describe "grid state" $ do
                            , [ Empty, Empty, Empty ]
                            , [ Empty, Empty, Empty ]
                            ]
-  
+
                          , [ [ Wall,  Wall,  Wall ]
                            , [ Empty, Empty, Empty ]
                            , [ Empty, Empty, Empty ]
                            ]
-  
+
                          , [ [ Empty,  Wall,  Wall ]
                            , [ LightBead defLight, LightBead defLight, Empty ]
                            , [ DoorBead $ Door "new map" "a" (0, 0, 0), Empty, Empty ]
@@ -93,10 +93,10 @@ spec = describe "grid state" $ do
               gameMaps = [ ("test", testMap)
                          , ("new map", mapB)
                          ]
-  
+
               gameState :: Position -> GameState
               gameState pos = makeGameState (makePlayer pos Positive) testMap gameMaps
-  
+
           describe "lenses" $ do
               it "gameStatePlayer" $ do
                   let player = makePlayer (0, 0, 0) Negative
@@ -107,13 +107,13 @@ spec = describe "grid state" $ do
               it "gameStateGameMaps" $ do
                   let gameMaps' = []
                   (gameStateGameMaps .~ gameMaps' $ gameState (1, 1, 1))^.gameStateGameMaps `shouldBe` gameMaps'
-  
+
           describe "player movement" $ do
               it "allows player movement to a valid position" $ do
                   leftButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 0)
               it "disallows player movement to an invalid position" $ do
                   leftButtonPressed (gameState (1, 1, 0)) `shouldBe` gameState (1, 1, 0)
-  
+
               describe "moves into light" $ do
                   describe "can't move" $ do
                       it "if light would be OoB" $
@@ -129,12 +129,12 @@ spec = describe "grid state" $ do
                               lights = (gameState')^.gameStateGameMap^.gameMapLights
                           it "has a new light position" $
                               (defLight, (2, 0, 0)) `elem` lights `shouldBe` True
-  
+
               describe "moves into door" $ do
                   it "loads a new room" $
                       leftButtonPressed (gameState (2, 2, 1))^.gameStateGameMap
                           `shouldBe` mapB
-  
+
               describe "directions" $ do
                   it "left" $ do
                       leftButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 0)

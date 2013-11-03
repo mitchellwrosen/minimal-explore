@@ -29,13 +29,12 @@ import Prelude ( Int
                )
 
 import GameLogic.Types ( Position
+                       , Grid
                        )
 import Data.Util.Maybe ( toMaybe )
 import Data.Util.List ( mapInd
                       , replace
                       )
-
-type Grid a = [[[a]]]
 
 gridDimensions :: Grid a -> Position
 gridDimensions grid = (sizeX, sizeY, sizeZ)

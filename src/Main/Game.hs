@@ -31,19 +31,16 @@ import GameLogic.Types ( GridX
                        , BeadData
                        , GridBead(..)
                        , Facing(..)
+                       , makePlayer
+                       , makeGameState
+                       , gameStateGameMap
                        )
 import GameLogic.Grid ( Grid(..)
                       , gridDimensions
                       )
-import GameLogic.Player ( Player
-                        , makePlayer
-                        )
 import GameLogic.GameMap ( gameMapGrid
                          )
-import GameLogic.State ( GameState
-                       , makeGameState
-                       , gameStateGameMap
-                       , leftButtonPressed
+import GameLogic.State ( leftButtonPressed
                        , rightButtonPressed
                        , upButtonPressed
                        , downButtonPressed
