@@ -10,12 +10,9 @@ module GameLogic.State.Internal ( leftButtonPressed
 
 import Prelude
 
-import GameLogic.Move ( moveLeft
-                      , moveRight
-                      , moveUp
-                      , moveDown
-                      , moveForward
-                      , Move
+import GameLogic.Move ( Move(..)
+                      , applyMove
+                      , oppositeMove
                       )
 import GameLogic.Player ( playerApplyMove
                         , playerChangeDirection
@@ -82,7 +79,7 @@ processLightMove defGameState playerMovedGameState light@(_, pos) move =
         _     -> defGameState
   where
     facing = defGameState^.gameStatePlayer^.playerFacing
-    pos' = move facing pos
+    pos' = applyMove move facing pos
     gridBead = fromMaybe Wall $ gridGet (playerMovedGameState^.gameStateGameMap^.gameMapGrid) pos'
 
     gameState = over gameStateGameMap (\gameMap -> gameMapApplyMoveLight gameMap light facing move) playerMovedGameState

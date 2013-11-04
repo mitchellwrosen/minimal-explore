@@ -7,6 +7,7 @@ module GameLogic.Player ( Player
 
 import Prelude
 import GameLogic.Move ( Move
+                      , applyMove
                       )
 import GameLogic.Types ( Facing(..)
                        )
@@ -28,4 +29,4 @@ playerChangeDirection = over playerFacing oppositeFacing
 playerApplyMove :: Player -> Move -> Player
 playerApplyMove player move = over playerPosition changePosition player
   where
-    changePosition = move (player^.playerFacing)
+    changePosition = applyMove move (player^.playerFacing)
