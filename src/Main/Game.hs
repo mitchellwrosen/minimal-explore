@@ -16,7 +16,7 @@ import Main.Perlenspiel ( setPSEvent
                         , psGridColor
                         )
 
-import qualified Levels.Level1
+import qualified Levels.Level2
 import qualified Levels.GameMaps
 import GameLogic.Types ( GridX
                        , GridY
@@ -52,8 +52,8 @@ import Control.Lens ( (^.) )
 -- Everything is in main for the beautiful closure that it offers over stateRef.
 main :: Fay ()
 main = do
-    let player = makePlayer (0, 2, 2) Positive
-        gameState = makeGameState player Levels.Level1.gameMap Levels.GameMaps.gameMaps
+    let player = makePlayer (1, 1, 2) Positive
+        gameState = makeGameState player Levels.Level2.gameMap Levels.GameMaps.gameMaps
     stateRef <- newRef gameState
     modKeyRef <- newRef False
 
