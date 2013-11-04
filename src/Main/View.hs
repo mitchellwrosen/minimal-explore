@@ -52,6 +52,8 @@ drawMap gameState = do
     psBorderWidth psAll psAll 2
     psBorderColor psAll psAll (15, 15, 15)
     psRadius psAll psAll 0
+    psGlyphAlpha psAll psAll 0
+    psGlyphFade psAll psAll 0
 
     mapMInd_ (mapMInd_ . flip psBeadColor) colorView
     mapMInd_ (mapMInd_ . flip colorBorders) beadView
@@ -62,7 +64,7 @@ drawMap gameState = do
     beadView = getBeadView gameState
 
     maxZ = gridDimensions (gameState^.gameStateGameMap^.gameMapGrid) ^. posZ
-    maybeInvertZ z =  case gameState ^. gameStatePlayer ^. playerFacing of
+    maybeInvertZ z = case gameState ^. gameStatePlayer ^. playerFacing of
         Positive -> z
         Negative -> maxZ - z - 1
 
@@ -77,7 +79,6 @@ drawMap gameState = do
             psBorderWidth x y 8
             psBorderColor x y (doorColor door)
 
-            psGlyphAlpha x y 0
             psGlyphColor x y (88, 0, 178)
             psGlyph x y "Q"
             psGlyphFade x y 60
