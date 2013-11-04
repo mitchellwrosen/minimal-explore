@@ -90,7 +90,7 @@ processLightMove defGameState playerMovedGameState light@(_, pos) move =
         _  -> defGameState
 
 processPlayerMove :: Move -> Bool -> GameState -> GameState
-processPlayerMove move shouldPull gameState =
+processPlayerMove move pullButtonPressed gameState =
     case gridBead of
         Empty -> pullLightBead resolveLightBeadCollisions
         doorBead@(DoorBead door) -> if isDoorOpen door
@@ -110,11 +110,12 @@ processPlayerMove move shouldPull gameState =
             pos = gameState^.gameStatePlayer^.playerPosition
             pos' = applyMove (oppositeMove move) facing pos
             lights' = filter ((== pos') . snd) $ gameMap^.gameMapLights
-        in  if shouldPull
-            then if length lights' == 1
-                 then over gameStateGameMap
-                    (\gm -> gameMapApplyMoveLight gm (head lights') facing move) gs
-                 else gs
+            playerMoved = pos /= gs^.gameStatePlayer^.playerPosition
+            hasLightToMove = length lights' == 1
+
+        in  if pullButtonPressed && playerMoved && hasLightToMove
+            then over gameStateGameMap
+               (\gm -> gameMapApplyMoveLight gm (head lights') facing move) gs
             else gs
 
     isDoorOpen :: Door -> Bool
