@@ -50,7 +50,6 @@ import GameLogic.GameMap ( getGameMapFromDoor
 
 import Data.Util.Maybe ( fromMaybe )
 import Control.Lens ( (^.)
-                    , (.~)
                     , over
                     )
 
@@ -110,11 +109,11 @@ processPlayerMove move shouldPull gameState =
         let facing = gameState^.gameStatePlayer^.playerFacing
             pos = gameState^.gameStatePlayer^.playerPosition
             pos' = applyMove (oppositeMove move) facing pos
-            lights = filter ((== pos') . snd) $ gameMap^.gameMapLights
+            lights' = filter ((== pos') . snd) $ gameMap^.gameMapLights
         in  if shouldPull
-            then if length lights == 1
+            then if length lights' == 1
                  then over gameStateGameMap
-                    (\gm -> gameMapApplyMoveLight gm (head lights) facing move) gs
+                    (\gm -> gameMapApplyMoveLight gm (head lights') facing move) gs
                  else gs
             else gs
 

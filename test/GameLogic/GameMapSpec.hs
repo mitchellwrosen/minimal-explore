@@ -7,7 +7,7 @@ import GameLogic.Types ( Door(..)
                        , Light(..)
                        , Facing(..)
                        )
-import GameLogic.Move ( moveRight )
+import GameLogic.Move ( Move( MoveRight ) )
 import GameLogic.GameMap ( makeGameMap
                          , gameMapGrid
                          , gameMapName
@@ -38,7 +38,7 @@ spec =
                 gameMap' = makeGameMap grid' name 255
 
             it "can move" $ do
-                gameMapApplyMoveLight gameMap mapLight Positive moveRight
+                gameMapApplyMoveLight gameMap mapLight Positive MoveRight
                     `shouldBe` gameMap'
 
         describe "player steps on door" $ do
