@@ -50,6 +50,7 @@ import GameLogic.GameMap ( getGameMapFromDoor
 
 import Data.Util.Maybe ( fromMaybe )
 import Control.Lens ( (^.)
+                    , (.~)
                     , over
                     )
 
@@ -120,20 +121,20 @@ processPlayerMove move gameState =
         []      -> gameState'
         _ -> error "2 lights should not have the same position"
 
-leftButtonPressed :: GameState -> GameState
-leftButtonPressed = processPlayerMove moveLeft
+leftButtonPressed :: Bool -> GameState -> GameState
+leftButtonPressed = processPlayerMove MoveLeft
 
-rightButtonPressed :: GameState -> GameState
-rightButtonPressed = processPlayerMove moveRight
+rightButtonPressed :: Bool -> GameState -> GameState
+rightButtonPressed = processPlayerMove MoveRight
 
-upButtonPressed :: GameState -> GameState
-upButtonPressed = processPlayerMove moveUp
+upButtonPressed :: Bool -> GameState -> GameState
+upButtonPressed = processPlayerMove MoveUp
 
-downButtonPressed :: GameState -> GameState
-downButtonPressed = processPlayerMove moveDown
+downButtonPressed :: Bool -> GameState -> GameState
+downButtonPressed = processPlayerMove MoveDown
 
-forwardButtonPressed :: GameState -> GameState
-forwardButtonPressed = processPlayerMove moveForward
+forwardButtonPressed :: Bool -> GameState -> GameState
+forwardButtonPressed = processPlayerMove MoveForward
 
-reverseButtonPressed :: GameState -> GameState
-reverseButtonPressed = over gameStatePlayer playerChangeDirection
+reverseButtonPressed :: Bool -> GameState -> GameState
+reverseButtonPressed _ = over gameStatePlayer playerChangeDirection

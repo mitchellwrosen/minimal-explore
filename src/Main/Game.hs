@@ -1,18 +1,13 @@
 module Main.Game () where
 
-import Prelude ( Fay
-               , Bool
-               , id
-               , return
-               , replicate
-               , (>>=)
-               )
+import Prelude
 
 import Main.View ( drawMap
                  )
 import Main.Ref ( modifyRef
                 , newRef
                 , readRef
+                , writeRef
                 )
 import Main.Perlenspiel ( setPSEvent
                         , setPSMouseEvent
@@ -60,6 +55,7 @@ main = do
     let player = makePlayer (0, 2, 2) Positive
         gameState = makeGameState player Levels.Level1.gameMap Levels.GameMaps.gameMaps
     stateRef <- newRef gameState
+    modKeyRef <- newRef False
 
     let psInit :: Fay ()
         psInit = do
@@ -89,19 +85,25 @@ main = do
 
         psKeyDown :: KeyValue -> Bool -> Bool -> Fay ()
         psKeyDown keyValue shift ctrl = do
-            let move = case keyValue of
-                    87 -> upButtonPressed
-                    65 -> leftButtonPressed
-                    83 -> downButtonPressed
-                    68 -> rightButtonPressed
-                    32 -> forwardButtonPressed
-                    74 -> reverseButtonPressed
-                    _ -> id
-            modifyRef stateRef move
-            readRef stateRef >>= drawMap
+            if keyValue == 75
+            then writeRef modKeyRef True
+            else do
+                 let move = case keyValue of
+                            87 -> upButtonPressed
+                            65 -> leftButtonPressed
+                            83 -> downButtonPressed
+                            68 -> rightButtonPressed
+                            32 -> forwardButtonPressed
+                            74 -> reverseButtonPressed
+                            _ -> \_ -> id
+                 shouldPull <- readRef modKeyRef
+                 modifyRef stateRef (move shouldPull)
+                 readRef stateRef >>= drawMap
 
         psKeyUp :: KeyValue -> Bool -> Bool -> Fay ()
-        psKeyUp keyValue shift ctrl = return ()
+        psKeyUp keyValue shift ctrl =
+            when (keyValue == 75) $
+                writeRef modKeyRef False
 
     setPSEvent "init" psInit
     setPSEvent "exitGrid" psExitGrid
