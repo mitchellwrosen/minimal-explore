@@ -90,23 +90,36 @@ processLightMove defGameState playerMovedGameState light@(_, pos) move =
         [] -> gameState
         _  -> defGameState
 
-processPlayerMove :: Move -> GameState -> GameState
-processPlayerMove move gameState =
+processPlayerMove :: Move -> Bool -> GameState -> GameState
+processPlayerMove move shouldPull gameState =
     case gridBead of
-        Empty -> resolveLightBeadCollisions
-        doorBead@(DoorBead door) -> if isLightOpen door
-                                    then loadNewRoom gameState doorBead
+        Empty -> pullLightBead resolveLightBeadCollisions
+        doorBead@(DoorBead door) -> if isDoorOpen door
+                                    then pullLightBead $ loadNewRoom gameState doorBead
                                     else gameState
         GateBead gate -> if isGateOpen gameState (player'^.playerPosition) gate
-                         then gameState'
+                         then pullLightBead gameState'
                          else if length lights == 1
-                              then resolveLightBeadCollisions
+                              then pullLightBead resolveLightBeadCollisions
                               else gameState
         Wall -> gameState
         _ -> error "Should not contain light beads"
   where
-    isLightOpen :: Door -> Bool
-    isLightOpen door = doorColor door == doorLightingColor
+    pullLightBead :: GameState -> GameState
+    pullLightBead gs =
+        let facing = gameState^.gameStatePlayer^.playerFacing
+            pos = gameState^.gameStatePlayer^.playerPosition
+            pos' = applyMove (oppositeMove move) facing pos
+            lights = filter ((== pos') . snd) $ gameMap^.gameMapLights
+        in  if shouldPull
+            then if length lights == 1
+                 then over gameStateGameMap
+                    (\gm -> gameMapApplyMoveLight gm (head lights) facing move) gs
+                 else gs
+            else gs
+
+    isDoorOpen :: Door -> Bool
+    isDoorOpen door = doorColor door == doorLightingColor
       where
         doorLightingColor = getColorViewAt gameState (player'^.playerPosition)
 
