@@ -10,12 +10,9 @@ module GameLogic.State.Internal ( leftButtonPressed
 
 import Prelude
 
-import GameLogic.Move ( moveLeft
-                      , moveRight
-                      , moveUp
-                      , moveDown
-                      , moveForward
-                      , Move
+import GameLogic.Move ( Move(..)
+                      , applyMove
+                      , oppositeMove
                       )
 import GameLogic.Player ( playerApplyMove
                         , playerChangeDirection
@@ -82,7 +79,7 @@ processLightMove defGameState playerMovedGameState light@(_, pos) move =
         _     -> defGameState
   where
     facing = defGameState^.gameStatePlayer^.playerFacing
-    pos' = move facing pos
+    pos' = applyMove move facing pos
     gridBead = fromMaybe Wall $ gridGet (playerMovedGameState^.gameStateGameMap^.gameMapGrid) pos'
 
     gameState = over gameStateGameMap (\gameMap -> gameMapApplyMoveLight gameMap light facing move) playerMovedGameState
@@ -92,23 +89,37 @@ processLightMove defGameState playerMovedGameState light@(_, pos) move =
         [] -> gameState
         _  -> defGameState
 
-processPlayerMove :: Move -> GameState -> GameState
-processPlayerMove move gameState =
+processPlayerMove :: Move -> Bool -> GameState -> GameState
+processPlayerMove move pullButtonPressed gameState =
     case gridBead of
-        Empty -> resolveLightBeadCollisions
-        doorBead@(DoorBead door) -> if isLightOpen door
-                                    then loadNewRoom gameState doorBead
+        Empty -> pullLightBead resolveLightBeadCollisions
+        doorBead@(DoorBead door) -> if isDoorOpen door
+                                    then pullLightBead $ loadNewRoom gameState doorBead
                                     else gameState
         GateBead gate -> if isGateOpen gameState (player'^.playerPosition) gate
-                         then gameState'
+                         then pullLightBead gameState'
                          else if length lights == 1
-                              then resolveLightBeadCollisions
+                              then pullLightBead resolveLightBeadCollisions
                               else gameState
         Wall -> gameState
         _ -> error "Should not contain light beads"
   where
-    isLightOpen :: Door -> Bool
-    isLightOpen door = doorColor door == doorLightingColor
+    pullLightBead :: GameState -> GameState
+    pullLightBead gs =
+        let facing = gameState^.gameStatePlayer^.playerFacing
+            pos = gameState^.gameStatePlayer^.playerPosition
+            pos' = applyMove (oppositeMove move) facing pos
+            lights' = filter ((== pos') . snd) $ gameMap^.gameMapLights
+            playerMoved = pos /= gs^.gameStatePlayer^.playerPosition
+            hasLightToMove = length lights' == 1
+
+        in  if pullButtonPressed && playerMoved && hasLightToMove
+            then over gameStateGameMap
+               (\gm -> gameMapApplyMoveLight gm (head lights') facing move) gs
+            else gs
+
+    isDoorOpen :: Door -> Bool
+    isDoorOpen door = doorColor door == doorLightingColor
       where
         doorLightingColor = getColorViewAt gameState (player'^.playerPosition)
 
@@ -123,20 +134,20 @@ processPlayerMove move gameState =
         []      -> gameState'
         _ -> error "2 lights should not have the same position"
 
-leftButtonPressed :: GameState -> GameState
-leftButtonPressed = processPlayerMove moveLeft
+leftButtonPressed :: Bool -> GameState -> GameState
+leftButtonPressed = processPlayerMove MoveLeft
 
-rightButtonPressed :: GameState -> GameState
-rightButtonPressed = processPlayerMove moveRight
+rightButtonPressed :: Bool -> GameState -> GameState
+rightButtonPressed = processPlayerMove MoveRight
 
-upButtonPressed :: GameState -> GameState
-upButtonPressed = processPlayerMove moveUp
+upButtonPressed :: Bool -> GameState -> GameState
+upButtonPressed = processPlayerMove MoveUp
 
-downButtonPressed :: GameState -> GameState
-downButtonPressed = processPlayerMove moveDown
+downButtonPressed :: Bool -> GameState -> GameState
+downButtonPressed = processPlayerMove MoveDown
 
-forwardButtonPressed :: GameState -> GameState
-forwardButtonPressed = processPlayerMove moveForward
+forwardButtonPressed :: Bool -> GameState -> GameState
+forwardButtonPressed = processPlayerMove MoveForward
 
-reverseButtonPressed :: GameState -> GameState
-reverseButtonPressed = over gameStatePlayer playerChangeDirection
+reverseButtonPressed :: Bool -> GameState -> GameState
+reverseButtonPressed _ = over gameStatePlayer playerChangeDirection

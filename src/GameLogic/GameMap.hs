@@ -16,6 +16,7 @@ import GameLogic.Grid ( Grid
                       , gridSet
                       )
 import GameLogic.Move ( Move
+                      , applyMove
                       )
 import GameLogic.Types ( GridBead(..)
                        , Byte
@@ -47,7 +48,7 @@ gameMapApplyMoveLight gameMap light facing move =
     over gameMapLights (map moveLight) gameMap
   where
     moveLight lite@(l, pos)
-        | lite == light = (l, move facing pos)
+        | lite == light = (l, applyMove move facing pos)
         | otherwise = lite
 
 getGameMapFromDoor :: [(String, GameMap)] -> GridBead -> GameMap

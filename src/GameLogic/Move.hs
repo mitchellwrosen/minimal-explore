@@ -1,9 +1,6 @@
-module GameLogic.Move ( moveForward
-                      , moveUp
-                      , moveDown
-                      , moveLeft
-                      , moveRight
-                      , Move
+module GameLogic.Move ( applyMove
+                      , oppositeMove
+                      , Move(..)
                       ) where
 
 import Prelude ( Show
@@ -18,7 +15,25 @@ import GameLogic.Types ( Facing(..)
                        , Position
                        )
 
-type Move = Facing -> Position -> Position
+data Move = MoveUp
+          | MoveDown
+          | MoveLeft
+          | MoveRight
+          | MoveForward
+
+applyMove :: Move -> Facing -> Position -> Position
+applyMove (MoveUp) = moveUp
+applyMove (MoveDown) = moveDown
+applyMove (MoveLeft) = moveLeft
+applyMove (MoveRight) = moveRight
+applyMove (MoveForward) = moveForward
+
+oppositeMove :: Move -> Move
+oppositeMove (MoveUp) = MoveDown
+oppositeMove (MoveDown) = MoveUp
+oppositeMove (MoveLeft) = MoveRight
+oppositeMove (MoveRight) = MoveLeft
+oppositeMove (MoveForward) = MoveForward
 
 moveForward :: Facing -> Position -> Position
 moveForward facing (x, y, z) = (delta x, y, z)

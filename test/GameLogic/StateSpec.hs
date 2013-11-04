@@ -58,20 +58,20 @@ spec = describe "grid state" $ do
                  let ambient = 128
                      gameState' = gameState ambient (0, 0, 0)
                  it "player cannot walk through" $
-                     rightButtonPressed (gameState' gridNoLightBead)
+                     rightButtonPressed False (gameState' gridNoLightBead)
                         `shouldBe` gameState' gridNoLightBead
                  it "player cannot push lightbead through" $
-                     rightButtonPressed (gameState' gridLightBead)
+                     rightButtonPressed False (gameState' gridLightBead)
                         `shouldBe` gameState' gridLightBead
 
              describe "gate open" $ do
                  let ambient = 192
                      gameState' = gameState ambient
                  it "player can walk through" $
-                     rightButtonPressed (gameState' (0, 0, 0) gridNoLightBead)
+                     rightButtonPressed False (gameState' (0, 0, 0) gridNoLightBead)
                         `shouldBe` gameState ambient (0, 0, 1) gridNoLightBead
                  describe "player can push lightbead through" $ do
-                     let gameState'' = rightButtonPressed (gameState' (0, 0, 0) gridLightBead)
+                     let gameState'' = rightButtonPressed False (gameState' (0, 0, 0) gridLightBead)
                      it "player moved" $ do
                          gameState''^.gameStatePlayer^.playerPosition^.posZ `shouldBe` 1
                      it "light moved" $ do
@@ -146,48 +146,48 @@ spec = describe "grid state" $ do
 
           describe "player movement" $ do
               it "allows player movement to a valid position" $ do
-                  leftButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 0)
+                  leftButtonPressed False (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 0)
               it "disallows player movement to an invalid position" $ do
-                  leftButtonPressed (gameState (1, 1, 0)) `shouldBe` gameState (1, 1, 0)
+                  leftButtonPressed False (gameState (1, 1, 0)) `shouldBe` gameState (1, 1, 0)
 
               describe "moves into light" $ do
                   describe "can't move" $ do
                       it "if light would be OoB" $
-                          forwardButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 1)
+                          forwardButtonPressed False (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 1)
                       it "if light would run into another light" $
-                          leftButtonPressed (gameState (2, 1, 2)) `shouldBe` gameState (2, 1, 2)
+                          leftButtonPressed False (gameState (2, 1, 2)) `shouldBe` gameState (2, 1, 2)
                   describe "can move" $ do
                       it "moves the player" $
-                          (upButtonPressed (gameState (2, 2, 0)))^.gameStatePlayer^.playerPosition
+                          (upButtonPressed False (gameState (2, 2, 0)))^.gameStatePlayer^.playerPosition
                               `shouldBe` (2, 1, 0)
                       describe "moves the light" $ do
-                          let gameState' = upButtonPressed (gameState (2, 2, 0))
+                          let gameState' = upButtonPressed False (gameState (2, 2, 0))
                               lights = (gameState')^.gameStateGameMap^.gameMapLights
                           it "has a new light position" $
                               (defLight, (2, 0, 0)) `elem` lights `shouldBe` True
 
               describe "moves into door" $ do
                   it "loads a new room" $
-                      leftButtonPressed (gameState (2, 2, 1))^.gameStateGameMap
+                      leftButtonPressed False (gameState (2, 2, 1))^.gameStateGameMap
                           `shouldBe` mapB
 
               describe "directions" $ do
                   it "left" $ do
-                      leftButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 0)
+                      leftButtonPressed False (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 0)
                   it "right" $ do
-                      rightButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 2)
+                      rightButtonPressed False (gameState (1, 1, 1)) `shouldBe` gameState (1, 1, 2)
                   it "up" $ do
-                      upButtonPressed (gameState (1, 2, 1)) `shouldBe` gameState (1, 1, 1)
+                      upButtonPressed False (gameState (1, 2, 1)) `shouldBe` gameState (1, 1, 1)
                   it "down" $ do
-                      downButtonPressed (gameState (1, 1, 1)) `shouldBe` gameState (1, 2, 1)
+                      downButtonPressed False (gameState (1, 1, 1)) `shouldBe` gameState (1, 2, 1)
                   it "forward" $ do
-                      forwardButtonPressed (gameState (0, 1, 1)) `shouldBe` gameState (1, 1, 1)
+                      forwardButtonPressed False (gameState (0, 1, 1)) `shouldBe` gameState (1, 1, 1)
                   describe "reverse" $ do
                       let gameStateReverse :: Position -> GameState
                           gameStateReverse pos = makeGameState (makePlayer pos Negative) testMap gameMaps
                       it "change directions" $ do
-                          reverseButtonPressed (gameState (1, 1, 1)) `shouldBe`
+                          reverseButtonPressed False (gameState (1, 1, 1)) `shouldBe`
                               gameStateReverse (1, 1, 1)
                       it "forward" $ do
-                          forwardButtonPressed (gameStateReverse (1, 1, 1)) `shouldBe`
+                          forwardButtonPressed False (gameStateReverse (1, 1, 1)) `shouldBe`
                               gameStateReverse (0, 1, 1)

@@ -3,7 +3,7 @@ module GameLogic.PlayerSpec ( spec ) where
 import Test.Hspec
 
 import GameLogic.Types ( Facing(..) )
-import GameLogic.Move ( moveRight )
+import GameLogic.Move ( Move( MoveRight ) )
 
 import GameLogic.Types.Player
     ( Player
@@ -26,7 +26,7 @@ spec =
             testPlayer ^. playerPosition `shouldBe` (1, 1, 1)
 
         it "moves right in the z direction one unit" $ do
-            (playerApplyMove testPlayer moveRight) ^. playerPosition `shouldBe` (1, 1, 2)
+            (playerApplyMove testPlayer MoveRight) ^. playerPosition `shouldBe` (1, 1, 2)
 
         it "faces +x direction" $ do
             testPlayer ^. playerFacing `shouldBe` Positive
@@ -41,4 +41,4 @@ spec =
                 player'' ^. playerFacing `shouldBe` Positive
 
             it "reverses left/right for the z direction" $ do
-                (playerApplyMove player' moveRight) ^. playerPosition `shouldBe` (1, 1, 0)
+                (playerApplyMove player' MoveRight) ^. playerPosition `shouldBe` (1, 1, 0)
