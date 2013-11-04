@@ -5,6 +5,7 @@ import Test.Hspec
 import GameLogic.Types ( GridBead(..)
                        , Facing(..)
                        , Door(..)
+                       , Gate(..)
                        , Light(..)
                        , Position
                        , posZ
@@ -44,6 +45,38 @@ defLight = Light 0 (0, 0, 0)
 
 spec :: Spec
 spec = describe "grid state" $ do
+          describe "gates" $ do
+             let gridNoLightBead =  [ [ [ Empty, GateBead $ Gate (192, 192, 192) ] ] ]
+                 gridLightBead =  [ [ [ Empty, LightBead $ Light 0 (255, 255, 255) , GateBead $ Gate (192, 192, 192) ] ] ]
+
+                 gameState ambient playerPos grid = makeGameState (makePlayer playerPos Positive) gameMap gameMaps
+                   where
+                     gameMap = makeGameMap grid "map" ambient
+                     gameMaps = [ ("map", gameMap) ]
+
+             describe "gate closed" $ do
+                 let ambient = 128
+                     gameState' = gameState ambient (0, 0, 0)
+                 it "player cannot walk through" $
+                     rightButtonPressed (gameState' gridNoLightBead)
+                        `shouldBe` gameState' gridNoLightBead
+                 it "player cannot push lightbead through" $
+                     rightButtonPressed (gameState' gridLightBead)
+                        `shouldBe` gameState' gridLightBead
+
+             describe "gate open" $ do
+                 let ambient = 192
+                     gameState' = gameState ambient
+                 it "player can walk through" $
+                     rightButtonPressed (gameState' (0, 0, 0) gridNoLightBead)
+                        `shouldBe` gameState ambient (0, 0, 1) gridNoLightBead
+                 describe "player can push lightbead through" $ do
+                     let gameState'' = rightButtonPressed (gameState' (0, 0, 0) gridLightBead)
+                     it "player moved" $ do
+                         gameState''^.gameStatePlayer^.playerPosition^.posZ `shouldBe` 1
+                     it "light moved" $ do
+                         (snd . head $ gameState''^.gameStateGameMap^.gameMapLights)^.posZ `shouldBe` 2
+
           describe "load new room" $ do
              let gridA :: Grid GridBead
                  doorBeadA = DoorBead $ Door "mapB" "a" (0, 0, 0)
