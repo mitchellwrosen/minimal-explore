@@ -16,6 +16,7 @@ import GameLogic.View.Light ( phongLighting
 import GameLogic.GameMap ( gameMapGrid
                          , gameMapLights
                          , gameMapAmbientLight
+                         , GameMap
                          )
 import GameLogic.Player ( playerPosition
                         , playerFacing
@@ -23,7 +24,8 @@ import GameLogic.Player ( playerPosition
 import GameLogic.Grid ( gridDimensions
                       , gridGet
                       )
-import GameLogic.Types ( GridY
+import GameLogic.Types ( GridX
+                       , GridY
                        , GridZ
                        , posX
                        , posZ
@@ -86,6 +88,11 @@ getBeadView gameState = viewSection
                   then viewSection'
                   else map reverse viewSection'
 
+lightAt :: GameMap -> GridX -> GridY -> GridZ -> Maybe Light
+lightAt gameMap x y z = fromList (map fst lights)
+  where
+    lights = filter (\(_, pos) -> pos == (x, y, z)) $ gameMap^.gameMapLights
+
 getView :: GameState -> [[(BeadColor, [(Light, Int)])]]
 getView gameState =
     mapInd (mapInd . beadColor) (getBeadView gameState)
@@ -120,11 +127,13 @@ getView gameState =
                     else subtract 1
 
             xDistance' dist index =
-                case xSlice !! index of
-                    Wall -> (dist, Wall)
-                    door@(DoorBead _) -> (dist, door)
-                    gate@(GateBead _) -> (dist, gate)
-                    _ -> xDistance' (dist + 1) (delta index)
+                case lightAt gameMap (index - 1) y z of
+                    Just light -> (dist, LightBead light)
+                    _ -> case xSlice !! index of
+                            Wall -> (dist, Wall)
+                            door@(DoorBead _) -> (dist, door)
+                            gate@(GateBead _) -> (dist, gate)
+                            _ -> xDistance' (dist + 1) (delta index)
 
             xDistance :: Int -> (Int, GridBead)
             xDistance = xDistance' 0
@@ -134,26 +143,22 @@ getView gameState =
     beadColor :: GridY -> GridZ -> GridBead -> (BeadColor, [(Light, Int)])
     beadColor beadY beadZ' _
         | (beadY, beadZ) == (playerY, playerZ) = (PlayerColor, nearbyLightBeads')
-        | lightIsAt beadY beadZ = lightBeadColor
-        | otherwise     = staticBeadColor
+        | otherwise = case lightAt gameMap playerX beadY beadZ of
+                        Just (Light _ color) -> (LightColor color, [])
+                        _ -> staticBeadColor
       where
-        lightIsAt y = isJust . lightAt y
         nearbyLightBeads' = nearbyLightBeads beadY beadZ
 
-        lightAt :: GridY -> GridZ -> Maybe (Light, Position)
-        lightAt y z = fromList lights
-          where
-            lights = filter (\(_, pos) -> pos == (playerX, y, z)) $ gameMap^.gameMapLights
-
         lightBeadColor =
-            let Just (Light _ color, _) = lightAt beadY beadZ
+            let Just (Light _ color) = lightAt gameMap playerX beadY beadZ
             in  (LightColor color, [])
 
         staticBeadColor = case bead of
             Wall         -> (WallColor dist, nearbyLightBeads')
-            (DoorBead _) -> (DoorColor dist, nearbyLightBeads')
-            (GateBead _) -> (GateColor dist, nearbyLightBeads')
-            _ -> error "Does not calculate BeadColors of LightBeads or Emptys"
+            DoorBead _ -> (DoorColor dist, nearbyLightBeads')
+            GateBead _ -> (GateColor dist, nearbyLightBeads')
+            LightBead light -> (LightColor $ lightColor light, [])
+            _ -> error "Does not calculate BeadColors of Emptys"
           where
             (dist, bead) = xDistanceToBead beadY beadZ
 

@@ -45,13 +45,8 @@ phongLighting diffuseConstant ambientColor lights = color
     multTriple = opTriple (*)
 
 beadDiffuse :: BeadColor -> (Double, Double, Double)
-beadDiffuse (EmptyColor)  = (1.0, 1.0, 1.0)
 beadDiffuse (PlayerColor) = (1.0, 0.1, 0.1)
-beadDiffuse (WallColor dist) =
-    case dist of
-        0 -> (0.1, 0.1, 0.1)
-        1 -> (0.4, 0.4, 0.4)
-        _ -> (0.5, 0.5, 0.5)
+beadDiffuse (WallColor _) = (0.1, 0.1, 0.1)
 beadDiffuse (DoorColor _) = (1.0, 1.0, 1.0)
 beadDiffuse (GateColor _) = (1.0, 1.0, 1.0)
-beadDiffuse _ = error "DoorBeads do not have a bead diffuse"
+beadDiffuse _ = error "Empty/Light Beads do not have a bead diffuse"
