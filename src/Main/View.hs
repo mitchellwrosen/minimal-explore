@@ -11,6 +11,8 @@ import Main.Perlenspiel ( psBeadColor
                         , psGlyphAlpha
                         , psGlyphColor
                         , psAll
+                        , psStatusColor
+                        , psStatusText
                         )
 
 import GameLogic.Types ( GridBead(..)

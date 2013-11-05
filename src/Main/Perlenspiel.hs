@@ -86,3 +86,12 @@ psGlyphColor' = ffi "PS.glyphColor(%1, %2, %3)"
 
 psGlyphColor :: Int -> Int -> Color -> Fay ()
 psGlyphColor x y color = psGlyphColor' x y (Color.toList color)
+
+psStatusText :: String -> Fay ()
+psStatusText = ffi "PS.statusText(%1)"
+
+psStatusColor' :: [Int] -> Fay ()
+psStatusColor' = ffi "PS.statusColor(%1)"
+
+psStatusColor :: Color -> Fay ()
+psStatusColor color = psStatusColor' $ Color.toList color
