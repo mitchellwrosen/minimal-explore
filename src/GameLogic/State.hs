@@ -3,6 +3,7 @@ module GameLogic.State ( leftButtonPressed
                        , upButtonPressed
                        , downButtonPressed
                        , forwardButtonPressed
+                       , backwardButtonPressed
                        , reverseButtonPressed
                        ) where
 

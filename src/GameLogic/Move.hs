@@ -20,6 +20,7 @@ data Move = MoveUp
           | MoveLeft
           | MoveRight
           | MoveForward
+          | MoveBackward
 
 applyMove :: Move -> Facing -> Position -> Position
 applyMove (MoveUp) = moveUp
@@ -27,13 +28,15 @@ applyMove (MoveDown) = moveDown
 applyMove (MoveLeft) = moveLeft
 applyMove (MoveRight) = moveRight
 applyMove (MoveForward) = moveForward
+applyMove (MoveBackward) = moveBackward
 
 oppositeMove :: Move -> Move
 oppositeMove (MoveUp) = MoveDown
 oppositeMove (MoveDown) = MoveUp
 oppositeMove (MoveLeft) = MoveRight
 oppositeMove (MoveRight) = MoveLeft
-oppositeMove (MoveForward) = MoveForward
+oppositeMove (MoveForward) = MoveBackward
+oppositeMove (MoveBackward) = MoveForward
 
 moveForward :: Facing -> Position -> Position
 moveForward facing (x, y, z) = (delta x, y, z)
@@ -41,6 +44,13 @@ moveForward facing (x, y, z) = (delta x, y, z)
     delta = if facing == Positive
             then (+ 1)
             else subtract 1
+
+moveBackward :: Facing -> Position -> Position
+moveBackward facing (x, y, z) = (delta x, y, z)
+  where
+    delta = if facing == Positive
+            then subtract 1
+            else (+ 1)
 
 moveUp :: Facing -> Position -> Position
 moveUp _ (x, y, z) = (x, y - 1, z)

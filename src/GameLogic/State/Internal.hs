@@ -3,6 +3,7 @@ module GameLogic.State.Internal ( leftButtonPressed
                                 , upButtonPressed
                                 , downButtonPressed
                                 , forwardButtonPressed
+                                , backwardButtonPressed
                                 , reverseButtonPressed
                                 , loadNewRoom
                                 , processLightMove
@@ -148,6 +149,9 @@ downButtonPressed = processPlayerMove MoveDown
 
 forwardButtonPressed :: Bool -> GameState -> GameState
 forwardButtonPressed = processPlayerMove MoveForward
+
+backwardButtonPressed :: Bool -> GameState -> GameState
+backwardButtonPressed = processPlayerMove MoveBackward
 
 reverseButtonPressed :: Bool -> GameState -> GameState
 reverseButtonPressed _ = over gameStatePlayer playerChangeDirection

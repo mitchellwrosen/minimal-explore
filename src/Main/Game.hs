@@ -44,6 +44,7 @@ import GameLogic.State ( leftButtonPressed
                        , upButtonPressed
                        , downButtonPressed
                        , forwardButtonPressed
+                       , backwardButtonPressed
                        , reverseButtonPressed
                        )
 
@@ -94,8 +95,10 @@ main = do
                        65 -> leftButtonPressed
                        83 -> downButtonPressed
                        68 -> rightButtonPressed
-                       32 -> forwardButtonPressed
-                       74 -> reverseButtonPressed
+                       1006 -> forwardButtonPressed
+                       1005 -> reverseButtonPressed
+                       1007 -> reverseButtonPressed
+                       1008 -> backwardButtonPressed
                        _ -> \_ -> id
                 pullKeyDown = shift
             modifyRef stateRef (move pullKeyDown)
