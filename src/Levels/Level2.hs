@@ -1,6 +1,6 @@
 module Levels.Level2 (gameMap) where
 
-import Prelude ( ($) )
+import Prelude
 
 import GameLogic.GameMap ( GameMap
                          , makeGameMap
@@ -20,8 +20,8 @@ grid = [ [ [ Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty ]
          , [ Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty ]
          ]
        , [ [ Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty ]
-         , [ Empty, Wall, Empty, Empty, Empty, Empty, Empty, Empty, Empty ]
-         , [ Empty, Wall, Empty, Empty, Empty, Empty, Empty, Empty, Empty ]
+         , [ Empty, Wall, TextBead "Hello" (255, 255, 255), Empty, Empty, Empty, Empty, Empty, Empty ]
+         , [ Empty, Wall, TextBead "World" (255, 255, 255), Empty, Empty, Empty, Empty, Empty, Empty ]
          , [ Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, DoorBead $ Door "level1" "a" (192, 192, 192)]
          , [ Empty, Empty, Empty, Empty, Empty, Empty, Empty, LightBead $ Light 3 (255, 255, 255), Empty ]
          , [ Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty ]

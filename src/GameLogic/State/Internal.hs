@@ -23,6 +23,7 @@ import GameLogic.View ( getColorViewAt
 import GameLogic.Grid ( gridGet
                       )
 import GameLogic.Types ( GridBead(..)
+                       , isEmpty
                        , Light(..)
                        , Door(..)
                        , Gate(..)
@@ -71,13 +72,14 @@ isGateOpen gameState position gate =
 
 processLightMove :: GameState -> GameState -> (Light, Position) -> Move -> GameState
 processLightMove defGameState playerMovedGameState light@(_, pos) move =
-    case gridBead of
-        Empty -> resolveLightBeadCollisions
-        GateBead gate ->
-            if isGateOpen defGameState pos' gate
-            then resolveLightBeadCollisions
-            else defGameState
-        _     -> defGameState
+    if isEmpty gridBead
+    then resolveLightBeadCollisions
+    else case gridBead of
+            GateBead gate ->
+                if isGateOpen defGameState pos' gate
+                then resolveLightBeadCollisions
+                else defGameState
+            _     -> defGameState
   where
     facing = defGameState^.gameStatePlayer^.playerFacing
     pos' = applyMove move facing pos
@@ -92,18 +94,19 @@ processLightMove defGameState playerMovedGameState light@(_, pos) move =
 
 processPlayerMove :: Move -> Bool -> GameState -> GameState
 processPlayerMove move pullButtonPressed gameState =
-    case gridBead of
-        Empty -> pullLightBead resolveLightBeadCollisions
-        doorBead@(DoorBead door) -> if isDoorOpen door
-                                    then pullLightBead $ loadNewRoom gameState doorBead
-                                    else gameState
-        GateBead gate -> if isGateOpen gameState (player'^.playerPosition) gate
-                         then pullLightBead gameState'
-                         else if length lights == 1
-                              then pullLightBead resolveLightBeadCollisions
-                              else gameState
-        Wall -> gameState
-        _ -> error "Should not contain light beads"
+    if isEmpty gridBead
+    then pullLightBead resolveLightBeadCollisions
+    else case gridBead of
+            doorBead@(DoorBead door) -> if isDoorOpen door
+                                        then pullLightBead $ loadNewRoom gameState doorBead
+                                        else gameState
+            GateBead gate -> if isGateOpen gameState (player'^.playerPosition) gate
+                             then pullLightBead gameState'
+                             else if length lights == 1
+                                  then pullLightBead resolveLightBeadCollisions
+                                  else gameState
+            Wall -> gameState
+            _ -> error "Should not contain light beads"
   where
     pullLightBead :: GameState -> GameState
     pullLightBead gs =

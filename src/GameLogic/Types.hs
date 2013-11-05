@@ -1,10 +1,6 @@
 module GameLogic.Types where
 
-import Prelude ( Int
-               , Show
-               , Eq
-               , String
-               )
+import Prelude
 import Control.Lens ( Lens(..)
                     )
 
@@ -46,10 +42,16 @@ doorId = Lens { view = _doorId
 
 data GridBead = Wall
               | Empty
+              | TextBead String Color
               | LightBead Light
               | DoorBead Door
               | GateBead Gate
   deriving (Show, Eq)
+
+isEmpty :: GridBead -> Bool
+isEmpty Empty = True
+isEmpty (TextBead _ _) = True
+isEmpty _ = False
 
 type Color = (Byte, Byte, Byte)
 type DistanceX = Int

@@ -13,13 +13,11 @@ module Main.Perlenspiel ( setPSEvent
                         , psGlyphColor
                         , psAll
                         , psRadius
+                        , psStatusText
+                        , psStatusColor
                         ) where
 
-import Prelude ( String
-               , Int
-               , Bool
-               , Fay
-               )
+import Prelude
 
 import qualified GameLogic.Color as Color
 import GameLogic.Types ( GridX
