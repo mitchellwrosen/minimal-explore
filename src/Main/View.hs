@@ -31,7 +31,9 @@ import GameLogic.GameMap ( GameMap
                          , gameMapGrid
                          , gameMapLights
                          )
-import GameLogic.Grid ( gridDimensions )
+import GameLogic.Grid ( gridDimensions
+                      , gridGet
+                      )
 import GameLogic.Player ( Player
                         , playerFacing
                         , playerPosition
@@ -61,6 +63,8 @@ drawMap gameState = do
     mapMInd_ (mapMInd_ . flip colorBorders) beadView
     mapMInd_ lightRadii lights
     psRadius playerZ playerY 50
+    psStatusColor statusColor
+    psStatusText statusText
   where
     colorView = getColorView gameState
     beadView = getBeadView gameState
@@ -70,8 +74,14 @@ drawMap gameState = do
         Positive -> z
         Negative -> maxZ - z - 1
 
-    (playerX, playerY, playerZ') = gameState ^. gameStatePlayer ^. playerPosition
+    (playerX, playerY, playerZ') = gameState^.gameStatePlayer^.playerPosition
+    pos = (playerX, playerY, playerZ')
     playerZ = maybeInvertZ playerZ'
+
+    maybeGridBead = gridGet (gameState^.gameStateGameMap^.gameMapGrid) pos
+    (statusText, statusColor) = case maybeGridBead of
+        Just (TextBead text color) -> (text, color)
+        _ -> ("", (0, 0, 0))
 
     lights = filter (\(_, (x, _, _)) -> x == playerX) $ gameState^.gameStateGameMap^.gameMapLights
     lightRadii _ (_, (_, y, z)) = psRadius (maybeInvertZ z) y 25
