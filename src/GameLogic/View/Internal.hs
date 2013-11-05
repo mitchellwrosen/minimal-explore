@@ -47,7 +47,6 @@ import Control.Lens ( (^.)
                     )
 import Data.Util.Maybe ( fromMaybe
                        , fromList
-                       , isJust
                        )
 import Data.Util.List ( mapInd )
 import Data.Util.Math ( distance )
@@ -148,10 +147,6 @@ getView gameState =
                         _ -> staticBeadColor
       where
         nearbyLightBeads' = nearbyLightBeads beadY beadZ
-
-        lightBeadColor =
-            let Just (Light _ color) = lightAt gameMap playerX beadY beadZ
-            in  (LightColor color, [])
 
         staticBeadColor = case bead of
             Wall         -> (WallColor dist, nearbyLightBeads')

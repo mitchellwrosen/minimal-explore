@@ -58,19 +58,12 @@ spec =
                 ir (lightIntensity $ light 4) `shouldBe` 0.0
 
         describe "beadDiffuse" $ do
-            it "EmptyColor" $
-                beadDiffuse EmptyColor `shouldBe` (1.0, 1.0, 1.0)
             it "PlayerColor" $
                 beadDiffuse PlayerColor `shouldBe` (1.0, 0.1, 0.1)
             it "DoorColor" $
                 beadDiffuse (DoorColor 0) `shouldBe` (1.0, 1.0, 1.0)
-            describe "WallColor" $ do
-                it "players plane" $
-                    beadDiffuse (WallColor 0) `shouldBe` (0.1, 0.1, 0.1)
-                it "far away" $
-                    beadDiffuse (WallColor 5) `shouldBe` (0.5, 0.5, 0.5)
-                it "close by" $
-                    beadDiffuse (WallColor 1) `shouldBe` (0.4, 0.4, 0.4)
+            it "WallColor" $
+                beadDiffuse (WallColor 0) `shouldBe` (0.1, 0.1, 0.1)
 
         describe "phongLighting" $ do
             let ambient@(ar, ag, ab) = (8, 9, 10)

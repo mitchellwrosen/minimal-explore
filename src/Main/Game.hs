@@ -55,7 +55,6 @@ main = do
     let player = makePlayer (1, 1, 2) Positive
         gameState = makeGameState player Levels.Level2.gameMap Levels.GameMaps.gameMaps
     stateRef <- newRef gameState
-    modKeyRef <- newRef False
 
     let psInit :: Fay ()
         psInit = do
@@ -84,26 +83,26 @@ main = do
         psInput = return ()
 
         psKeyDown :: KeyValue -> Bool -> Bool -> Fay ()
-        psKeyDown keyValue shift ctrl = do
-            if keyValue == 75
-            then writeRef modKeyRef True
-            else do
-                 let move = case keyValue of
-                            87 -> upButtonPressed
-                            65 -> leftButtonPressed
-                            83 -> downButtonPressed
-                            68 -> rightButtonPressed
-                            32 -> forwardButtonPressed
-                            74 -> reverseButtonPressed
-                            _ -> \_ -> id
-                 shouldPull <- readRef modKeyRef
-                 modifyRef stateRef (move shouldPull)
-                 readRef stateRef >>= drawMap
+        psKeyDown keyValue' shift ctrl = do
+            let -- Convert the keyvalue to lowercase first.
+                keyValue =
+                    if keyValue' >= 65 + 32 && keyValue' <= 90 + 32 
+                    then keyValue' - 32
+                    else keyValue'
+                move = case keyValue of
+                       87 -> upButtonPressed
+                       65 -> leftButtonPressed
+                       83 -> downButtonPressed
+                       68 -> rightButtonPressed
+                       32 -> forwardButtonPressed
+                       74 -> reverseButtonPressed
+                       _ -> \_ -> id
+                pullKeyDown = shift
+            modifyRef stateRef (move pullKeyDown)
+            readRef stateRef >>= drawMap
 
         psKeyUp :: KeyValue -> Bool -> Bool -> Fay ()
-        psKeyUp keyValue shift ctrl =
-            when (keyValue == 75) $
-                writeRef modKeyRef False
+        psKeyUp keyValue shift ctrl = return ()
 
     setPSEvent "init" psInit
     setPSEvent "exitGrid" psExitGrid
