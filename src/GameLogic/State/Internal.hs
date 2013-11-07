@@ -116,8 +116,9 @@ processPlayerMove move pullButtonPressed gameState =
             lights' = filter ((== pos') . snd) $ gameMap^.gameMapLights
             playerMoved = pos /= gs^.gameStatePlayer^.playerPosition
             hasLightToMove = length lights' == 1
+            didn'tPushLight = gameState' == gs
 
-        in  if pullButtonPressed && playerMoved && hasLightToMove
+        in  if pullButtonPressed && playerMoved && hasLightToMove && didn'tPushLight
             then over gameStateGameMap
                (\gm -> gameMapApplyMoveLight gm (head lights') facing move) gs
             else gs
