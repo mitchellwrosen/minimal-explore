@@ -2,48 +2,55 @@ module Main.View (drawMap) where
 
 import Prelude
 
-import Main.Perlenspiel ( psBeadColor
-                        , psBorderWidth
-                        , psBorderColor
-                        , psRadius
-                        , psGlyph
-                        , psGlyphFade
-                        , psGlyphAlpha
-                        , psGlyphColor
-                        , psAll
-                        , psStatusColor
-                        , psStatusText
-                        )
+import Main.Perlenspiel
+    ( psBeadColor
+    , psBorderWidth
+    , psBorderColor
+    , psRadius
+    , psGlyph
+    , psGlyphFade
+    , psGlyphAlpha
+    , psGlyphColor
+    , psAll
+    , psStatusColor
+    , psStatusText
+    )
 
-import GameLogic.Types ( GridBead(..)
-                       , Door(..)
-                       , Gate(..)
-                       , posZ
-                       , Facing(..)
-                       )
+import GameLogic.Types
+    ( GridBead(..)
+    , Door(..)
+    , Gate(..)
+    , posZ
+    , Facing(..)
+    )
 
 import GameLogic.Types.GameState
     ( GameState(..)
     , gameStateGameMap
     , gameStatePlayer
     )
-import GameLogic.GameMap ( GameMap
-                         , gameMapGrid
-                         , gameMapLights
-                         )
-import GameLogic.Grid ( gridDimensions
-                      , gridGet
-                      )
-import GameLogic.Player ( Player
-                        , playerFacing
-                        , playerPosition
-                        )
-import GameLogic.View ( getColorView
-                      , getBeadView
-                      )
+import GameLogic.GameMap
+    ( GameMap
+    , gameMapGrid
+    , gameMapLights
+    )
+import GameLogic.Grid
+    ( gridDimensions
+    , gridGet
+    )
+import GameLogic.Player
+    ( Player
+    , playerFacing
+    , playerPosition
+    )
+import GameLogic.View
+    ( getColorView
+    , getBeadView
+    )
 
-import Control.Lens ( (^.)
-                    )
+import Control.Lens
+    ( (^.)
+    )
 
 mapMInd_ :: (Int -> a -> Fay b) -> [a] -> Fay ()
 mapMInd_ f = zipWithM_ f [0..]
