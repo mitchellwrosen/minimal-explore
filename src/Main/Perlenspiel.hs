@@ -1,32 +1,34 @@
-module Main.Perlenspiel ( setPSEvent
-                        , setPSMouseEvent
-                        , setPSMouseWheelEvent
-                        , setPSKeyEvent
-                        , psGridSize
-                        , psGridColor
-                        , psBeadColor
-                        , psBorderColor
-                        , psBorderWidth
-                        , psGlyph
-                        , psGlyphFade
-                        , psGlyphAlpha
-                        , psGlyphColor
-                        , psAll
-                        , psRadius
-                        , psStatusText
-                        , psStatusColor
-                        ) where
+module Main.Perlenspiel
+    ( setPSEvent
+    , setPSMouseEvent
+    , setPSMouseWheelEvent
+    , setPSKeyEvent
+    , psGridSize
+    , psGridColor
+    , psBeadColor
+    , psBorderColor
+    , psBorderWidth
+    , psGlyph
+    , psGlyphFade
+    , psGlyphAlpha
+    , psGlyphColor
+    , psAll
+    , psRadius
+    , psStatusText
+    , psStatusColor
+    ) where
 
 import Prelude
 
 import qualified GameLogic.Color as Color
-import GameLogic.Types ( GridX
-                       , GridY
-                       , BeadData
-                       , KeyValue
-                       , MWheelDelta
-                       , Color(..)
-                       )
+import GameLogic.Types
+    ( GridX
+    , GridY
+    , BeadData
+    , KeyValue
+    , MWheelDelta
+    , Color(..)
+    )
 
 import FFI (ffi)
 

@@ -2,31 +2,35 @@ module Main.Game () where
 
 import Prelude
 
-import Main.View ( drawMap
-                 )
-import Main.Ref ( modifyRef
-                , newRef
-                , readRef
-                , writeRef
-                )
-import Main.Perlenspiel ( setPSEvent
-                        , setPSMouseEvent
-                        , setPSKeyEvent
-                        , psGridSize
-                        , psGridColor
-                        )
+import Main.View
+    ( drawMap
+    )
+import Main.Ref
+    ( modifyRef
+    , newRef
+    , readRef
+    , writeRef
+    )
+import Main.Perlenspiel
+    ( setPSEvent
+    , setPSMouseEvent
+    , setPSKeyEvent
+    , psGridSize
+    , psGridColor
+    )
 
 import qualified Levels.Level2
 import qualified Levels.GameMaps
-import GameLogic.Types ( GridX
-                       , GridY
-                       , GridZ
-                       , KeyValue
-                       , MWheelDelta
-                       , BeadData
-                       , GridBead(..)
-                       , Facing(..)
-                       )
+import GameLogic.Types
+    ( GridX
+    , GridY
+    , GridZ
+    , KeyValue
+    , MWheelDelta
+    , BeadData
+    , GridBead(..)
+    , Facing(..)
+    )
 import GameLogic.Types.Player
     ( makePlayer
     )
@@ -34,21 +38,25 @@ import GameLogic.Types.GameState
     ( makeGameState
     , gameStateGameMap
     )
-import GameLogic.Grid ( Grid(..)
-                      , gridDimensions
-                      )
-import GameLogic.GameMap ( gameMapGrid
-                         )
-import GameLogic.State ( leftButtonPressed
-                       , rightButtonPressed
-                       , upButtonPressed
-                       , downButtonPressed
-                       , forwardButtonPressed
-                       , backwardButtonPressed
-                       , reverseButtonPressed
-                       )
+import GameLogic.Grid
+    ( Grid(..)
+    , gridDimensions
+    )
+import GameLogic.GameMap
+    ( gameMapGrid
+    )
+import GameLogic.State
+    ( leftButtonPressed
+    , rightButtonPressed
+    , upButtonPressed
+    , downButtonPressed
+    , forwardButtonPressed
+    , backwardButtonPressed
+    , reverseButtonPressed
+    )
 
-import Control.Lens ( (^.) )
+import Control.Lens
+    ( (^.) )
 
 -- Everything is in main for the beautiful closure that it offers over stateRef.
 main :: Fay ()
@@ -84,7 +92,10 @@ main = do
         psInput = return ()
 
         psKeyDown :: KeyValue -> Bool -> Bool -> Fay ()
-        psKeyDown keyValue' shift ctrl = do
+        psKeyDown keyValue' shift ctrl = return ()
+
+        psOnKeyDown :: KeyValue -> Bool -> Bool -> Fay ()
+        psOnKeyDown keyValue' shift ctrl = do
             let -- Convert the keyvalue to lowercase first.
                 keyValue =
                     if keyValue' >= 65 + 32 && keyValue' <= 90 + 32 
@@ -114,5 +125,6 @@ main = do
     setPSMouseEvent "release" psRelease
     setPSMouseEvent "enter" psEnter
     setPSMouseEvent "exit" psExit
+    setPSKeyEvent "onKeyDown" psOnKeyDown
     setPSKeyEvent "keyDown" psKeyDown
     setPSKeyEvent "keyUp" psKeyUp
