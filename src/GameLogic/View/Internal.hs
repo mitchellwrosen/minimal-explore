@@ -69,8 +69,10 @@ getColorView gameState = map (map calculateBeadColor) $ getView gameState
 
     calculateBeadColor :: (BeadColor, [(Light, Int)]) -> Color
     calculateBeadColor (LightColor color, _) = color
-    calculateBeadColor (beadColor, lights) =
-        phongLighting (beadDiffuse beadColor) (ambientColor maxLight beadColor) lights
+    calculateBeadColor (beadColor, lights) = color
+      where
+        (r, g, b) = phongLighting (beadDiffuse beadColor) (ambientColor maxLight beadColor) lights
+        color = (min r 255, min g 255, min b 255)
 
 isPositiveFacing :: GameState -> Bool
 isPositiveFacing gameState =
