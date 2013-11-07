@@ -41,6 +41,11 @@ along with Perlenspiel. If not, see <http://www.gnu.org/licenses/>.
 		You can add additional script elements as needed.
 		Altering this file in any other way can result in breakage!
 		-->
+      <script type="text/javascript">
+         document.onkeydown = function(e) {
+            PS.onKeyDown(e.which, e.shiftKey, e.ctrlKey);
+         };
+      </script>
 		<script src="gen/game.js" type="text/javascript"></script>
 	</body>
 </html>
