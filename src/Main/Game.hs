@@ -21,6 +21,8 @@ import qualified Levels.GameMaps
 import GameLogic.Types ( GridX
                        , GridY
                        , GridZ
+                       , posY
+                       , posZ
                        , KeyValue
                        , MWheelDelta
                        , BeadData
@@ -85,6 +87,7 @@ main = do
 
         psKeyDown :: KeyValue -> Bool -> Bool -> Fay ()
         psKeyDown keyValue' shift ctrl = do
+            state <- readRef stateRef
             let -- Convert the keyvalue to lowercase first.
                 keyValue =
                     if keyValue' >= 65 + 32 && keyValue' <= 90 + 32 
@@ -101,8 +104,13 @@ main = do
                        1008 -> backwardButtonPressed
                        _ -> \_ -> id
                 pullKeyDown = shift
-            modifyRef stateRef (move pullKeyDown)
-            readRef stateRef >>= drawMap
+                state' = move pullKeyDown state
+                gridDims' = gridDimensions (state'^.gameStateGameMap^.gameMapGrid)
+            writeRef stateRef state'
+            when (gridDims' /= gridDimensions (state^.gameStateGameMap^.gameMapGrid)) $ do
+                psGridSize (gridDims'^.posZ) (gridDims'^.posY)
+                psGridColor (15, 15, 15)
+            drawMap state'
 
         psKeyUp :: KeyValue -> Bool -> Bool -> Fay ()
         psKeyUp keyValue shift ctrl = return ()
