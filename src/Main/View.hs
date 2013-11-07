@@ -21,6 +21,7 @@ import GameLogic.Types
     , Door(..)
     , Gate(..)
     , posZ
+    , makeColor
     , Facing(..)
     )
 
@@ -61,7 +62,7 @@ zipWithM_ f xs ys = sequence_ (zipWith f xs ys)
 drawMap :: GameState -> Fay ()
 drawMap gameState = do
     psBorderWidth psAll psAll 2
-    psBorderColor psAll psAll (15, 15, 15)
+    psBorderColor psAll psAll $ makeColor (15, 15, 15)
     psRadius psAll psAll 0
     psGlyphAlpha psAll psAll 0
     psGlyphFade psAll psAll 0
@@ -88,7 +89,7 @@ drawMap gameState = do
     maybeGridBead = gridGet (gameState^.gameStateGameMap^.gameMapGrid) pos
     (statusText, statusColor) = case maybeGridBead of
         Just (TextBead text color) -> (text, color)
-        _ -> ("", (0, 0, 0))
+        _ -> ("", makeColor (0, 0, 0))
 
     lights = filter (\(_, (x, _, _)) -> x == playerX) $ gameState^.gameStateGameMap^.gameMapLights
     lightRadii _ (_, (_, y, z)) = psRadius (maybeInvertZ z) y 25
@@ -98,7 +99,7 @@ drawMap gameState = do
             psBorderWidth x y 8
             psBorderColor x y (doorColor door)
 
-            psGlyphColor x y (88, 0, 178)
+            psGlyphColor x y $ makeColor (88, 0, 178)
             psGlyph x y "Q"
             psGlyphFade x y 60
 

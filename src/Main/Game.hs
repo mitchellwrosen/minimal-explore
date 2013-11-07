@@ -30,6 +30,7 @@ import GameLogic.Types
     , KeyValue
     , MWheelDelta
     , BeadData
+    , makeColor
     , GridBead(..)
     , Facing(..)
     )
@@ -72,7 +73,7 @@ main = do
             gameState <- readRef stateRef
             let (_, viewHeight, viewWidth) = gridDimensions (gameState^.gameStateGameMap^.gameMapGrid)
             psGridSize viewWidth viewHeight
-            psGridColor (15, 15, 15)
+            psGridColor $ makeColor (15, 15, 15)
             drawMap gameState
 
         psTouch :: GridX -> GridY -> BeadData -> Fay ()
@@ -120,7 +121,7 @@ main = do
             writeRef stateRef state'
             when (gridDims' /= gridDimensions (state^.gameStateGameMap^.gameMapGrid)) $ do
                 psGridSize (gridDims'^.posZ) (gridDims'^.posY)
-                psGridColor (15, 15, 15)
+                psGridColor $ makeColor (15, 15, 15)
             drawMap state'
 
         psKeyUp :: KeyValue -> Bool -> Bool -> Fay ()

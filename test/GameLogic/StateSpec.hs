@@ -2,18 +2,22 @@ module GameLogic.StateSpec ( spec ) where
 
 import Test.Hspec
 
-import GameLogic.Types ( GridBead(..)
-                       , Facing(..)
-                       , Door(..)
-                       , Gate(..)
-                       , Light(..)
-                       , Position
-                       , posZ
-                       )
-import GameLogic.Grid ( Grid )
-import GameLogic.GameMap ( makeGameMap
-                         , gameMapLights
-                         )
+import GameLogic.Types
+    ( GridBead(..)
+    , Facing(..)
+    , Door(..)
+    , Gate(..)
+    , Light(..)
+    , Position
+    , posZ
+    , makeColor
+    )
+import GameLogic.Grid
+    ( Grid )
+import GameLogic.GameMap
+    ( makeGameMap
+    , gameMapLights
+    )
 import GameLogic.Types.Player
     ( makePlayer
     , playerPosition
@@ -26,28 +30,31 @@ import GameLogic.Types.GameState
     , gameStateGameMaps
     , gameStateGameMap
     )
-import GameLogic.State ( leftButtonPressed
-                       , rightButtonPressed
-                       , upButtonPressed
-                       , downButtonPressed
-                       , forwardButtonPressed
-                       , reverseButtonPressed
-                       )
-import GameLogic.State.Internal ( loadNewRoom
-                                )
+import GameLogic.State
+    ( leftButtonPressed
+    , rightButtonPressed
+    , upButtonPressed
+    , downButtonPressed
+    , forwardButtonPressed
+    , reverseButtonPressed
+    )
+import GameLogic.State.Internal
+    ( loadNewRoom
+    )
 
-import Control.Lens ( (^.)
-                    , (.~)
-                    )
+import Control.Lens
+    ( (^.)
+    , (.~)
+    )
 
 defLight :: Light
-defLight = Light 0 (0, 0, 0)
+defLight = Light 0 $ makeColor (0, 0, 0)
 
 spec :: Spec
 spec = describe "grid state" $ do
           describe "gates" $ do
-             let gridNoLightBead =  [ [ [ Empty, GateBead $ Gate (192, 192, 192) ] ] ]
-                 gridLightBead =  [ [ [ Empty, LightBead $ Light 0 (255, 255, 255) , GateBead $ Gate (192, 192, 192) ] ] ]
+             let gridNoLightBead =  [ [ [ Empty, GateBead $ Gate $ makeColor (192, 192, 192) ] ] ]
+                 gridLightBead =  [ [ [ Empty, LightBead $ Light 0 $ makeColor (255, 255, 255) , GateBead $ Gate $ makeColor (192, 192, 192) ] ] ]
 
                  gameState ambient playerPos grid = makeGameState (makePlayer playerPos Positive) gameMap gameMaps
                    where
@@ -79,12 +86,12 @@ spec = describe "grid state" $ do
 
           describe "load new room" $ do
              let gridA :: Grid GridBead
-                 doorBeadA = DoorBead $ Door "mapB" "a" (0, 0, 0)
+                 doorBeadA = DoorBead $ Door "mapB" "a" $ makeColor (0, 0, 0)
                  gridA =  [ [ [ doorBeadA ] ] ]
                  gameMapA = makeGameMap gridA "mapA" 255
 
                  gridB :: Grid GridBead
-                 gridB =  [[[ Empty, DoorBead $ Door "mapA" "a" (0, 0, 0) ]]]
+                 gridB =  [[[ Empty, DoorBead $ Door "mapA" "a" $ makeColor (0, 0, 0) ]]]
                  gameMapB = makeGameMap gridB "mapB" 255
 
                  gameMaps = [ ("mapA", gameMapA)
@@ -120,10 +127,10 @@ spec = describe "grid state" $ do
 
                          , [ [ Empty,  Wall,  Wall ]
                            , [ LightBead defLight, LightBead defLight, Empty ]
-                           , [ DoorBead $ Door "new map" "a" (255, 255, 255), Empty, Empty ]
+                           , [ DoorBead $ Door "new map" "a" $ makeColor (255, 255, 255), Empty, Empty ]
                            ]
                          ]
-              gridB = [ [ [ DoorBead $ Door "test" "a" (0, 0, 0) ] ] ]
+              gridB = [ [ [ DoorBead $ Door "test" "a" $ makeColor (0, 0, 0) ] ] ]
               testMap = makeGameMap testGrid "test" 255
               mapB = makeGameMap gridB "new map" 255
               gameMaps = [ ("test", testMap)

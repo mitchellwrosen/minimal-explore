@@ -53,7 +53,31 @@ isEmpty Empty = True
 isEmpty (TextBead _ _) = True
 isEmpty _ = False
 
-type Color = (Byte, Byte, Byte)
+data Color = Color (Byte, Byte, Byte)
+  deriving (Show, Eq)
+
+makeColor :: (Byte, Byte, Byte) -> Color
+makeColor (r, g, b) = Color (clamp r, clamp g, clamp b)
+  where clamp val = min (max 0 val) 255
+
+colorR :: Lens Color Byte
+colorR = Lens
+    { view = \(Color (r, _, _)) -> r
+    , set = \r (Color (_, g, b)) -> makeColor (r, g, b)
+    }
+
+colorG :: Lens Color Byte
+colorG = Lens
+    { view = \(Color (_, g, _)) -> g
+    , set = \g (Color (r, _, b)) -> makeColor (r, g, b)
+    }
+
+colorB :: Lens Color Byte
+colorB = Lens
+    { view = \(Color (_, _, b)) -> b
+    , set = \b (Color (r, g, _)) -> makeColor (r, g, b)
+    }
+
 type DistanceX = Int
 data BeadColor = WallColor DistanceX
                | DoorColor DistanceX

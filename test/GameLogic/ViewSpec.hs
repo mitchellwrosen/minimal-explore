@@ -4,23 +4,29 @@ import Test.Hspec
 
 import GameLogic.Types.Player
     ( makePlayer )
-import GameLogic.Types ( GridBead(..)
-                       , BeadColor(..)
-                       , Light(..)
-                       , Facing(..)
-                       )
+import GameLogic.Types
+    ( GridBead(..)
+    , BeadColor(..)
+    , Light(..)
+    , Facing(..)
+    , makeColor
+    )
 import qualified GameLogic.Color as Color
-import GameLogic.Grid ( Grid )
-import GameLogic.GameMap ( makeGameMap )
+import GameLogic.Grid
+    ( Grid )
+import GameLogic.GameMap
+    ( makeGameMap )
 import GameLogic.Types.GameState
     ( GameState
     , makeGameState
     )
-import GameLogic.View.Internal ( getView
-                               , lightIntensity
-                               , phongLighting
-                               )
-import GameLogic.View.Light ( beadDiffuse )
+import GameLogic.View.Internal
+    ( getView
+    , lightIntensity
+    , phongLighting
+    )
+import GameLogic.View.Light
+    ( beadDiffuse )
 
 import qualified Levels.GameMaps
 
@@ -49,7 +55,7 @@ spec =
             viewAt state x y = map fst (getView state !! x) !! y
 
         describe "lightIntensity" $ do
-            let light dist = (Light 3 (255, 0, 0), dist)
+            let light dist = (Light 3 $ makeColor (255, 0, 0), dist)
                 ir (r, _, _) = r
             it "is at 100% when distance is 0" $ do
                 ir (lightIntensity $ light 0) `shouldBe` 255.0
@@ -66,8 +72,9 @@ spec =
                 beadDiffuse (WallColor 0) `shouldBe` (0.1, 0.1, 0.1)
 
         describe "phongLighting" $ do
-            let ambient@(ar, ag, ab) = (8, 9, 10)
-                lights = [ (Light 3 (255, 255, 255), 2) ]
+            let (ar, ag, ab) = (8, 9, 10)
+                ambient = makeColor (ar, ag, ab)
+                lights = [ (Light 3 $ makeColor (255, 255, 255), 2) ]
                 [(ir, _, ib)] = map lightIntensity lights
             it "0 diffuse means no extra light" $ do
                 phongLighting (0.0, 0.0, 0.0) ambient lights `shouldBe` ambient

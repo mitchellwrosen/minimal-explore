@@ -2,34 +2,40 @@ module GameLogic.GameMapSpec ( spec ) where
 
 import Test.Hspec
 
-import GameLogic.Types ( Door(..)
-                       , GridBead(..)
-                       , Light(..)
-                       , Facing(..)
-                       )
-import GameLogic.Move ( Move( MoveRight ) )
-import GameLogic.GameMap ( makeGameMap
-                         , gameMapGrid
-                         , gameMapName
-                         , gameMapDoors
-                         , gameMapLights
-                         , gameMapAmbientLight
-                         , gameMapApplyMoveLight
-                         , getGameMapFromDoor
-                         , getMatchingDoorPosition
-                         )
+import GameLogic.Types
+    ( Door(..)
+    , GridBead(..)
+    , Light(..)
+    , Facing(..)
+    , makeColor
+    )
+import GameLogic.Move
+    ( Move( MoveRight ) )
+import GameLogic.GameMap
+    ( makeGameMap
+    , gameMapGrid
+    , gameMapName
+    , gameMapDoors
+    , gameMapLights
+    , gameMapAmbientLight
+    , gameMapApplyMoveLight
+    , getGameMapFromDoor
+    , getMatchingDoorPosition
+    )
 
-import Control.Lens ( (^.)
-                    , (.~)
-                    )
-import Control.Exception ( evaluate )
+import Control.Lens
+    ( (^.)
+    , (.~)
+    )
+import Control.Exception
+    ( evaluate )
 
 spec :: Spec
 spec =
     describe "gameMap" $ do
         describe "light movement" $ do
             let name = "mapA"
-                light = Light 255 (255, 255, 255)
+                light = Light 255 $ makeColor (255, 255, 255)
                 grid = [ [ [ LightBead light, Empty, LightBead light ] ] ]
                 gameMap = makeGameMap grid name 255
                 mapLight = head $ gameMap ^. gameMapLights
@@ -42,11 +48,11 @@ spec =
                     `shouldBe` gameMap'
 
         describe "player steps on door" $ do
-            let doorA = DoorBead $ Door "mapB" "unique" (255, 255, 255)
+            let doorA = DoorBead $ Door "mapB" "unique" $ makeColor (255, 255, 255)
                 gridA = [ [ [ doorA ] ] ]
                 gameMapA = makeGameMap gridA "mapA" 255
 
-                doorB = DoorBead $ Door "mapA" "unique" (255, 255, 255)
+                doorB = DoorBead $ Door "mapA" "unique" $ makeColor (255, 255, 255)
                 gridB = [ [ [ doorB ] ] ]
                 gameMapB = makeGameMap gridB "mapB" 255
 
@@ -54,7 +60,7 @@ spec =
                        , (gameMapB^.gameMapName, gameMapB)
                        ]
 
-                badDoor = DoorBead $ Door "mapC" "unique" (255, 255, 255)
+                badDoor = DoorBead $ Door "mapC" "unique" $ makeColor (255, 255, 255)
 
             describe "finding a matching map" $ do
                 it "finds the matching map" $
@@ -68,7 +74,7 @@ spec =
                 getMatchingDoorPosition gameMapA gameMapB doorA `shouldBe` (0, 0, 0)
 
         let name = "mapA"
-            door = Door "mapB" "unique" (255, 255, 255)
+            door = Door "mapB" "unique" $ makeColor (255, 255, 255)
             grid = [ [ [ DoorBead door ] ] ]
             gameMap = makeGameMap grid name 255
         describe "lenses" $ do

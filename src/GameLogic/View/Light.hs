@@ -5,10 +5,15 @@ module GameLogic.View.Light ( phongLighting
 
 import Prelude
 
-import GameLogic.Types ( Color
-                       , BeadColor(..)
-                       , Light(..)
-                       )
+import GameLogic.Types
+    ( Color
+    , makeColor
+    , BeadColor(..)
+    , Light(..)
+    )
+import GameLogic.Color
+    ( toTriple
+    )
 
 zeroTriple :: (Double, Double, Double)
 zeroTriple = (0.0, 0.0, 0.0)
@@ -20,10 +25,11 @@ opTriple :: (a -> a -> a) -> (a, a, a) -> (a, a, a) -> (a, a, a)
 opTriple f (a, b, c) (x, y, z) = (f a x, f b y, f c z)
 
 lightIntensity :: (Light, Int) -> (Double, Double, Double)
-lightIntensity (Light radius (r, g, b), dist)
+lightIntensity (Light radius color, dist)
     | dist > radius = zeroTriple
     | otherwise = (i r, i g, i b)
   where
+    (r, g, b) = toTriple color
     i v = fromIntegral v / fromIntegral (dist + 1)
 
 -- Phong Model
@@ -32,9 +38,9 @@ phongLighting :: (Double, Double, Double) -> Color -> [(Light, Int)] -> Color
 phongLighting diffuseConstant ambientColor lights = color
   where
     color :: Color
-    color = mapTriple round $ addTriple ambientComponent diffuseComponent
+    color = makeColor $ mapTriple round $ addTriple ambientComponent diffuseComponent
 
-    ambientComponent = mapTriple fromIntegral ambientColor
+    ambientComponent = mapTriple fromIntegral (toTriple ambientColor)
     diffuseComponent = multTriple diffuseConstant lightContribution
 
     lightContribution :: (Double, Double, Double)

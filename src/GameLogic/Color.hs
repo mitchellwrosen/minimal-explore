@@ -1,28 +1,41 @@
-module GameLogic.Color ( toList
-                       , fromList
-                       , ambientColor
-                       ) where
+module GameLogic.Color
+    ( toList
+    , toTriple
+    , fromList
+    , ambientColor
+    ) where
 
 import Prelude
 
-import GameLogic.Types ( Color
-                       , Byte
-                       , BeadColor(..)
-                       )
+import GameLogic.Types
+    ( Color
+    , colorR
+    , colorG
+    , colorB
+    , makeColor
+    , Byte
+    , BeadColor(..)
+    )
+import Control.Lens
+    ( (^.) )
+
+toTriple :: Color -> (Byte, Byte, Byte)
+toTriple color = (color^.colorR, color^.colorG, color^.colorB)
 
 toList :: Color -> [Byte]
-toList (r, g, b) = [r, g, b]
+toList color = [r, g, b]
+  where (r, g, b) = toTriple color
 
 fromList :: [Byte] -> Color
-fromList [r, g, b] = (r, g, b)
+fromList [r, g, b] = makeColor (r, g, b)
 fromList _ = error "Badly formed color list"
 
 ambientColor :: Byte -> BeadColor -> Color
-ambientColor maxLight (EmptyColor) = (maxLight, maxLight, maxLight)
-ambientColor maxLight (DoorColor _) = (maxLight, maxLight, maxLight)
-ambientColor maxLight (GateColor _) = (maxLight, maxLight, maxLight)
-ambientColor maxLight (PlayerColor) = (maxLight, 0, 0)
-ambientColor maxLight (WallColor dist) = (wallFadeValue dist, wallFadeValue dist, wallFadeValue dist)
+ambientColor maxLight (EmptyColor) = makeColor (maxLight, maxLight, maxLight)
+ambientColor maxLight (DoorColor _) = makeColor (maxLight, maxLight, maxLight)
+ambientColor maxLight (GateColor _) = makeColor (maxLight, maxLight, maxLight)
+ambientColor maxLight (PlayerColor) = makeColor (maxLight, 0, 0)
+ambientColor maxLight (WallColor dist) = makeColor (wallFadeValue dist, wallFadeValue dist, wallFadeValue dist)
   where
     fadeRatio :: Double -> Int
     fadeRatio num = round $ fromIntegral maxLight * num / 255

@@ -8,48 +8,58 @@ module GameLogic.View.Internal ( getColorView
 
 import Prelude
 
-import GameLogic.View.Light ( phongLighting
-                            , beadDiffuse
-                            , lightIntensity
-                            )
+import GameLogic.View.Light
+    ( phongLighting
+    , beadDiffuse
+    , lightIntensity
+    )
 
-import GameLogic.GameMap ( gameMapGrid
-                         , gameMapLights
-                         , gameMapAmbientLight
-                         , GameMap
-                         )
-import GameLogic.Player ( playerPosition
-                        , playerFacing
-                        )
-import GameLogic.Grid ( gridDimensions
-                      , gridGet
-                      )
-import GameLogic.Types ( GridX
-                       , GridY
-                       , GridZ
-                       , posX
-                       , posZ
-                       , Light(..)
-                       , GridBead(..)
-                       , BeadColor(..)
-                       , Color
-                       , Position
-                       , Facing(..)
-                       )
+import GameLogic.GameMap
+    ( gameMapGrid
+    , gameMapLights
+    , gameMapAmbientLight
+    , GameMap
+    )
+import GameLogic.Player
+    ( playerPosition
+    , playerFacing
+    )
+import GameLogic.Grid
+    ( gridDimensions
+    , gridGet
+    )
+import GameLogic.Types
+    ( GridX
+    , GridY
+    , GridZ
+    , posX
+    , posZ
+    , Light(..)
+    , GridBead(..)
+    , BeadColor(..)
+    , Color
+    , Position
+    , Facing(..)
+    )
 import GameLogic.Types.GameState
     ( GameState
     , gameStateGameMap
     , gameStatePlayer
     )
-import GameLogic.Color ( ambientColor )
+import GameLogic.Color
+    ( ambientColor )
 
-import Control.Lens ( (^.)
-                    )
-import Data.Util.Maybe ( fromMaybe
-                       , fromList
-                       )
-import Data.Util.List ( mapInd )
-import Data.Util.Math ( distance )
+import Control.Lens
+    ( (^.)
+    )
+import Data.Util.Maybe
+    ( fromMaybe
+    , fromList
+    )
+import Data.Util.List
+    ( mapInd )
+import Data.Util.Math
+    ( distance )
 
 correctZ :: GameState -> GridZ -> GridZ
 correctZ gameState z =
@@ -69,10 +79,8 @@ getColorView gameState = map (map calculateBeadColor) $ getView gameState
 
     calculateBeadColor :: (BeadColor, [(Light, Int)]) -> Color
     calculateBeadColor (LightColor color, _) = color
-    calculateBeadColor (beadColor, lights) = color
-      where
-        (r, g, b) = phongLighting (beadDiffuse beadColor) (ambientColor maxLight beadColor) lights
-        color = (min r 255, min g 255, min b 255)
+    calculateBeadColor (beadColor, lights) =
+        phongLighting (beadDiffuse beadColor) (ambientColor maxLight beadColor) lights
 
 isPositiveFacing :: GameState -> Bool
 isPositiveFacing gameState =
